@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "793608468663",
+    "project_id": "campusmart-4a549",
+    "storage_bucket": "campusmart-4a549.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:793608468663:android:aefda5bbf60494922cb532",
+        "android_client_info": {
+          "package_name": "com.unimarkt"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZK0sx2o7576br4mMeCMxPYcecExPeOdg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
