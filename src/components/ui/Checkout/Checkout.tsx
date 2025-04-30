@@ -97,7 +97,7 @@ export const Checkout = (): React.JSX.Element => {
       Alert.alert('Success', 'Order placed successfully!');
       clearCart(); 
 
-      navigate('Home');
+      navigate('Payment');
     } catch (error) {
       console.error('Error placing order:', error);
       Alert.alert('Failed', 'Failed to place order. Please try again.');

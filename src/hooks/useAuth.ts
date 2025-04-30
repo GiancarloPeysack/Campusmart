@@ -11,6 +11,7 @@ export default function useAuth() {
 
     useEffect(() => {
         const subscribe = auth().onAuthStateChanged(async user =>{
+            console.log('calling...');
             setLoading(true);
             if(user){
                 const userDoc = await firestore().collection('users').doc(user.uid).get();

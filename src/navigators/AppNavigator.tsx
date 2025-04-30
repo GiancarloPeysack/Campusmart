@@ -172,20 +172,39 @@ function AppNavigator(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  return (
-    <NavigationContainer ref={navigationRef}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-        networkActivityIndicatorVisible={true}
-      />
-      {user ? (
-        userRole === 'public_user' ? (
+  if(user){
+    if(userRole === 'public_user') {
+      return (
+        <NavigationContainer ref={navigationRef}>
+          <StatusBar
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor={backgroundStyle.backgroundColor}
+            networkActivityIndicatorVisible={true}
+          />
           <TabNavUser />
-        ) : (
+        </NavigationContainer>
+      );
+    } else {
+  
+      return (
+        <NavigationContainer ref={navigationRef}>
+          <StatusBar
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor={backgroundStyle.backgroundColor}
+            networkActivityIndicatorVisible={true}
+          />
           <RestaurentStack />
-        )
-      ) : (
+        </NavigationContainer>
+      );
+    } 
+  } else {
+    return(
+      <NavigationContainer ref={navigationRef}>
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={backgroundStyle.backgroundColor}
+          networkActivityIndicatorVisible={true}
+        />
         <Navigator initialRouteName="startup" screenOptions={screenOptions}>
           <Screen name="startup" component={Startup} />
           <Screen name="onboarding" component={OnboardingScreen} />
@@ -209,9 +228,9 @@ function AppNavigator(): React.JSX.Element {
           <Screen name="restLogin" component={RestLoginScreen} />
           <Screen name="restReg" component={RestRegScreen} />
         </Navigator>
-      )}
-    </NavigationContainer>
-  );
+      </NavigationContainer>  
+    )
+  }
 }
 
 export default AppNavigator;
