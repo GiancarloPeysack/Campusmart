@@ -9,6 +9,7 @@ import { Cart } from "./Cart";
 import { CircleQuetion } from "./CircleQuetion";
 import { CircleRest } from "./CircleRest";
 import { Community } from "./Community";
+import { DineIn } from "./DineIn";
 import { Dollar } from "./Dollar";
 import { Dot } from "./Dot";
 import { Failed } from "./Failed";
@@ -101,5 +102,6 @@ export const Icons = {
     Truck,
     Orders,
     Trash,
-    Dollar
+    Dollar,
+    DineIn
 }

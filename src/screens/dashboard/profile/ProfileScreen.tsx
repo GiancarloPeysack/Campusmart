@@ -4,7 +4,6 @@ import {
   EditIcon,
   HStack,
   Icon,
-  Image,
   MailIcon,
   PhoneIcon,
   Pressable,
@@ -14,7 +13,6 @@ import {
 import React, {
   PropsWithChildren,
   useCallback,
-  useEffect,
   useState,
 } from 'react';
 import {useTheme} from '../../../theme/useTheme';
@@ -254,7 +252,9 @@ export const ProfileScreen = (): React.JSX.Element => {
             </Box>
           </Card>
 
-          <Card title=" Payment Method" buttonText="Edit">
+          <Card title=" Payment Method" buttonText="Edit" onPress={() =>
+              navigate('editProfile', {option: 'address', title: 'Address'})
+            }>
             <Box
               bg={colors.gray6}
               borderWidth={1}

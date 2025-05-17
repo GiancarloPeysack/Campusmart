@@ -33,6 +33,7 @@ import {PaymentScreen} from '../screens/dashboard/cart/PaymentScreen';
 import {ProfileScreen} from '../screens/dashboard/profile/ProfileScreen';
 import {EditProfileScreen} from '../screens/dashboard/profile/EditProfile';
 import {useCart} from '../context/cart';
+import { AddCard } from '../components/ui/Checkout/AddCard';
 
 const Tab = createBottomTabNavigator();
 const {Screen, Navigator} = createStackNavigator();
@@ -43,7 +44,6 @@ const screenOptions = {
 
 const CommonHeader = (props: any) => {
   const {colors} = useTheme();
-  const name = props.route.name;
   const {title} = props.route.params;
   return (
     <HStack
@@ -245,6 +245,14 @@ const FoodStack = (): React.JSX.Element => {
         name="editProfile"
         component={EditProfileScreen}
       />
+       <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="addCard"
+        component={AddCard}
+      />
     </Navigator>
   );
 };
@@ -291,6 +299,14 @@ const CartStack = (): React.JSX.Element => {
         }}
         name="editProfile"
         component={EditProfileScreen}
+      />
+       <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="addCard"
+        component={AddCard}
       />
     </Navigator>
   );

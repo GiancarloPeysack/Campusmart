@@ -127,28 +127,28 @@ export default function LoginScreen(): React.JSX.Element {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
       <Box flex={1} bg={colors.background}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <ScrollView contentContainerStyle={{flexGrow: 1}} showsVerticalScrollIndicator={false}>
           <VStack gap={30} p={16}>
             <Center gap={6}>
               <Icons.Logo />
               <Text fontWeight="$bold" fontSize={24} color="$black">
-                Restaurant Partner Login
+                Delivery Staff Login
               </Text>
               <Text fontSize={16} color={colors.gray} fontWeight="$light">
-                Access your dashboard
+                Access your delivery dashboard
               </Text>
             </Center>
 
             <HStack justifyContent="space-between">
               <IconButton
                 text="Restaurant Admin"
-                onPress={() => {}}
-                isActive={true}
+                onPress={() => navigate('restLogin')}
+                isActive={false}
               />
               <IconButton
                 text="Delivery Staff"
-                onPress={() => navigate('driverLogin')}
-                isActive={false}
+                onPress={() => {}}
+                isActive={true}
               />
             </HStack>
             <VStack gap={20}>
@@ -163,7 +163,7 @@ export default function LoginScreen(): React.JSX.Element {
                     rightIcon={<Icon as={MailIcon} color="#A3A3A3" />}
                     type="text"
                     label="Email"
-                    placeholder="restaurant@email.com"
+                    placeholder="driver@email.com"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -244,7 +244,7 @@ export default function LoginScreen(): React.JSX.Element {
                 <Text color={colors.title} fontSize={14} fontWeight="$light">
                   New restaurant partner?
                 </Text>
-                <Pressable onPress={() => navigate('restReg')}>
+                <Pressable onPress={() => navigate('driverRegister')}>
                   <Text
                     fontWeight="$light"
                     fontSize={14}

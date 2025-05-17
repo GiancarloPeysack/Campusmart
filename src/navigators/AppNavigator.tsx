@@ -17,6 +17,10 @@ import RestRegScreen from '../screens/restaurent/auth/RegisterScreen';
 import RestVerifyScreen from '../screens/restaurent/auth/VerifyScreen';
 import SuccessScreen from '../screens/restaurent/auth/SuccessScreen';
 
+//driver
+import DriverLoginScreen from '../screens/driver/auth/LoginScreen';
+import DriverRegScreen from '../screens/driver/auth/RegisterScreen';
+
 import {
   ArrowLeftIcon,
   Box,
@@ -163,6 +167,61 @@ const RestaurentStack = (): React.JSX.Element => {
   }
 };
 
+const DriverStack = (): React.JSX.Element => {
+  const {isRegistrationCompleted} = useAuth();
+
+  if (isRegistrationCompleted) {
+    return (
+      <Navigator initialRouteName="home" screenOptions={screenOptions}>
+        <Screen name="home" component={TabNavRest} />
+      </Navigator>
+    );
+  } else {
+    return (
+      <Navigator initialRouteName="setupRest" screenOptions={screenOptions}>
+        <Screen
+          name="setupRest"
+          initialParams={{title: 'Restaurant Setup'}}
+          options={{
+            headerShown: true,
+            header: Header,
+          }}
+          component={SetupRestScreen}
+        />
+        <Screen
+          name="setupMenu"
+          options={{
+            headerShown: true,
+            header: Header,
+          }}
+          component={SetupMenuScreen}
+        />
+        <Screen
+          name="createCategory"
+          options={{
+            headerShown: true,
+            header: SubHeader,
+          }}
+          component={CreateCategory}
+        />
+        <Screen
+          name="createMenu"
+          options={{
+            headerShown: true,
+            header: SubHeader,
+          }}
+          component={CreateMenu}
+        />
+        <Screen
+          name="success"
+          component={SuccessScreen}
+        />
+        <Screen name="home" component={TabNavRest} />
+      </Navigator>
+    );
+  }
+};
+
 function AppNavigator(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
@@ -227,6 +286,8 @@ function AppNavigator(): React.JSX.Element {
           />
           <Screen name="restLogin" component={RestLoginScreen} />
           <Screen name="restReg" component={RestRegScreen} />
+          <Screen name="driverLogin" component={DriverLoginScreen} />
+          <Screen name="driverRegister" component={DriverRegScreen} />
         </Navigator>
       </NavigationContainer>  
     )

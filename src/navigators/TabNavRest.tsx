@@ -14,7 +14,7 @@ import {Icons} from '../assets/icons';
 import {useTheme} from '../theme/useTheme';
 import MarketScreen from '../screens/dashboard/market/MarketScreen';
 import HomeScreen from '../screens/restaurent/dashboard/home/HomeScreen';
-import OrderScreen from '../screens/restaurent/dashboard/order/OrderScreen';
+import OrderScreen from '../screens/restaurent/dashboard/order';
 import MenuScreen from '../screens/restaurent/dashboard/menu/MenuScreen';
 import EditRestaurentProfile from '../screens/restaurent/dashboard/editRestaurent/EditRestaurentScreen';
 import CreateCategory from '../components/ui/Restaurant/CreateCategory';

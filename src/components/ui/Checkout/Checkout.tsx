@@ -8,6 +8,7 @@ import {
   VStack,
 } from '@gluestack-ui/themed';
 import React, {ReactNode} from 'react';
+import uuid from 'react-native-uuid';
 import {useTheme} from '../../../theme/useTheme';
 import {Icons} from '../../../assets/icons';
 import {PrimaryButton} from '../../common/Buttons/PrimaryButton';
@@ -16,7 +17,7 @@ import useAuth from '../../../hooks/useAuth';
 import { useCart } from '../../../context/cart';
 import { Alert } from 'react-native';
 import auth from '@react-native-firebase/auth';
-import firestore, { serverTimestamp } from '@react-native-firebase/firestore';
+import firestore, { Timestamp } from '@react-native-firebase/firestore';
 import { useLoading } from '../../../hooks/useLoading';
 
 type BlockProps = {
@@ -75,6 +76,7 @@ export const Checkout = (): React.JSX.Element => {
       }
       onLoad();
       const orderData = {
+        orderNumber: Math.floor(1000 + Math.random() * 9000).toString(),
         userId: currentUser.uid,
         restaurentId: cart[0].restaurantId,
         items: cart.map(item => ({
@@ -84,11 +86,11 @@ export const Checkout = (): React.JSX.Element => {
           quantity: item.quantity,
         })),
         deliveryAddress: user.address.street,
-        totalAmount: total,
+        totalAmount: total.toFixed(2),
         deliveryFee: deliveryFee,
         subtotal: subtotal,
-        timestamp: serverTimestamp(),
         status: 'pending', 
+        createdAt: Timestamp.now(),
       };
 
       console.log('Order Data:', orderData);
@@ -97,7 +99,7 @@ export const Checkout = (): React.JSX.Element => {
       Alert.alert('Success', 'Order placed successfully!');
       clearCart(); 
 
-      navigate('Payment');
+      navigate('Payment', {title: 'Payment'});
     } catch (error) {
       console.error('Error placing order:', error);
       Alert.alert('Failed', 'Failed to place order. Please try again.');
@@ -141,6 +143,9 @@ export const Checkout = (): React.JSX.Element => {
           iconText="Visa ending in 4242"
           desc="Expires 12/25"
           icon={<Icons.Card color={colors.primary} />}
+          onPress={() =>
+            navigate('addCard', {title: 'Add Card'})
+          }
         />
         <Divider bg={colors.gray1} />
         <VStack p={16} gap={18}>
@@ -188,7 +193,7 @@ export const Checkout = (): React.JSX.Element => {
         <PrimaryButton
           isLoading={isLoading}
           icon={<Icons.Lock />}
-          text="Pay €27.85"
+          text={`Pay ${total.toFixed(2)}`}
           onPress={placeOrder}
         />
       </Box>

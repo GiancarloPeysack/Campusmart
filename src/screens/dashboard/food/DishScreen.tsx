@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, ScrollView} from 'react-native';
+import {Alert, ScrollView, Image} from 'react-native';
 import {
   AddIcon,
   Box,
@@ -7,7 +7,6 @@ import {
   ButtonText,
   HStack,
   Icon,
-  Image,
   Pressable,
   RemoveIcon,
   Text,
@@ -41,7 +40,7 @@ interface Restaurant {
   id: string;
   nameOfRestaurent: string;
   discount: number;
-  coverImage: string;
+  image: string;
   deliveryCharge: number;
   bio: string;
 }
@@ -51,7 +50,7 @@ export default function DishScreen(props: any): React.JSX.Element {
 
   const [menuItem, setMenuItem] = useState<MenuItem | null>();
   const [restaurant, setRestaurent] = useState<Restaurant | null>(null);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity] = useState(1);
 
   const {addToCart} = useCart();
 
@@ -61,13 +60,6 @@ export default function DishScreen(props: any): React.JSX.Element {
   const {fetchRestaurantById} = useRestaurents();
 
   const sizes = ['Regular', 'Large (+$2)'];
-
-  const extraOptions = [
-    'Extra Cheese (+$1)',
-    'Bacon (+$2)',
-    'Avocado (+$1.5)',
-    'Fried Egg (+$1)',
-  ];
 
   useEffect(() => {
     if (id) {
@@ -87,7 +79,7 @@ export default function DishScreen(props: any): React.JSX.Element {
       addToCart({
         id: menuItem.id,
         itemName: menuItem.itemName,
-        price: menuItem.price,
+        price: parseFloat(menuItem.price),
         quantity,
         image: menuItem.image,
         restaurantId: restaurant?.id,
@@ -115,8 +107,8 @@ export default function DishScreen(props: any): React.JSX.Element {
             uri: menuItem?.image,
           }}
           resizeMode="cover"
-          h={280}
-          w="100%"
+          height={280}
+          
           alt="card-image"
         />
         <VStack gap={16} p={16}>
@@ -173,24 +165,6 @@ export default function DishScreen(props: any): React.JSX.Element {
         borderTopWidth={1}
         gap={10}
         justifyContent="space-between">
-        {/* <HStack
-          alignItems="center"
-          w={128}
-          borderColor={colors.gray1}
-          borderWidth={1}
-          h={60}
-          rounded={12}
-          justifyContent="space-around">
-           <Pressable p={5} onPress={() => setQuantity(Math.max(1, quantity - 1))}>
-            <Icon as={RemoveIcon} color={colors.primary} />
-          </Pressable>
-          <Text color="$black" fontWeight="$semibold">
-            {quantity}
-          </Text>
-          <Pressable p={5} onPress={() => setQuantity(quantity + 1)}>
-            <Icon as={AddIcon} color={colors.primary} />
-          </Pressable>
-        </HStack> */}
         <Button
           h={60}
           flexGrow={1}

@@ -5,7 +5,6 @@ import {
   EditIcon,
   HStack,
   Icon,
-  Image,
   Pressable,
   Spinner,
   Text,
@@ -13,7 +12,7 @@ import {
   VStack,
 } from '@gluestack-ui/themed';
 import React, {useCallback, useState} from 'react';
-import {Alert, StyleSheet} from 'react-native';
+import {Alert, Image, StyleSheet} from 'react-native';
 import {useTheme} from '../../../../theme/useTheme';
 
 import auth from '@react-native-firebase/auth';
@@ -113,8 +112,8 @@ export default function HomeScreen(): React.JSX.Element {
       <Box position="relative">
         {restaurent && (
           <Image
-            w="$full"
-            h={200}
+            
+            height={200}
             resizeMode="cover"
             source={{
               uri: restaurent?.coverImage,
@@ -130,8 +129,8 @@ export default function HomeScreen(): React.JSX.Element {
             left={0}
             right={0}
             bottom={0}>
-            <Box bg="$white" p={6} rounded={8}>
-              <Spinner color={colors.primary} size="small" />
+            <Box bg="$white"  p={6} rounded={8}>
+              <Spinner color={colors.primary} size="large" />
             </Box>
           </Center>
         )}

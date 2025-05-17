@@ -75,7 +75,6 @@ export const PrimaryButton = (props: ButtonProps): React.JSX.Element => {
       shadowOpacity={props.disabled ? 0 : styles.shadowOpacity}
       shadowOffset={{height:2, width: 2}}
       shadowRadius={8}
-      elevation={5}
       borderWidth={styles.borderWidth}
       borderColor={styles.borderColor}
       borderStyle={props.borderStyle}

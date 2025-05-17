@@ -18,10 +18,10 @@ import {
   CheckIcon,
   Link,
 } from '@gluestack-ui/themed';
-import React, {ReactNode, useState} from 'react';
+import React, {ReactNode, useEffect, useState} from 'react';
 import {useTheme} from '../../../theme/useTheme';
 import {Icons} from '../../../assets/icons';
-import {InputFiled, PrimaryButton} from '../../../components';
+import {InputFiled, PrimaryButton, Selector} from '../../../components';
 
 import {Alert, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
 import {navigate} from '../../../navigators/Root';
@@ -34,6 +34,7 @@ import auth from '@react-native-firebase/auth';
 import firestore, {serverTimestamp} from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
 import {handleFirebaseError} from '../../../utils/helper/error-handler';
+import useRestaurent from '../../../hooks/useRestaurent';
 
 interface Props {
   text: string;
@@ -42,8 +43,7 @@ interface Props {
 }
 
 type FormData = {
-  nameOfRestaurent: string;
-  address: string;
+  restaurentId: string;
   fullName: string;
   email: string;
   phoneNumber: string;
@@ -52,8 +52,7 @@ type FormData = {
 };
 
 const validation = yup.object({
-  nameOfRestaurent: yup.string().required('restaurent name is a required field'),
-  address: yup.string().required(),
+  restaurentId: yup.string().required(),
   fullName: yup.string().required(),
   email: yup.string().email().required(),
   phoneNumber: yup.string().required(),
@@ -70,6 +69,8 @@ export default function RegisterScreen(): React.JSX.Element {
   const {colors, styles} = useTheme();
   const [passState, setPassState] = useState(true);
 
+  const { restaurents, fetchAllRestaurents, isLoading: isLoadingRest} = useRestaurent()
+
   const {isLoading, onLoad, onLoaded} = useLoading();
 
   const {
@@ -80,6 +81,13 @@ export default function RegisterScreen(): React.JSX.Element {
   } = useForm<FormData>({
     resolver: yupResolver(validation),
   });
+
+
+  useEffect(() => {
+  fetchAllRestaurents();
+}, []);
+
+  console.log('res', restaurents);
 
   const onSubmit = async (data: FormData) => {
     onLoad();
@@ -98,32 +106,19 @@ export default function RegisterScreen(): React.JSX.Element {
         phoneNumber: data.phoneNumber,
         lastName: '',
         email: data.email,
-        password: data.password,
-        role: 'restaurent',
+        role: 'driver',
         whatsapp: '',
         profilePicture:
           'https://firebasestorage.googleapis.com/v0/b/campusmart-4a549.firebasestorage.app/o/blank-profile-picture-973460_1280.jpg?alt=media&token=2f42ae07-f42a-428c-9137-5fb35a304a0d',
         createdAt: serverTimestamp(),
       });
 
-      await firestore()
-        .collection('restaurents')
-        .doc(user.uid)
-        .set({
-          nameOfRestaurent: data.nameOfRestaurent,
-          bio: '',
-          openTime: '08:00 AM',
-          closeTime: '10:00 PM',
-          coverImage: '',
-          location: {
-            lat: '',
-            long: '',
-          },
-          createdAt: serverTimestamp(),
-        });
+      await firestore().collection('drivers').doc(user.uid).set({
+        createdAt: serverTimestamp(),
+      });
 
       reset();
-      Alert.alert('Success', 'Restaurent registered successfully');
+      Alert.alert('Success', 'Driver registered successfully');
     } catch (error) {
       const errorMessage = handleFirebaseError(error);
       Toast.show({
@@ -141,28 +136,28 @@ export default function RegisterScreen(): React.JSX.Element {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
       <Box flex={1} bg={colors.background}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <ScrollView contentContainerStyle={{flexGrow: 1}} showsVerticalScrollIndicator={false}>
           <VStack gap={30} p={16}>
             <Center gap={6}>
               <Icons.Logo />
               <Text fontWeight="$bold" fontSize={24} color="$black">
-                Partner Registration
+                Create Account
               </Text>
               <Text fontSize={16} color={colors.gray} fontWeight="$light">
-                Join our restaurant network
+                Join our delivery team
               </Text>
             </Center>
 
             <HStack justifyContent="space-between">
               <IconButton
                 text="Restaurant Admin"
-                onPress={() => {}}
-                isActive={true}
+                onPress={() => navigate('restReg')}
+                isActive={false}
               />
               <IconButton
                 text="Delivery Staff"
-                onPress={() => navigate('driverRegister')}
-                isActive={false}
+                onPress={() => {}}
+                isActive={true}
               />
             </HStack>
             <VStack gap={20}>
@@ -172,42 +167,23 @@ export default function RegisterScreen(): React.JSX.Element {
                   required: true,
                 }}
                 render={({field: {onChange, onBlur, value}}) => (
-                  <InputFiled
-                    defaultValue=""
-                    rightIcon={<Icons.Rest />}
-                    type="text"
-                    label="Restaurant Name"
-                    placeholder="Restaurant name"
+                  <Selector
+                    data={['a', 'b'].map((item: any) => ({
+                      label: item,
+                      value: item,
+                    }))}
+                    placeholder="Select your restaurant"
+                    isRequired
+                    label="Select Restaurant"
                     onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    isInvalid={errors.nameOfRestaurent ? true : false}
-                    error={errors.nameOfRestaurent?.message}
+                    onValueChange={onChange}
+                    isInvalid={errors.restaurentId ? true : false}
+                    error={errors.restaurentId?.message}
                   />
                 )}
-                name="nameOfRestaurent"
+                name="restaurentId"
               />
-              <Controller
-                control={control}
-                rules={{
-                  required: true,
-                }}
-                render={({field: {onChange, onBlur, value}}) => (
-                  <InputFiled
-                    defaultValue=""
-                    rightIcon={<Icons.MapPin />}
-                    type="text"
-                    label="Restaurant Address"
-                    placeholder="Restaurant address"
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    isInvalid={errors.address ? true : false}
-                    error={errors.address?.message}
-                  />
-                )}
-                name="address"
-              />
+
               <Controller
                 control={control}
                 rules={{
@@ -261,7 +237,7 @@ export default function RegisterScreen(): React.JSX.Element {
                     rightIcon={<Icon as={MailIcon} color="#A3A3A3" />}
                     type="text"
                     label="Emaill address"
-                    placeholder="business@email.com"
+                    placeholder="jhone@email.com"
                     onBlur={onBlur}
                     onChangeText={onChange}
                     value={value}
@@ -371,7 +347,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 <Text color={colors.title} fontSize={14} fontWeight="$light">
                   Already have an account?
                 </Text>
-                <Pressable onPress={() => navigate('restLogin')}>
+                <Pressable onPress={() => navigate('driverLogin')}>
                   <Text
                     fontWeight="$light"
                     fontSize={14}
