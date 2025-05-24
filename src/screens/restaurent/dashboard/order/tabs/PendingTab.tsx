@@ -9,7 +9,7 @@ import {
 import {useTheme} from '../../../../../theme/useTheme';
 import {OrderCard} from '../../../../../components';
 import useOrder from '../hooks/useOrder';
-import {useCallback, useEffect} from 'react';
+import {useCallback} from 'react';
 import {RefreshControl} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 
@@ -31,7 +31,7 @@ export const PendingTab = () => {
   }, [fetchOrder]);
 
   return (
-    <Box bg={colors.light_blue} flex={1} p={16}>
+    <Box bg={colors.newBg} flex={1} p={16}>
       {isLoading && (
         <Center
           zIndex={999}
@@ -57,7 +57,7 @@ export const PendingTab = () => {
             tintColor={colors.primary}
           />
         }>
-        {orders?.length > 0 && (
+        {orders?.length > 0 ? (
           <VStack gap={15}>
             {orders.map((item: any, key: number) => {
               return (
@@ -79,7 +79,7 @@ export const PendingTab = () => {
               );
             })}
           </VStack>
-        )}
+        ) : <Text textAlign='center' fontWeight='$semibold' color='$black' fontStyle='italic'>No pending orders</Text>}
       </ScrollView>
     </Box>
   );

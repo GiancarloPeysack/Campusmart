@@ -8,6 +8,7 @@ import { Card } from "./Card";
 import { Cart } from "./Cart";
 import { CircleQuetion } from "./CircleQuetion";
 import { CircleRest } from "./CircleRest";
+import { Clock } from "./Clock";
 import { Community } from "./Community";
 import { DineIn } from "./DineIn";
 import { Dollar } from "./Dollar";
@@ -29,6 +30,8 @@ import { Mail } from "./Mail";
 import { MapPin } from "./MapPin";
 import { MapTag } from "./MapTag";
 import { Market } from "./Market";
+import { Message } from "./Message";
+import { MessageSmall } from "./MessageSmall";
 import { Orders } from "./Orders";
 import { Others } from "./Others";
 import { Outlook } from "./Outlook";
@@ -41,6 +44,7 @@ import { Rest } from "./Rest";
 import { Restaurent } from "./Restaurent";
 import { Search } from "./Search";
 import { Shop } from "./Shop";
+import { SmallBike } from "./SmallBike";
 import { Sports } from "./Sports";
 import { Success } from "./Success";
 import { Tag } from "./Tag";
@@ -103,5 +107,9 @@ export const Icons = {
     Orders,
     Trash,
     Dollar,
-    DineIn
+    DineIn,
+    Clock,
+    SmallBike,
+    Message,
+    MessageSmall
 }

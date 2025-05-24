@@ -9,13 +9,13 @@ export default function Startup(): React.JSX.Element {
 
   const {user} = useAuth();
 
-  useEffect(() => {
-    if (!user) {
-      setTimeout(() => {
-        navigate('onboarding');
-      }, 3000);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!user) {
+  //     setTimeout(() => {
+  //       navigate('onboarding');
+  //     }, 3000);
+  //   }
+  // }, []);
 
   return (
     <Box flex={1} bg={colors.background}>

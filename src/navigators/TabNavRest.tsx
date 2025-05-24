@@ -8,17 +8,17 @@ import {
   Pressable,
   Text,
 } from '@gluestack-ui/themed';
-import {getFocusedRouteNameFromRoute} from '@react-navigation/native';
 
 import {Icons} from '../assets/icons';
 import {useTheme} from '../theme/useTheme';
-import MarketScreen from '../screens/dashboard/market/MarketScreen';
 import HomeScreen from '../screens/restaurent/dashboard/home/HomeScreen';
 import OrderScreen from '../screens/restaurent/dashboard/order';
 import MenuScreen from '../screens/restaurent/dashboard/menu/MenuScreen';
 import EditRestaurentProfile from '../screens/restaurent/dashboard/editRestaurent/EditRestaurentScreen';
 import CreateCategory from '../components/ui/Restaurant/CreateCategory';
 import CreateMenu from '../components/ui/Restaurant/CreateMenu';
+import DeliveryScreen from '../screens/restaurent/dashboard/delivery/DeliveryScreen';
+import AssignDriverScreen from '../screens/restaurent/dashboard/order/assignDriver/AssignDriverScreen';
 
 const Tab = createBottomTabNavigator();
 const {Screen, Navigator} = createStackNavigator();
@@ -81,8 +81,9 @@ const HomeStack = (): React.JSX.Element => {
 
 const DeliveryStack = (): React.JSX.Element => {
   return (
-    <Navigator initialRouteName="Market" screenOptions={screenOptions}>
-      <Screen name="Market" component={MarketScreen} />
+    <Navigator initialRouteName="Delivery" screenOptions={screenOptions}>
+      <Screen name="Delivery" component={DeliveryScreen} />
+     
     </Navigator>
   );
 };
@@ -91,6 +92,14 @@ const OrderStack = (): React.JSX.Element => {
   return (
     <Navigator initialRouteName="Order" screenOptions={screenOptions}>
       <Screen name="Order" component={OrderScreen} />
+       <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="assignDriver"
+        component={AssignDriverScreen}
+      />
     </Navigator>
   );
 };

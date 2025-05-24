@@ -2,7 +2,7 @@ export const useTheme = () =>{
     const colors = {
         primary:'#2563EB',
         secondary:'#7C3AED',
-        background: '#F5F5F5',
+        background: '#fff',
         title: '#4B5563',
         title_1:'#1F2937',
         white:'#FFFFFF',
@@ -19,7 +19,8 @@ export const useTheme = () =>{
         blue:'#1E40AF',
         blue1:'#2563EB',
         red: '#EF4444',
-        red1:'#FEF2F2'
+        red1:'#FEF2F2',
+        newBg: '#F9FAFB'
     }
 
     const styles = {

@@ -156,9 +156,9 @@ export default function HomeScreen(): React.JSX.Element {
           <HStack justifyContent="space-between">
             <HStack alignItems="center" gap={12}>
               <Image
-                h={48}
-                w={48}
-                rounded='$full'
+                height={48}
+                width={48}
+                style={{borderRadius:'100%'}}
                 resizeMode="cover"
                 source={{
                   uri: user?.profilePicture,

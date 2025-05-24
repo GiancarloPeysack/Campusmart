@@ -5,14 +5,17 @@ import {Box, Text} from '@gluestack-ui/themed';
 type BadgeProps = {
   text: string;
   icon?: ReactNode;
+  color ?: string;
+  bg ?: string
 };
 
 export const Badge = (props: BadgeProps): React.JSX.Element => {
   const {colors} = useTheme();
+  const {bg = colors.buttonGray, color = colors.title} = props;
 
   return (
     <Box
-      bg={colors.buttonGray}
+      bg={bg}
       py={6}
       px={12}
       rounded={20}
@@ -20,7 +23,7 @@ export const Badge = (props: BadgeProps): React.JSX.Element => {
       alignItems="center"
       gap={5}>
       {props.icon}
-      <Text fontSize={14} color={colors.title}>
+      <Text fontSize={14} color={color}>
         {props.text}
       </Text>
     </Box>

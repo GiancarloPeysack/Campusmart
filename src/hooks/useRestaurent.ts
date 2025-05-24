@@ -43,12 +43,9 @@ export default function useRestaurent() {
   const fetchAllRestaurents = async () => {
     try {
       setIsLoading(true);
-
       const restaurentSnapshot = await firestore()
         .collection('restaurants')
         .get();
-
-      console.log("snap",restaurentSnapshot);
 
       const restItems = restaurentSnapshot.docs.map(doc => ({
         id: doc.id,
@@ -57,6 +54,7 @@ export default function useRestaurent() {
 
       setRestaurents(restItems);
     } catch (error) {
+          console.log("error", error);
       throw error;
     } finally {
       setIsLoading(false);

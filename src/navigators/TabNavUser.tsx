@@ -400,7 +400,7 @@ const TabNavUser = (): React.JSX.Element => {
         }}
         component={MarketStack}
       />
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Community"
         options={{
           tabBarIcon: (props: any) => (
@@ -410,7 +410,7 @@ const TabNavUser = (): React.JSX.Element => {
           ),
         }}
         component={FoodStack}
-      />
+      /> */}
     </Tab.Navigator>
   );
 };

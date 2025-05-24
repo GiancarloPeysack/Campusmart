@@ -18,7 +18,7 @@ import {
   CheckIcon,
   Link,
 } from '@gluestack-ui/themed';
-import React, {ReactNode, useEffect, useState} from 'react';
+import React, {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useTheme} from '../../../theme/useTheme';
 import {Icons} from '../../../assets/icons';
 import {InputFiled, PrimaryButton, Selector} from '../../../components';
@@ -87,7 +87,17 @@ export default function RegisterScreen(): React.JSX.Element {
   fetchAllRestaurents();
 }, []);
 
-  console.log('res', restaurents);
+
+const rests = useMemo(
+  () =>
+    Array.isArray(restaurents)
+      ? restaurents.map((item: any) => ({
+          label: item.nameOfRestaurent,
+          value: item.id,
+        }))
+      : [],
+  [restaurents]
+);
 
   const onSubmit = async (data: FormData) => {
     onLoad();
@@ -114,11 +124,15 @@ export default function RegisterScreen(): React.JSX.Element {
       });
 
       await firestore().collection('drivers').doc(user.uid).set({
+        restaurentId: data.restaurentId,
+        isAvailable: false,
+        isRegistrationCompleted: false,
         createdAt: serverTimestamp(),
       });
 
       reset();
       Alert.alert('Success', 'Driver registered successfully');
+
     } catch (error) {
       const errorMessage = handleFirebaseError(error);
       Toast.show({
@@ -168,10 +182,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 }}
                 render={({field: {onChange, onBlur, value}}) => (
                   <Selector
-                    data={['a', 'b'].map((item: any) => ({
-                      label: item,
-                      value: item,
-                    }))}
+                    data={rests}
                     placeholder="Select your restaurant"
                     isRequired
                     label="Select Restaurant"

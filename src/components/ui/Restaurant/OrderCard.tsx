@@ -47,7 +47,7 @@ export const OrderCard = ({
 }: Props) => {
   return (
     <View bg="$white" p={17} rounded={12}>
-      <HStack alignItems="center" justifyContent="space-between">
+      <HStack justifyContent="space-between">
         <HStack alignItems="center" gap={10}>
           <Icons.DineIn />
           <VStack gap={8}>
@@ -70,6 +70,7 @@ export const OrderCard = ({
           }
           px={12}
           py={4}
+          alignSelf='flex-start'
           rounded={24}>
           <Text
             textTransform="capitalize"
@@ -82,7 +83,7 @@ export const OrderCard = ({
                 ? '#A16207'
                 : '#16A34A'
             }>
-            {status}
+            {status ==='accepted' ? 'Ready to Assign' : status}
           </Text>
         </Box>
       </HStack>

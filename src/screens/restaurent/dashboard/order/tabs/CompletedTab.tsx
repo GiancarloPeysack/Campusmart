@@ -14,7 +14,7 @@ const {fetchOrder, orders, isLoading} = useOrder();
   }, []);
 
   return (
-    <Box bg={colors.light_blue} flex={1} p={16}>
+    <Box bg={colors.newBg} flex={1} p={16}>
       {isLoading && (
         <Center
           zIndex={999}
@@ -37,13 +37,13 @@ const {fetchOrder, orders, isLoading} = useOrder();
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
         showsVerticalScrollIndicator={false}>
-        {orders?.length > 0 && (
+        {orders?.length > 0 ? (
           <VStack gap={15}>
             {orders.map((item: any, key: number) => {
              return <OrderCard key={key} list={item.items} status={item.status} total={item.totalAmount} address={item.deliveryAddress} phoneNumber={item.user.phoneNumber} whatsappNumber={item.user.whatsapp} />;
             })}
           </VStack>
-        )}
+        ) : <Text textAlign='center' fontWeight='$semibold' color='$black' fontStyle='italic'>No completed orders</Text>}
       </ScrollView>
     </Box>
   );

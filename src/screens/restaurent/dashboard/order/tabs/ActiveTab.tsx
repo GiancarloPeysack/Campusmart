@@ -5,6 +5,7 @@ import {useCallback, useEffect} from 'react';
 import useOrder from '../hooks/useOrder';
 import {RefreshControl, ScrollView} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
+import { navigate } from '../../../../../navigators/Root';
 
 export const ActiveTab = () => {
   const {colors} = useTheme();
@@ -24,7 +25,7 @@ export const ActiveTab = () => {
   }, [fetchOrder]);
 
   return (
-    <Box bg={colors.light_blue} flex={1} p={16}>
+    <Box bg={colors.newBg} flex={1} p={16}>
       {isLoading && (
         <Center
           zIndex={999}
@@ -50,7 +51,7 @@ export const ActiveTab = () => {
             tintColor={colors.primary}
           />
         }>
-        {orders?.length > 0 && (
+        {orders?.length > 0 ? (
           <VStack gap={15}>
             {orders.map((item: any, key: number) => {
               return (
@@ -63,11 +64,13 @@ export const ActiveTab = () => {
                   address={item.deliveryAddress}
                   phoneNumber={item.user.phoneNumber}
                   whatsappNumber={item.user.whatsapp}
+                  onPress={()=> navigate('assignDriver',{title:'Assign Driver'})}
+                
                 />
               );
             })}
           </VStack>
-        )}
+        ) : <Text textAlign='center' fontWeight='$semibold' color='$black' fontStyle='italic'>No active orders</Text>}
       </ScrollView>
     </Box>
   );
