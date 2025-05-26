@@ -4,7 +4,6 @@ import {
   Center,
   HStack,
   Icon,
-  Image,
   Pressable,
   RemoveIcon,
   Text,
@@ -12,6 +11,7 @@ import {
 } from '@gluestack-ui/themed';
 import React from 'react';
 import {useTheme} from '../../../theme/useTheme';
+import { Image } from 'react-native';
 
 type CartCardProps = {
   text: string;
@@ -35,10 +35,10 @@ export const CartCard = (props: CartCardProps): React.JSX.Element => {
           <Image
             source={{uri: props.img}}
             resizeMode="cover"
-            h={64}
-            w={64}
+            height={64}
+            width={64}
             alt="cart-image"
-            rounded={8}
+            style={{borderRadius: 8}}
           />
           <VStack gap={7} w={150}>
             <Text flex={1} fontSize={16} fontWeight="$medium" color="$black">

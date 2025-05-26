@@ -1,6 +1,7 @@
 import { Adjustment } from "./Adjustment";
 import { Bell } from "./Bell";
 import { Bike } from "./Bike";
+import { Bill } from "./Bill";
 import { Books } from "./Books";
 import { Call } from "./Call";
 import { Camara } from "./Camara";
@@ -24,6 +25,7 @@ import { Home } from "./Home";
 import { House } from "./House";
 import { Inbox } from "./Inbox";
 import { Info } from "./Info";
+import { Invoice } from "./Invoice";
 import { Lock } from "./Lock";
 import { Logo } from "./Logo";
 import { Mail } from "./Mail";
@@ -53,6 +55,7 @@ import { Trash } from "./Trash";
 import { Truck } from "./Truck";
 import { Uprof } from "./Uprof";
 import { User } from "./User";
+import { UserFill } from "./UserFill";
 import { Whatsapp } from "./Whatsapp";
 
 export const Icons = {
@@ -111,5 +114,8 @@ export const Icons = {
     Clock,
     SmallBike,
     Message,
-    MessageSmall
+    MessageSmall,
+    Invoice,
+    Bill,
+    UserFill
 }

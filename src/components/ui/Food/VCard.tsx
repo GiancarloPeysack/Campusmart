@@ -1,13 +1,13 @@
 import {
   Box,
   HStack,
-  Image,
   Pressable,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
 import {useTheme} from '../../../theme/useTheme';
 import {Icons} from '../../../assets/icons';
+import { Image } from 'react-native';
 
 type HCardProps = {
   title: string;
@@ -34,9 +34,9 @@ export const VCard = (props: HCardProps) => {
       <VStack>
         <Image
           source={{uri: props.image}}
-          h={170}
+          height={170}
           resizeMode="cover"
-          w="100%"
+            style={{width: '100%'}}
           alt='card-image'
         />
         <HStack position="absolute" top={12} right={12} gap={10}>

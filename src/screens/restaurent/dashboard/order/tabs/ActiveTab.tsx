@@ -64,7 +64,16 @@ export const ActiveTab = () => {
                   address={item.deliveryAddress}
                   phoneNumber={item.user.phoneNumber}
                   whatsappNumber={item.user.whatsapp}
-                  onPress={()=> navigate('assignDriver',{title:'Assign Driver'})}
+                  onPress={()=> navigate('assignDriver',{ title:'Assign Driver', order:{
+                    id: item.id,
+                    orderNumber: item.orderNumber,
+                    totalAmount: item.totalAmount,
+                    address: item.deliveryAddress,
+                    user: {
+                      phoneNumber: item.user.phoneNumber,
+                      whatsapp: item.user.whatsapp
+                    }
+                  }})}
                 
                 />
               );

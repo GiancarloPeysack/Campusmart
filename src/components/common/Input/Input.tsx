@@ -16,9 +16,9 @@ import {useTheme} from '../../../theme/useTheme';
 import { KeyboardType } from 'react-native';
 
 type InputProps = {
-  type: 'text' | 'password';
-  defaultValue: string;
-  placeholder: string;
+  type?: 'text' | 'password';
+  defaultValue?: string;
+  placeholder?: string;
   label?: string;
   icon?: React.ReactNode;
   rightIcon?: React.ReactNode;

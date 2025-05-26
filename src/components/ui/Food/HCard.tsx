@@ -1,12 +1,12 @@
 import {
   Box,
   HStack,
-  Image,
   Pressable,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
 import {useTheme} from '../../../theme/useTheme';
+import { Image } from 'react-native';
 
 type HCardProps = {
   title: string;
@@ -34,8 +34,8 @@ export const HCard = (props: HCardProps) => {
         <Image
           source={{uri: props.image}}
           resizeMode="cover"
-          h={144}
-          w="100%"
+          height={144}
+          style={{width: '100%'}}
           alt='card-image'
         />
 

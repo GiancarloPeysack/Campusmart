@@ -7,13 +7,14 @@ import {
   BadgeText,
   HStack,
   Icon,
-  Image,
   Input,
   InputField,
   InputIcon,
   InputSlot,
+  MenuIcon,
   Pressable,
   SearchIcon,
+  SettingsIcon,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
@@ -34,6 +35,10 @@ import {ProfileScreen} from '../screens/dashboard/profile/ProfileScreen';
 import {EditProfileScreen} from '../screens/dashboard/profile/EditProfile';
 import {useCart} from '../context/cart';
 import { AddCard } from '../components/ui/Checkout/AddCard';
+import { Image } from 'react-native';
+import NotificationScreen from '../screens/dashboard/notifications/NotificationScreen';
+import OrdersScreen from '../screens/dashboard/orders/OrdersScreen';
+import { OrderDetails } from '../screens/dashboard/orderDetails/OrderDetails';
 
 const Tab = createBottomTabNavigator();
 const {Screen, Navigator} = createStackNavigator();
@@ -95,9 +100,13 @@ const AdvanceHeader = (props: any) => {
       </Text>
       <HStack gap={16} alignItems="center">
         {name !== 'Cart' && <Icons.Search />}
-        {name !== 'Cart' && <Icons.Mail />}
+     
 
-        <Icons.Bell />
+        <Pressable  onPress={() =>
+            props.navigation.navigate('Notifications', {title: 'Notifications'})
+          }>
+          <Icons.Bell />
+        </Pressable>
         <Pressable
           onPress={() =>
             props.navigation.navigate('profile', {title: 'Profile'})
@@ -109,8 +118,8 @@ const AdvanceHeader = (props: any) => {
           alignItems="center"
           overflow="hidden">
           <Image
-            w={32}
-            h={32}
+            width={32}
+            height={32}
             resizeMode="cover"
             source={{
               uri: 'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
@@ -253,6 +262,10 @@ const FoodStack = (): React.JSX.Element => {
         name="addCard"
         component={AddCard}
       />
+       <Screen name="Notifications" options={{
+          headerShown: true,
+          header: CommonHeader,
+        }} component={NotificationScreen} />
     </Navigator>
   );
 };
@@ -264,6 +277,22 @@ const MarketStack = (): React.JSX.Element => {
     </Navigator>
   );
 };
+
+const OrderStack = (): React.JSX.Element => {
+  return (
+    <Navigator initialRouteName="Orders" screenOptions={screenOptions}>
+      <Screen name="Orders" component={OrdersScreen} options={{
+          headerShown: true,
+          header: AdvanceHeader,
+        }} />
+       <Screen name="OrderDetails" component={OrderDetails} options={{
+          headerShown: true,
+          header: CommonHeader,
+        }} />
+    </Navigator>
+  );
+};
+
 
 const CartStack = (): React.JSX.Element => {
   return (
@@ -389,7 +418,7 @@ const TabNavUser = (): React.JSX.Element => {
         component={CartStack}
       />
 
-      <Tab.Screen
+      {/* <Tab.Screen
         name="Inbox"
         options={{
           tabBarIcon: (props: any) => (
@@ -399,18 +428,17 @@ const TabNavUser = (): React.JSX.Element => {
           ),
         }}
         component={MarketStack}
-      />
-      {/* <Tab.Screen
-        name="Community"
+      /> */}
+      <Tab.Screen
+        name="Orders"
         options={{
           tabBarIcon: (props: any) => (
-            <Icons.Community
-              color={props.focused ? colors.primary : colors.gray3}
-            />
+
+            <MenuIcon size='xl' color={props.focused ? colors.primary : colors.gray3} />
           ),
         }}
-        component={FoodStack}
-      /> */}
+        component={OrderStack}
+      />
     </Tab.Navigator>
   );
 };

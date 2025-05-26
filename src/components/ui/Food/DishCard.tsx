@@ -1,7 +1,7 @@
-import {Box, HStack, Image, Pressable, Text, VStack} from '@gluestack-ui/themed';
+import {Box, HStack, Pressable, Text, VStack} from '@gluestack-ui/themed';
 import React from 'react';
 import {useTheme} from '../../../theme/useTheme';
-import {Icons} from '../../../assets/icons';
+import { Image } from 'react-native';
 
 type CardProps = {
   title: string;
@@ -34,10 +34,10 @@ export const DishCard = (props: CardProps) => {
         <Image
           source={{uri: props.image}}
           resizeMode="cover"
-          h={96}
-          w={96}
+          height={96}
+          width={96}
           alt="card-image"
-          rounded={8}
+          style={{borderRadius: 8}}
         />
       </HStack>
     </Box>

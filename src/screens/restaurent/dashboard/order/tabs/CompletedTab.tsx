@@ -1,17 +1,24 @@
-import { Box, Center, Spinner, Text, VStack } from "@gluestack-ui/themed"
-import { useTheme } from "../../../../../theme/useTheme";
-import { OrderCard } from "../../../../../components";
-import useOrder from "../hooks/useOrder";
-import { useEffect } from "react";
-import { ScrollView } from "react-native";
+import {Box, Center, Spinner, Text, VStack} from '@gluestack-ui/themed';
+import {useTheme} from '../../../../../theme/useTheme';
+import {OrderCard} from '../../../../../components';
+import useOrder from '../hooks/useOrder';
+import {useCallback, useEffect} from 'react';
+import {ScrollView} from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
-export const CompletedTab = () =>{
-    const {colors} = useTheme();
-const {fetchOrder, orders, isLoading} = useOrder();
+export const CompletedTab = () => {
+  const {colors} = useTheme();
+  const {fetchOrder, orders, isLoading} = useOrder();
 
-  useEffect(() => {
-    fetchOrder('completed');
-  }, []);
+
+  useFocusEffect(
+      useCallback(() => {
+        const fetchData = async () => {
+          await fetchOrder('completed');
+        };
+        fetchData();
+      }, []),
+    );
 
   return (
     <Box bg={colors.newBg} flex={1} p={16}>
@@ -40,12 +47,30 @@ const {fetchOrder, orders, isLoading} = useOrder();
         {orders?.length > 0 ? (
           <VStack gap={15}>
             {orders.map((item: any, key: number) => {
-             return <OrderCard key={key} list={item.items} status={item.status} total={item.totalAmount} address={item.deliveryAddress} phoneNumber={item.user.phoneNumber} whatsappNumber={item.user.whatsapp} />;
+              return (
+                <OrderCard
+                  key={key}
+                  orderNumber={item.orderNumber}
+                  list={item.items}
+                  status={item.status}
+                  total={item.totalAmount}
+                  address={item.deliveryAddress}
+                  phoneNumber={item.user.phoneNumber}
+                  whatsappNumber={item.user.whatsapp}
+                />
+              );
             })}
           </VStack>
-        ) : <Text textAlign='center' fontWeight='$semibold' color='$black' fontStyle='italic'>No completed orders</Text>}
+        ) : (
+          <Text
+            textAlign="center"
+            fontWeight="$semibold"
+            color="$black"
+            fontStyle="italic">
+            No completed orders
+          </Text>
+        )}
       </ScrollView>
     </Box>
   );
-
-}
+};

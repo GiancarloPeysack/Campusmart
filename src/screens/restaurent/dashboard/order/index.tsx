@@ -38,7 +38,7 @@ export default function OrderScreen(): React.JSX.Element {
     () => [
       {key: 'pending', title: `Pending (${pendingOrders?.length || 0})`},
       {key: 'active', title: `Active (${activeOrders?.length || 0})`},
-      {key: 'completed', title: `Completed`},
+      {key: 'completed', title: `Completed `},
     ],
     [pendingOrders, activeOrders],
   );

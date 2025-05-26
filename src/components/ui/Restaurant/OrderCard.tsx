@@ -125,6 +125,7 @@ export const OrderCard = ({
         </VStack>
         {status === 'pending' || status === 'accepted' ? (
           <Button
+          rounded={8}
           onPress={onPress}
             $active-opacity={0.8}
             h={36}
@@ -135,7 +136,8 @@ export const OrderCard = ({
             </ButtonText>
           </Button>
         ) : (
-          <Text color="#16A34A">Completed</Text>
+          // <Text color="#16A34A">Waiting for Driver Response</Text>
+          null
         )}
       </HStack>
     </View>

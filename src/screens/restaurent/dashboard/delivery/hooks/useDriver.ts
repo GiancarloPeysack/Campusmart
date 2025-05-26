@@ -7,13 +7,14 @@ export default function useDriver() {
   const [drivers, setDrivers] = useState<any>(null);
   const [newApplicants, setNewApplicants] = useState<any>(null);
   const [activeDrivers, setActiveDrivers] = useState<any>(null);
-
+  const [availableDrivers, setAvailbleDrivers] = useState<any>(null); 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useFocusEffect(
     useCallback(() => {
       fetchNewApplicants();
       fetchActiveDrivers();
+      fetchAvailableDrivers();
     }, []),
   );
 
@@ -101,6 +102,49 @@ export default function useDriver() {
     }
   };
 
+    const fetchAvailableDrivers = async () => {
+    try {
+      setIsLoading(true);
+      const currentUser = auth().currentUser;
+      if (currentUser) {
+        const driverSnapshot = await firestore()
+          .collection('drivers')
+          .where('isRegistrationCompleted', '==', true )
+          .where('isAvailable', '==', true)
+          .where('restaurentId', '==', currentUser.uid)
+          .get();
+
+        const driverItems = await Promise.all(
+          driverSnapshot.docs.map(async doc => {
+            const driverData = doc.data();
+            let userData = null;
+
+            if (doc.id) {
+              const userDoc = await firestore()
+                .collection('users')
+                .doc(doc.id)
+                .get();
+              userData = userDoc.exists ? userDoc.data() : null;
+            }
+            return {
+              id: doc.id,
+              ...driverData,
+              user: userData,
+            };
+          }),
+        );
+
+        setAvailbleDrivers(driverItems);
+      } else {
+        setAvailbleDrivers(null);
+      }
+    } catch (error) {
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const fetchAllDrivers = async () => {
     try {
       setIsLoading(true);
@@ -149,6 +193,8 @@ export default function useDriver() {
     newApplicants,
     drivers,
     activeDrivers,
-    updateDriverRequest
+    updateDriverRequest,
+    fetchAvailableDrivers,
+    availableDrivers
   };
 }

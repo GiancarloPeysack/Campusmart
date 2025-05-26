@@ -84,6 +84,7 @@ export const Checkout = (): React.JSX.Element => {
           itemName: item.itemName,
           price: item.price,
           quantity: item.quantity,
+          image: item.image,
         })),
         deliveryAddress: user.address.street,
         totalAmount: total.toFixed(2),

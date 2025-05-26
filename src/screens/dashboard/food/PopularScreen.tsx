@@ -1,12 +1,18 @@
-import {Box, VStack} from '@gluestack-ui/themed';
+import {Box, Text, VStack} from '@gluestack-ui/themed';
 import React from 'react';
 import {ScrollView} from 'react-native';
 import {useTheme} from '../../../theme/useTheme';
 import {HCard, VCard} from '../../../components';
+import useRestaurents from '../../../hooks/public/useRestaurents';
+import useMenus from '../../../hooks/public/useMenus';
+import {navigate} from '../../../navigators/Root';
 
 export default function PopularScreen(props: any): React.JSX.Element {
   const {popular} = props.route.params;
   const {colors} = useTheme();
+
+  const {restaurents, isLoading} = useRestaurents();
+  const {menus, isLoading: fetchingMenus} = useMenus();
 
   const dishes = [
     {
@@ -38,32 +44,15 @@ export default function PopularScreen(props: any): React.JSX.Element {
     },
   ];
 
-  const popularRestaurants = [
-    {
-      title: 'Ogala',
-      description: 'Italian • 15-25 min',
-      discount: 20,
-      rate: 4.8,
-      image:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt69ZYdYx_svjbjPgUjsZXwgPiwwZQ_S8_Dg&s',
-    },
-    {
-      title: 'Ogala',
-      description: 'Italian • 15-25 min',
-      discount: 20,
-      rate: 4.8,
-      image:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt69ZYdYx_svjbjPgUjsZXwgPiwwZQ_S8_Dg&s',
-    },
-    {
-      title: 'Ogala',
-      description: 'Italian • 15-25 min',
-      discount: 20,
-      rate: 4.8,
-      image:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt69ZYdYx_svjbjPgUjsZXwgPiwwZQ_S8_Dg&s',
-    },
-  ];
+  if (isLoading) {
+    return (
+      <Box flex={1} p={16} bg={colors.white}>
+        <Text fontSize={14} fontWeight="$light">
+          Fetching data...
+        </Text>
+      </Box>
+    );
+  }
 
   return (
     <Box flex={1} bg={colors.white}>
@@ -74,27 +63,34 @@ export default function PopularScreen(props: any): React.JSX.Element {
             flexDirection="row"
             justifyContent="space-between">
             {popular === 'dishes'
-              ? dishes.map((item, index) => (
+              ? menus.map((item: any, index: number) => (
                   <Box mb={20} key={index}>
                     <VCard
-                      title={item.title}
+                      title={item.itemName}
                       description={item.description}
-                      rate={item.rate}
-                      discount_price={item.discount_price}
+                      rate={5}
+                      discount_price={item.price}
                       price={item.price}
                       image={item.image}
+                      onPress={() =>
+                        navigate('Dish', {title: 'Dish Details', id: item.id})
+                      }
                     />
                   </Box>
                 ))
-              : popularRestaurants.map((restaurant, index) => (
+              : restaurents?.map((restaurant: any, index: number) => (
                   <Box mb={20} key={index}>
                     <HCard
-                      key={index}
-                      title={restaurant.title}
-                      description={restaurant.description}
+                      title={restaurant.nameOfRestaurent}
+                      description={restaurant.bio}
                       discount={restaurant.discount}
-                      rate={restaurant.rate}
-                      image={restaurant.image}
+                      image={restaurant.coverImage}
+                      onPress={() =>
+                        navigate('Restaurant', {
+                          title: 'Resturent Details',
+                          id: restaurant.id,
+                        })
+                      }
                     />
                   </Box>
                 ))}

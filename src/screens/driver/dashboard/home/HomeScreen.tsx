@@ -1,11 +1,8 @@
 import {
-  Avatar,
-  AvatarBadge,
   Box,
   Button,
   ButtonText,
   Center,
-  Heading,
   HStack,
   SettingsIcon,
   Text,
