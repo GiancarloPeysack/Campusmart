@@ -147,7 +147,7 @@ export default function LoginScreen(): React.JSX.Element {
               />
               <IconButton
                 text="Delivery Staff"
-                onPress={() => {}}
+                onPress={() => navigate('driverLogin')}
                 isActive={false}
               />
             </HStack>

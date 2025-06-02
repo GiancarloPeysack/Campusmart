@@ -14,9 +14,10 @@ type ButtonProps = {
   borderStyle?: 'solid' | 'dotted' | 'dashed';
   borderColor?: string;
   bgColor?: string;
-  width?: 'full' | '50%';
+  width?: 'full' | '50%' | number;
   color?: string,
-  isLoading?: boolean;
+  isLoading?: boolean,
+  height?: number
 };
 
 export const PrimaryButton = (props: ButtonProps): React.JSX.Element => {
@@ -26,7 +27,7 @@ export const PrimaryButton = (props: ButtonProps): React.JSX.Element => {
     switch (props.variant) {
       case 'primary':
         return {
-          bg: colors.primary,
+          bg: props.bgColor ? props.bgColor : colors.primary,
           textColor: colors.white,
           shadowOpacity: 0
         };
@@ -68,14 +69,13 @@ export const PrimaryButton = (props: ButtonProps): React.JSX.Element => {
       disabled={props.disabled}
       bg={props.disabled ? colors.gray1 : styles.bg}
       rounded={8}
-      w={props.width === '50%' ? 170 : '$full'}
-      h={48}
+      w={props.width === '50%' ? 170 : props.width =='full' ? '$full' : props.width}
+      h={props.height ? props.height : 48}
       alignItems='center' gap={10}
       shadowColor='#1D4ED8'
       shadowOpacity={props.disabled ? 0 : styles.shadowOpacity}
       shadowOffset={{height:2, width: 2}}
       shadowRadius={8}
-      elevation={5}
       borderWidth={styles.borderWidth}
       borderColor={styles.borderColor}
       borderStyle={props.borderStyle}

@@ -1,8 +1,6 @@
 import Svg, { Path, G, ClipPath, Defs, type SvgProps } from "react-native-svg";
 
-interface IProps extends SvgProps {}
-
-export const Restaurent = (props: IProps) => {
+export const Restaurent = (props: any) => {
   return (
     <Svg width="18" height="16" fill="none" viewBox="0 0 18 16" {...props}>
       <G clipPath="url(#a)">
@@ -17,6 +15,5 @@ export const Restaurent = (props: IProps) => {
         </ClipPath>
       </Defs>
     </Svg>
-    
   );
 };

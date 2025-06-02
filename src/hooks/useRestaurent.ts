@@ -5,6 +5,7 @@ import {useFocusEffect} from '@react-navigation/native';
 
 export default function useRestaurent() {
   const [restaurent, setRestaurent] = useState<any>(null);
+  const [restaurents, setRestaurents] = useState<any>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -39,5 +40,32 @@ export default function useRestaurent() {
     }
   };
 
-  return {restaurent, isLoading, fetchRestaurent};
+  const fetchAllRestaurents = async () => {
+    try {
+      setIsLoading(true);
+      const restaurentSnapshot = await firestore()
+        .collection('restaurants')
+        .get();
+
+      const restItems = restaurentSnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setRestaurents(restItems);
+    } catch (error) {
+          console.log("error", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return {
+    restaurent,
+    isLoading,
+    fetchRestaurent,
+    fetchAllRestaurents,
+    restaurents,
+  };
 }

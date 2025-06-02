@@ -17,6 +17,11 @@ import RestRegScreen from '../screens/restaurent/auth/RegisterScreen';
 import RestVerifyScreen from '../screens/restaurent/auth/VerifyScreen';
 import SuccessScreen from '../screens/restaurent/auth/SuccessScreen';
 
+//driver
+import DriverLoginScreen from '../screens/driver/auth/LoginScreen';
+import DriverRegScreen from '../screens/driver/auth/RegisterScreen';
+import Onboarding from '../screens/driver/Onboarding';
+
 import {
   ArrowLeftIcon,
   Box,
@@ -35,6 +40,8 @@ import CreateMenu from '../components/ui/Restaurant/CreateMenu';
 import useAuth from '../hooks/useAuth';
 import Startup from '../screens/Startup';
 import TabNavRest from './TabNavRest';
+import useDriver from '../screens/driver/hooks/useDriver';
+import TabNavDriver from './TabNavDriver';
 
 //screens
 
@@ -153,11 +160,28 @@ const RestaurentStack = (): React.JSX.Element => {
           }}
           component={CreateMenu}
         />
-        <Screen
-          name="success"
-          component={SuccessScreen}
-        />
+        <Screen name="success" component={SuccessScreen} />
         <Screen name="home" component={TabNavRest} />
+      </Navigator>
+    );
+  }
+};
+
+const DriverStack = (): React.JSX.Element => {
+  const {driver} = useDriver();
+
+  if (driver?.isRegistrationCompleted) {
+    return (
+      <Navigator initialRouteName="home" screenOptions={screenOptions}>
+        <Screen name="home" component={TabNavDriver} />
+      </Navigator>
+    );
+  } else {
+    return (
+      <Navigator initialRouteName="onboarding" screenOptions={screenOptions}>
+        <Screen name="onboarding" component={Onboarding} />
+
+        <Screen name="home" component={TabNavDriver} />
       </Navigator>
     );
   }
@@ -172,21 +196,50 @@ function AppNavigator(): React.JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  return (
-    <NavigationContainer ref={navigationRef}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-        networkActivityIndicatorVisible={true}
-      />
-      {user ? (
-        userRole === 'public_user' ? (
+  if (user) {
+    if (userRole === 'public_user') {
+      return (
+        <NavigationContainer ref={navigationRef}>
+          <StatusBar
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor={backgroundStyle.backgroundColor}
+            networkActivityIndicatorVisible={true}
+          />
           <TabNavUser />
-        ) : (
+        </NavigationContainer>
+      );
+    } else if (userRole === 'restaurent') {
+      return (
+        <NavigationContainer ref={navigationRef}>
+          <StatusBar
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor={backgroundStyle.backgroundColor}
+            networkActivityIndicatorVisible={true}
+          />
           <RestaurentStack />
-        )
-      ) : (
-        <Navigator initialRouteName="startup" screenOptions={screenOptions}>
+        </NavigationContainer>
+      );
+    } else {
+      return (
+        <NavigationContainer ref={navigationRef}>
+          <StatusBar
+            barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            backgroundColor={backgroundStyle.backgroundColor}
+            networkActivityIndicatorVisible={true}
+          />
+          <DriverStack />
+        </NavigationContainer>
+      );
+    }
+  } else {
+    return (
+      <NavigationContainer ref={navigationRef}>
+        <StatusBar
+          barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+          backgroundColor={backgroundStyle.backgroundColor}
+          networkActivityIndicatorVisible={true}
+        />
+        <Navigator initialRouteName="onboarding" screenOptions={screenOptions}>
           <Screen name="startup" component={Startup} />
           <Screen name="onboarding" component={OnboardingScreen} />
           <Screen name="login" component={LoginScreen} />
@@ -208,10 +261,12 @@ function AppNavigator(): React.JSX.Element {
           />
           <Screen name="restLogin" component={RestLoginScreen} />
           <Screen name="restReg" component={RestRegScreen} />
+          <Screen name="driverLogin" component={DriverLoginScreen} />
+          <Screen name="driverRegister" component={DriverRegScreen} />
         </Navigator>
-      )}
-    </NavigationContainer>
-  );
+      </NavigationContainer>
+    );
+  }
 }
 
 export default AppNavigator;

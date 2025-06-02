@@ -1,14 +1,13 @@
 import {
   Box,
   Center,
-  Image,
   Pressable,
   Spinner,
   Text,
   View,
 } from '@gluestack-ui/themed';
 import React, {useEffect} from 'react';
-import {Alert, StyleSheet} from 'react-native';
+import {Alert, Image, StyleSheet} from 'react-native';
 import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
 
 import {Icons} from '../../../assets/icons';
@@ -36,6 +35,8 @@ export const ImagePick = ({
   uploadImage,
 }: imagePickerProps): React.JSX.Element => {
   const {colors} = useTheme();
+
+  console.log('imga', image)
 
   const pickImage = async () => {
     let result;
@@ -106,14 +107,14 @@ export const ImagePick = ({
         {image ? (
           <Center flex={1}>
             <Image
-              w={150}
-              h={150}
-              rounded={12}
+              width={150}
+              height={150}
+              style={{borderRadius: 15}}
               resizeMode="cover"
               source={{
                 uri: image,
               }}
-              alt="user profile"
+              alt="user-profile"
             />
           </Center>
         ) : (
@@ -149,9 +150,9 @@ export const ImagePick = ({
         </Center>
       ) : (
         <Image
-          rounded="$full"
-          w={64}
-          h={64}
+         style={{borderRadius: 50}}
+          width={64}
+          height={64}
           resizeMode="cover"
           source={{
             uri: image,

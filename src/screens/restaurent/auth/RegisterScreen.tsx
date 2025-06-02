@@ -161,7 +161,7 @@ export default function RegisterScreen(): React.JSX.Element {
               />
               <IconButton
                 text="Delivery Staff"
-                onPress={() => {}}
+                onPress={() => navigate('driverRegister')}
                 isActive={false}
               />
             </HStack>

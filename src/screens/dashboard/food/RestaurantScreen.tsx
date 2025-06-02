@@ -5,14 +5,13 @@ import {
   ButtonText,
   Center,
   HStack,
-  Image,
   Text,
   VStack,
 } from '@gluestack-ui/themed';
 import {useTheme} from '../../../theme/useTheme';
 import {Icons} from '../../../assets/icons';
 import {Badge, DishCard} from '../../../components';
-import {ScrollView} from 'react-native';
+import {Image, ScrollView} from 'react-native';
 import {navigate} from '../../../navigators/Root';
 import useRestaurents from '../../../hooks/public/useRestaurents';
 import useMenus from '../../../hooks/public/useMenus';
@@ -95,8 +94,8 @@ export default function RestaurantScreen(props: any): React.JSX.Element {
           uri: restaurant?.coverImage,
         }}
         resizeMode="cover"
-        h={200}
-        w="100%"
+        height={200}
+        style={{width: '100%'}}
         alt="card-image"
       />
       <VStack
