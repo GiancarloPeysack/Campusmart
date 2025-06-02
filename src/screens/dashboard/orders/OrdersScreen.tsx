@@ -28,6 +28,7 @@ export default function OrdersScreen(): React.JSX.Element {
           {orders?.map((item: any, index: number) => {
             return (
               <Card
+              key={index}
                 createdAt={item.createdAt}
                 orderNumber={item.orderNumber}
                 orderStatus={item.status}

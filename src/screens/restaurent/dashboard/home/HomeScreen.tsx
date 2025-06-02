@@ -1,5 +1,7 @@
 import {
   Box,
+  Button,
+  ButtonText,
   Center,
   ClockIcon,
   EditIcon,
@@ -18,13 +20,13 @@ import {useTheme} from '../../../../theme/useTheme';
 import auth from '@react-native-firebase/auth';
 import useAuth from '../../../../hooks/useAuth';
 import {Icons} from '../../../../assets/icons';
-import {ImagePick} from '../../../../components';
+import {ImagePick, PrimaryButton} from '../../../../components';
 
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
 import {useLoading} from '../../../../hooks/useLoading';
 import useRestaurent from '../../../../hooks/useRestaurent';
-import { navigate } from '../../../../navigators/Root';
+import {navigate} from '../../../../navigators/Root';
 
 export default function HomeScreen(): React.JSX.Element {
   const {colors} = useTheme();
@@ -36,7 +38,11 @@ export default function HomeScreen(): React.JSX.Element {
 
   const {isLoading, onLoad, onLoaded} = useLoading();
 
-  const {restaurent, isLoading: isLoadingData, fetchRestaurent} = useRestaurent();
+  const {
+    restaurent,
+    isLoading: isLoadingData,
+    fetchRestaurent,
+  } = useRestaurent();
 
   const handleLogout = () => {
     try {
@@ -112,7 +118,6 @@ export default function HomeScreen(): React.JSX.Element {
       <Box position="relative">
         {restaurent && (
           <Image
-            
             height={200}
             resizeMode="cover"
             source={{
@@ -129,7 +134,7 @@ export default function HomeScreen(): React.JSX.Element {
             left={0}
             right={0}
             bottom={0}>
-            <Box bg="$white"  p={6} rounded={8}>
+            <Box bg="$white" p={6} rounded={8}>
               <Spinner color={colors.primary} size="large" />
             </Box>
           </Center>
@@ -158,7 +163,7 @@ export default function HomeScreen(): React.JSX.Element {
               <Image
                 height={48}
                 width={48}
-                style={{borderRadius:'100%'}}
+                style={{borderRadius: '100%'}}
                 resizeMode="cover"
                 source={{
                   uri: user?.profilePicture,
@@ -169,15 +174,16 @@ export default function HomeScreen(): React.JSX.Element {
                 <Text color="$black" fontWeight="$bold" fontSize={18}>
                   {user?.firstName} Admin
                 </Text>
-                <HStack alignItems='center' gap={8}>
-                <Box w={8} h={8} rounded='$full' bg='#22C55E' />
-                <Text color={colors.gray5} fontSize={14} fontWeight="$light">
-                  Open until {restaurent && restaurent.closeTime}
-                </Text>
+                <HStack alignItems="center" gap={8}>
+                  <Box w={8} h={8} rounded="$full" bg="#22C55E" />
+                  <Text color={colors.gray5} fontSize={14} fontWeight="$light">
+                    Open until {restaurent && restaurent.closeTime}
+                  </Text>
                 </HStack>
               </VStack>
             </HStack>
-            <Pressable onPress={()=> navigate('EditProfile',{title:'Edit Profile'})}>
+            <Pressable
+              onPress={() => navigate('EditProfile', {title: 'Edit Profile'})}>
               <Icon as={EditIcon} color={colors.primary} w={20} h={20} />
             </Pressable>
           </HStack>
@@ -225,17 +231,18 @@ export default function HomeScreen(): React.JSX.Element {
               {(restaurent && restaurent.bio) || '{ Placeholder } '}
             </Text>
           </Box>
-          <Center>
-            <Pressable onPress={handleLogout}>
-              <Text
-                color={colors.primary}
-                fontSize={14}
-                textTransform="uppercase">
-                Logout
-              </Text>
-            </Pressable>
-          </Center>
+          <PrimaryButton
+            variant="secondry"
+            text="Restaurent Wallet"
+            onPress={() => navigate('StripeConnect')}
+          />
+         
         </VStack>
+        <Box p={16}>
+           <Button rounded={8} onPress={handleLogout} bg='$red500'  size="md">
+            <ButtonText>Logout</ButtonText>
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

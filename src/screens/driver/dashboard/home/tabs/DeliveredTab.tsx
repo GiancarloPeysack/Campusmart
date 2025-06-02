@@ -28,7 +28,7 @@ export const DeliveredTab = () => {
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
         showsVerticalScrollIndicator={false}>
-        <VStack p={16}>
+        <VStack p={16} space='md'>
           {delivered?.length > 0 ? (
             delivered.map((item: any, key: number) => {
               return (

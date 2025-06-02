@@ -14,11 +14,13 @@ import {Icons} from '../../../assets/icons';
 import {PrimaryButton} from '../../common/Buttons/PrimaryButton';
 import {navigate} from '../../../navigators/Root';
 import useAuth from '../../../hooks/useAuth';
-import { useCart } from '../../../context/cart';
-import { Alert } from 'react-native';
+import {useCart} from '../../../context/cart';
+import {Alert} from 'react-native';
 import auth from '@react-native-firebase/auth';
-import firestore, { Timestamp } from '@react-native-firebase/firestore';
-import { useLoading } from '../../../hooks/useLoading';
+import firestore, {Timestamp} from '@react-native-firebase/firestore';
+import {useLoading} from '../../../hooks/useLoading';
+
+import {CardField} from '@stripe/stripe-react-native';
 
 type BlockProps = {
   title: string;
@@ -36,7 +38,7 @@ const Block = (props: BlockProps): React.JSX.Element => {
         <Text fontSize={16} fontWeight="$semibold" color="$black">
           {props.title}
         </Text>
-        <Pressable $active-opacity={0.8} onPress={props.onPress}>  
+        <Pressable $active-opacity={0.8} onPress={props.onPress}>
           <Text fontSize={14} fontWeight="$medium" color={colors.primary}>
             Change
           </Text>
@@ -90,15 +92,15 @@ export const Checkout = (): React.JSX.Element => {
         totalAmount: total.toFixed(2),
         deliveryFee: deliveryFee,
         subtotal: subtotal,
-        status: 'pending', 
+        status: 'pending',
         createdAt: Timestamp.now(),
       };
 
       console.log('Order Data:', orderData);
       await firestore().collection('orders').add(orderData);
-      
+
       Alert.alert('Success', 'Order placed successfully!');
-      clearCart(); 
+      clearCart();
 
       navigate('Payment', {title: 'Payment'});
     } catch (error) {
@@ -139,7 +141,7 @@ export const Checkout = (): React.JSX.Element => {
           icon={<Icons.MapTag color={colors.primary} />}
         />
         <Divider bg={colors.gray1} />
-        <Block
+        {/* <Block
           title="Payment Method"
           iconText="Visa ending in 4242"
           desc="Expires 12/25"
@@ -147,7 +149,36 @@ export const Checkout = (): React.JSX.Element => {
           onPress={() =>
             navigate('addCard', {title: 'Add Card'})
           }
-        />
+        /> */}
+        <VStack p={16}>
+          <Text fontSize={16} fontWeight="$semibold" color="$black">
+            Payment Method
+          </Text>
+          <CardField
+            postalCodeEnabled={false}
+            placeholders={{
+              number: '4242 4242 4242 4242',
+            }}
+            cardStyle={{
+              backgroundColor: colors.white,
+              textColor: '#000',
+              borderWidth: 1,
+              borderColor: colors.primary,
+              borderRadius: 8,
+            }}
+            style={{
+              width: '100%',
+              height: 50,
+              marginVertical: 30,
+            }}
+            onCardChange={cardDetails => {
+              console.log('cardDetails', cardDetails);
+            }}
+            onFocus={focusedField => {
+              console.log('focusField', focusedField);
+            }}
+          />
+        </VStack>
         <Divider bg={colors.gray1} />
         <VStack p={16} gap={18}>
           <Text fontSize={16} fontWeight="$semibold" color="$black">
@@ -159,7 +190,7 @@ export const Checkout = (): React.JSX.Element => {
                 Selected Items ({cart.length})
               </Text>
               <Text fontSize={14} fontWeight="$light" color={colors.title}>
-               ${subtotal.toFixed(2)}
+                ${subtotal.toFixed(2)}
               </Text>
             </HStack>
             <HStack justifyContent="space-between">
@@ -174,9 +205,10 @@ export const Checkout = (): React.JSX.Element => {
               <Text fontSize={14} fontWeight="$light" color={colors.green}>
                 Discount (0%)
               </Text>
-              <Text fontSize={14} fontWeight="$light" color={colors.green}>
-                
-              </Text>
+              <Text
+                fontSize={14}
+                fontWeight="$light"
+                color={colors.green}></Text>
             </HStack>
             <Divider bg={colors.gray1} />
             <HStack justifyContent="space-between">

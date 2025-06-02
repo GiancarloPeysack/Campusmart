@@ -55,7 +55,7 @@ const Block = (props: BlockProps): React.JSX.Element => {
 export const Payment = (): React.JSX.Element => {
   const {colors} = useTheme();
 
-  const isSuccess = false;
+  const isSuccess = true;
 
   return (
     <Box flex={1} bg={colors.white} p={16}>

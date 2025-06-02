@@ -28,7 +28,7 @@ export const ConfirmedTab = () => {
       <ScrollView
         contentContainerStyle={{flexGrow: 1}}
         showsVerticalScrollIndicator={false}>
-        <VStack p={16}>
+        <VStack p={16} space='md'>
           {inprogressDeliveries?.length > 0 ? (
             inprogressDeliveries.map((item: any, key: number) => {
               return (

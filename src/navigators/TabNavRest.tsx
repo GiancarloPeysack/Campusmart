@@ -19,6 +19,7 @@ import CreateCategory from '../components/ui/Restaurant/CreateCategory';
 import CreateMenu from '../components/ui/Restaurant/CreateMenu';
 import DeliveryScreen from '../screens/restaurent/dashboard/delivery/DeliveryScreen';
 import AssignDriverScreen from '../screens/restaurent/dashboard/order/assignDriver/AssignDriverScreen';
+import StripeConnectScreen from '../screens/restaurent/dashboard/stripeConnect/StripeConnect';
 
 const Tab = createBottomTabNavigator();
 const {Screen, Navigator} = createStackNavigator();
@@ -75,6 +76,7 @@ const HomeStack = (): React.JSX.Element => {
         name="EditProfile"
         component={EditRestaurentProfile}
       />
+        <Screen name="StripeConnect" component={StripeConnectScreen} />
     </Navigator>
   );
 };
