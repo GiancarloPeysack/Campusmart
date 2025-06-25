@@ -9,20 +9,19 @@ import {
   VStack,
 } from '@gluestack-ui/themed';
 import React from 'react';
-import {useTheme} from '../../../theme/useTheme';
-import {Icons} from '../../../assets/icons';
-import {Image, ScrollView} from 'react-native';
+import { useTheme } from '../../../theme/useTheme';
+import { Icons } from '../../../assets/icons';
+import { Image, ScrollView } from 'react-native';
 
-export const OrderDetails = ({route}: any): React.JSX.Element => {
-  const {colors} = useTheme();
+export const OrderDetails = ({ route }: any): React.JSX.Element => {
+  const { colors } = useTheme();
 
-  const {data} = route.params;
+  const { data } = route.params;
 
-  console.log('Order Details Data:', data);
 
   return (
     <Box bg={colors.newBg} flex={1}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Box bg={'#3B82F6'} h={148} justifyContent="center" px={16}>
           <HStack alignItems="center" justifyContent="space-between">
             <VStack space="sm">
@@ -127,12 +126,12 @@ export const OrderDetails = ({route}: any): React.JSX.Element => {
                   height={64}
                   width={64}
                   alt="cart-image"
-                  style={{borderRadius: 8}}
+                  style={{ borderRadius: 8 }}
                 />
 
                 <VStack space="md">
                   <Text fontSize={16} fontWeight="$medium" color="$black">
-                   {item.itemName}
+                    {item.itemName}
                   </Text>
                   <Text fontSize={14} fontWeight="$light" color={colors.gray5}>
                     {item.quantity} x ${item.price.toFixed(2)}

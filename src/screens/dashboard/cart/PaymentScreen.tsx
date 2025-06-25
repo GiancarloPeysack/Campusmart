@@ -1,16 +1,15 @@
 import {Box} from '@gluestack-ui/themed';
 import React from 'react';
-
-import {Checkout} from '../../../components';
 import {useTheme} from '../../../theme/useTheme';
 import { Payment } from '../../../components/ui/Checkout/Payment';
 
-export const PaymentScreen = (): React.JSX.Element => {
+export const PaymentScreen = (props: any): React.JSX.Element => {
+  const {title,orderData} = props.route.params;
   const {colors} = useTheme();
 
   return (
     <Box flex={1} bg={colors.white}>
-      <Payment />
+      <Payment title={title} orderData={orderData} onNavigate={()=>props.navigation.navigate('Food')}/>
     </Box>
   );
 };

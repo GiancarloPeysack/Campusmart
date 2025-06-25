@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  TouchableOpacity, 
-  Linking, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Linking,
   ActivityIndicator,
-  Alert 
+  Alert
 } from 'react-native';
 import { useStripe } from '@stripe/stripe-react-native';
 import axios, { AxiosError } from 'axios';
@@ -22,6 +22,7 @@ const StripeConnectScreen = ({ navigation }: any) => {
   const [stripeStatus, setStripeStatus] = useState<StripeStatus>('not_connected');
   const [onboardingUrl, setOnboardingUrl] = useState<string | null>(null);
   const restaurantId = auth().currentUser?.uid || '';
+  const [stripeAccountId, setStripeAccountId] = useState(null)
 
   // Check current connection status
   useEffect(() => {
@@ -29,6 +30,11 @@ const StripeConnectScreen = ({ navigation }: any) => {
       try {
         const doc = await firestore().collection('restaurants').doc(restaurantId).get();
         const status = doc.data()?.stripeStatus as StripeStatus;
+
+        setStripeAccountId(doc.data()?.stripeAccountId)
+        if (status !== 'verified') {
+          checkStripeStatus()
+        }
         setStripeStatus(status || 'not_connected');
       } catch (error) {
         console.error('Firestore fetch error:', error);
@@ -53,7 +59,8 @@ const StripeConnectScreen = ({ navigation }: any) => {
     try {
       const doc = await firestore().collection('restaurants').doc(restaurantId).get();
       const status = doc.data()?.stripeStatus as StripeStatus;
-      
+      setStripeAccountId(doc.data()?.stripeAccountId)
+
       if (status === 'verified') {
         navigation.replace('Dashboard');
       } else {
@@ -69,29 +76,58 @@ const StripeConnectScreen = ({ navigation }: any) => {
 
   const connectStripe = async () => {
     if (!restaurantId) return;
-    
+
     setLoading(true);
     try {
       const response = await axios.post<{ onboardingUrl: string }>(
-        'http://localhost:8080/restaurant/connect', 
+        'https://us-central1-campusmart-4a549.cloudfunctions.net/api/restaurant/connect',
         {
           restaurantId,
           email: auth().currentUser?.email
         }
       );
-      
+
       setOnboardingUrl(response.data.onboardingUrl);
       await Linking.openURL(response.data.onboardingUrl);
     } catch (error) {
       const axiosError = error as AxiosError<{ error?: string }>;
       Alert.alert(
-        'Connection Failed', 
+        'Connection Failed',
         axiosError.response?.data?.error || axiosError.message
       );
     } finally {
       setLoading(false);
     }
   };
+
+
+  const checkStripeStatus = async () => {
+    console.log('doc.data()', stripeAccountId)
+    const response = await fetch('https://us-central1-campusmart-4a549.cloudfunctions.net/api/restaurant/status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        restaurantId: stripeAccountId,
+      }),
+    });
+    const { status } = await response.json();
+
+    const currentStatus = status ? 'verified' : 'not_connected';
+
+    if (currentStatus === 'verified') {
+      await firestore()
+        .collection('restaurants')
+        .doc(restaurantId)
+        .update({
+          stripeStatus: 'verified'
+        });
+    }
+
+    setStripeStatus(currentStatus || 'not_connected');
+
+  }
 
   if (stripeStatus === 'verified') {
     return (
@@ -111,8 +147,8 @@ const StripeConnectScreen = ({ navigation }: any) => {
         To receive payments, link your Stripe account (takes 2 minutes)
       </Text>
 
-      <TouchableOpacity 
-        style={styles.button} 
+      <TouchableOpacity
+        style={styles.button}
         onPress={connectStripe}
         disabled={loading}
       >
@@ -124,7 +160,7 @@ const StripeConnectScreen = ({ navigation }: any) => {
       </TouchableOpacity>
 
       {onboardingUrl && (
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.secondaryButton}
           onPress={() => Linking.openURL(onboardingUrl)}
         >

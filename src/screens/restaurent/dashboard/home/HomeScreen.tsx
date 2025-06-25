@@ -13,30 +13,30 @@ import {
   View,
   VStack,
 } from '@gluestack-ui/themed';
-import React, {useCallback, useState} from 'react';
-import {Alert, Image, StyleSheet} from 'react-native';
-import {useTheme} from '../../../../theme/useTheme';
+import React, { useCallback, useState } from 'react';
+import { Alert, Image, StyleSheet } from 'react-native';
+import { useTheme } from '../../../../theme/useTheme';
 
 import auth from '@react-native-firebase/auth';
 import useAuth from '../../../../hooks/useAuth';
-import {Icons} from '../../../../assets/icons';
-import {ImagePick, PrimaryButton} from '../../../../components';
+import { Icons } from '../../../../assets/icons';
+import { ImagePick, PrimaryButton } from '../../../../components';
 
 import firestore from '@react-native-firebase/firestore';
 import storage from '@react-native-firebase/storage';
-import {useLoading} from '../../../../hooks/useLoading';
+import { useLoading } from '../../../../hooks/useLoading';
 import useRestaurent from '../../../../hooks/useRestaurent';
-import {navigate} from '../../../../navigators/Root';
+import { navigate } from '../../../../navigators/Root';
 
 export default function HomeScreen(): React.JSX.Element {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   const [imageSource, setImageSource] = useState<string>('');
   const [image, setImage] = useState<string>('');
 
-  const {isLoading, onLoad, onLoaded} = useLoading();
+  const { isLoading, onLoad, onLoaded } = useLoading();
 
   const {
     restaurent,
@@ -52,7 +52,7 @@ export default function HomeScreen(): React.JSX.Element {
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
-        {text: 'OK', onPress: async () => await auth().signOut()},
+        { text: 'OK', onPress: async () => await auth().signOut() },
       ]);
     } catch (error) {
       console.error('Error signing out:', error);
@@ -77,7 +77,7 @@ export default function HomeScreen(): React.JSX.Element {
           style: 'cancel',
         },
       ],
-      {cancelable: true},
+      { cancelable: true },
     );
   };
 
@@ -163,7 +163,7 @@ export default function HomeScreen(): React.JSX.Element {
               <Image
                 height={48}
                 width={48}
-                style={{borderRadius: '100%'}}
+                // style={{borderRadius: '100%'}}
                 resizeMode="cover"
                 source={{
                   uri: user?.profilePicture,
@@ -183,7 +183,7 @@ export default function HomeScreen(): React.JSX.Element {
               </VStack>
             </HStack>
             <Pressable
-              onPress={() => navigate('EditProfile', {title: 'Edit Profile'})}>
+              onPress={() => navigate('EditProfile', { title: 'Edit Profile' })}>
               <Icon as={EditIcon} color={colors.primary} w={20} h={20} />
             </Pressable>
           </HStack>
@@ -236,10 +236,10 @@ export default function HomeScreen(): React.JSX.Element {
             text="Restaurent Wallet"
             onPress={() => navigate('StripeConnect')}
           />
-         
+
         </VStack>
         <Box p={16}>
-           <Button rounded={8} onPress={handleLogout} bg='$red500'  size="md">
+          <Button rounded={8} onPress={handleLogout} bg='$red500' size="md">
             <ButtonText>Logout</ButtonText>
           </Button>
         </Box>

@@ -18,20 +18,20 @@ import {
   CheckIcon,
   Link,
 } from '@gluestack-ui/themed';
-import React, {ReactNode, useState} from 'react';
-import {useTheme} from '../../../theme/useTheme';
-import {Icons} from '../../../assets/icons';
-import {InputFiled, PrimaryButton} from '../../../components';
-import {KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
-import {navigate} from '../../../navigators/Root';
+import React, { ReactNode, useState } from 'react';
+import { useTheme } from '../../../theme/useTheme';
+import { Icons } from '../../../assets/icons';
+import { InputFiled, PrimaryButton } from '../../../components';
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { navigate } from '../../../navigators/Root';
 
-import {useLoading} from '../../../hooks/useLoading';
+import { useLoading } from '../../../hooks/useLoading';
 import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
-import {handleFirebaseError} from '../../../utils/helper/error-handler';
-import {useForm, Controller} from 'react-hook-form';
+import { handleFirebaseError } from '../../../utils/helper/error-handler';
+import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import {yupResolver} from '@hookform/resolvers/yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 interface Props {
   text: string;
@@ -40,7 +40,7 @@ interface Props {
 }
 
 const IconButton: React.FC<Props> = props => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   const border = props.isActive ? colors.primary : colors.gray1;
   const color = props.isActive ? colors.primary : colors.gray3;
@@ -81,16 +81,16 @@ const validation = yup.object({
 });
 
 export default function LoginScreen(): React.JSX.Element {
-  const {colors, styles} = useTheme();
+  const { colors, styles } = useTheme();
   const [passState, setPassState] = useState(true);
 
-  const {isLoading, onLoad, onLoaded} = useLoading();
+  const { isLoading, onLoad, onLoaded } = useLoading();
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: {errors},
+    formState: { errors },
   } = useForm<FormData>({
     resolver: yupResolver(validation),
   });
@@ -98,7 +98,7 @@ export default function LoginScreen(): React.JSX.Element {
   const onSubmit = async (data: FormData) => {
     onLoad();
     try {
-      const {email, password} = data;
+      const { email, password } = data;
 
       await auth()
         .signInWithEmailAndPassword(email, password)
@@ -127,7 +127,7 @@ export default function LoginScreen(): React.JSX.Element {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
       <Box flex={1} bg={colors.background}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <VStack gap={30} p={16}>
             <Center gap={6}>
               <Icons.Logo />
@@ -142,7 +142,7 @@ export default function LoginScreen(): React.JSX.Element {
             <HStack justifyContent="space-between">
               <IconButton
                 text="Restaurant Admin"
-                onPress={() => {}}
+                onPress={() => { }}
                 isActive={true}
               />
               <IconButton
@@ -157,7 +157,7 @@ export default function LoginScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icon as={MailIcon} color="#A3A3A3" />}
@@ -178,7 +178,7 @@ export default function LoginScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icons.CircleQuetion />}

@@ -32,7 +32,7 @@ function App(): React.JSX.Element {
 
   return (
     <GluestackUIProvider config={config}>
-      <StripeProvider publishableKey='pk_test_51R8YsLDXGN1IpE4cXmj6mEkIz9Is8gQVN04xfFyC4Jc2zfk0H2LQFzQtljkR1DNeUcXaJARBbjRxNcr5m5dvoKtl00IutWS6DQ' urlScheme='Campusmart'>
+      <StripeProvider publishableKey='pk_test_51RVduaRihkI6uvhW0cy3zM9VATSyyCXjiQQnuxmg09plMSZ59CGDYqKE5997wkBdf0zj1z5MISDbmsjX2UKLcr1j00H437c65i' urlScheme='Campusmart'>
         <CartProvider>
         <SafeAreaView style={backgroundStyle}>
           <AppNavigator />

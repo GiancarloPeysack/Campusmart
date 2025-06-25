@@ -13,52 +13,19 @@ import {Icons} from '../../../assets/icons';
 import {PrimaryButton} from '../../common/Buttons/PrimaryButton';
 import {navigate} from '../../../navigators/Root';
 
-type BlockProps = {
-  title: string;
-  iconText: string;
-  icon: ReactNode;
-  desc: string;
-  onPress?: () => void;
-};
-
-const Block = (props: BlockProps): React.JSX.Element => {
+export const Payment = ({orderData, onNavigate}: any) => {
   const {colors} = useTheme();
-  return (
-    <VStack p={16} gap={12}>
-      <HStack alignItems="center" justifyContent="space-between">
-        <Text fontSize={16} fontWeight="$semibold" color="$black">
-          {props.title}
-        </Text>
-        <Pressable $active-opacity={0.8}>
-          <Text fontSize={14} fontWeight="$medium" color={colors.primary}>
-            Change
-          </Text>
-        </Pressable>
-      </HStack>
-      <HStack gap={12}>
-        <Box bg={colors.light_blue} w={40} h={40} rounded="$full">
-          <Center flex={1}>{props.icon}</Center>
-        </Box>
-        <VStack gap={6}>
-          <Text fontSize={16} fontWeight="$medium" color="$black">
-            {props.iconText}
-          </Text>
-          <Text fontSize={14} fontWeight="$light" color={colors.title}>
-            {props.desc}
-          </Text>
-        </VStack>
-      </HStack>
-    </VStack>
-  );
-};
-
-export const Payment = (): React.JSX.Element => {
-  const {colors} = useTheme();
-
   const isSuccess = true;
 
+  const transactionDate = new Date(orderData?.createdAt?.seconds * 1000);
+  const formattedDate = transactionDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+
   return (
-    <Box flex={1} bg={colors.white} p={16}>
+    <Box flex={1} bg={colors.white} p={16} mt={6}>
       <Center>
         <VStack alignItems="center" gap={20}>
           {isSuccess ? <Icons.Success /> : <Icons.Failed />}
@@ -77,7 +44,7 @@ export const Payment = (): React.JSX.Element => {
             </Text>
             {isSuccess && (
               <Text fontSize={24} fontWeight="$bold" color={colors.title_1}>
-                $149.99
+                ${orderData?.totalAmount || '0.00'}
               </Text>
             )}
           </VStack>
@@ -96,7 +63,7 @@ export const Payment = (): React.JSX.Element => {
               Transaction ID
             </Text>
             <Text fontSize={14} fontWeight="$medium" color={colors.title_1}>
-              TXN25698741
+              {orderData?.orderNumber || 'N/A'}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
@@ -104,7 +71,7 @@ export const Payment = (): React.JSX.Element => {
               Date
             </Text>
             <Text fontSize={14} fontWeight="$medium" color={colors.title_1}>
-              Feb 15, 2025
+              {formattedDate}
             </Text>
           </HStack>
           <HStack justifyContent="space-between">
@@ -132,31 +99,30 @@ export const Payment = (): React.JSX.Element => {
       )}
 
       {isSuccess ? (
-       
         <VStack mt={30} gap={12}>
-        <PrimaryButton text="Download Receipt" />
-        <PrimaryButton text="Back to Home" variant="success" />
-        <HStack gap={5} mt={30} alignItems="center" justifyContent="center">
-          <Text fontSize={14} fontWeight="$light">
-            Having trouble?
-          </Text>
-          <Pressable>
-            <Text fontSize={14} fontWeight="$medium" color={colors.primary}>
-              Contact Support
+          <PrimaryButton text="Download Receipt" />
+          <PrimaryButton text="Back to Home" variant="success" 
+            onPress={onNavigate}/>
+          <HStack gap={5} mt={30} alignItems="center" justifyContent="center">
+            <Text fontSize={14} fontWeight="$light">
+              Having trouble?
             </Text>
-          </Pressable>
-        </HStack>
-      </VStack>
+            <Pressable>
+              <Text fontSize={14} fontWeight="$medium" color={colors.primary}>
+                Contact Support
+              </Text>
+            </Pressable>
+          </HStack>
+        </VStack>
       ) : (
         <VStack mt={30} gap={12}>
-        <PrimaryButton icon={<Icons.Refresh />} text="Try Again" />
-        <PrimaryButton
-          icon={<Icons.Card color="#374151" />}
-          text="Change Payment Method"
-          variant="success"
-        />
-      
-      </VStack>
+          <PrimaryButton icon={<Icons.Refresh />} text="Try Again" />
+          <PrimaryButton
+            icon={<Icons.Card color="#374151" />}
+            text="Change Payment Method"
+            variant="success"
+          />
+        </VStack>
       )}
     </Box>
   );

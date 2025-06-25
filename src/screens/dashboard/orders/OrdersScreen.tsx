@@ -1,15 +1,15 @@
-import {ScrollView} from 'react-native';
+import { ScrollView } from 'react-native';
 import React from 'react';
-import {Box, Text, VStack} from '@gluestack-ui/themed';
-import {useTheme} from '../../../theme/useTheme';
-import {Card} from '../../../components';
-import {navigate} from '../../../navigators/Root';
+import { Box, Text, VStack } from '@gluestack-ui/themed';
+import { useTheme } from '../../../theme/useTheme';
+import { Card } from '../../../components';
+import { navigate } from '../../../navigators/Root';
 import useUserOrders from './hooks/useUserOrders';
 
 export default function OrdersScreen(): React.JSX.Element {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {orders, isLoading} = useUserOrders();
+  const { orders, isLoading } = useUserOrders();
 
   if (isLoading) {
     return (
@@ -23,17 +23,17 @@ export default function OrdersScreen(): React.JSX.Element {
 
   return (
     <Box flex={1} bg={colors.newBg}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <VStack space="lg" p={16} flex={1}>
-          {orders?.map((item: any, index: number) => {
+          {orders?.sort((a, b) => a.createdAt > b.createdAt ? -1 : 1)?.map((item: any, index: number) => {
             return (
               <Card
-              key={index}
+                key={index}
                 createdAt={item.createdAt}
                 orderNumber={item.orderNumber}
                 orderStatus={item.status}
                 onPress={() =>
-                  navigate('OrderDetails', {title: 'Order Details', data: item})
+                  navigate('OrderDetails', { title: 'Order Details', data: item })
                 }
               />
             );

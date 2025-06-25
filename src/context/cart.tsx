@@ -30,7 +30,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
       if (prevCart.length === 0) {
-        return [...prevCart, { ...item, quantity: 1 }];
+        return [...prevCart, { ...item }];
       } else {
         const firstItem = prevCart[0];
         if (firstItem.restaurantId === item.restaurantId) {
@@ -43,7 +43,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 : cartItem
             );
           } else {
-            return [...prevCart, { ...item, quantity: 1 }];
+            return [...prevCart, { ...item }];
           }
         } else {
           Alert.alert(
@@ -88,12 +88,12 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const total = useMemo(() => (cart.length > 0 ? subtotal + deliveryFee : 0), [subtotal, cart]);
 
 
-  const clearCart = () =>{
+  const clearCart = () => {
     setCart([]);
   }
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, subtotal, total, deliveryFee , clearCart}}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, subtotal, total, deliveryFee, clearCart }}>
       {children}
     </CartContext.Provider>
   );

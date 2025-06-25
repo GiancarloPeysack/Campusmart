@@ -6,20 +6,20 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import {useTheme} from '../../../theme/useTheme';
-import {FlatList, ScrollView} from 'react-native';
-import {Icons} from '../../../assets/icons';
-import {HCard, VCard} from '../../../components';
-import {navigate} from '../../../navigators/Root';
+import { useTheme } from '../../../theme/useTheme';
+import { FlatList, ScrollView } from 'react-native';
+import { Icons } from '../../../assets/icons';
+import { HCard, VCard } from '../../../components';
+import { navigate } from '../../../navigators/Root';
 import useRestaurents from '../../../hooks/public/useRestaurents';
 import useMenus from '../../../hooks/public/useMenus';
 
 export default function FoodScreen(): React.JSX.Element {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {restaurents, isLoading} = useRestaurents();
+  const { restaurents, isLoading } = useRestaurents();
 
-  const {menus, isLoading: fetchingMenus} = useMenus();
+  const { menus, isLoading: fetchingMenus } = useMenus();
 
   if (isLoading || fetchingMenus) {
     return (
@@ -33,7 +33,7 @@ export default function FoodScreen(): React.JSX.Element {
 
   return (
     <Box flex={1} bg={colors.white}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
         <VStack p={16} flex={1} gap={20}>
           <Box bg={colors.light_blue} h={100} rounded={12} px={16} py={18}>
             <Text color={colors.blue} fontWeight="$bold">
@@ -57,7 +57,7 @@ export default function FoodScreen(): React.JSX.Element {
                 })
               }
               $active-opacity={0.8}
-              bg={colors.light_blue}
+              bg={'transparent'}
               rounded="$full">
               <ButtonText
                 fontWeight="$semibold"
@@ -126,7 +126,7 @@ export default function FoodScreen(): React.JSX.Element {
                   price={item.price}
                   image={item.image}
                   onPress={() =>
-                    navigate('Dish', {title: 'Dish Details', id: item.id})
+                    navigate('Dish', { title: 'Dish Details', id: item.id })
                   }
                 />
               </Box>

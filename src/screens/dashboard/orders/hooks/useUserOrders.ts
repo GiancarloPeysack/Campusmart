@@ -2,24 +2,24 @@ import {useCallback, useState} from 'react';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import {set} from '@gluestack-style/react';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 export default function useUserOrders() {
   const [orders, setOrders] = useState<any>(null);
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-
-    useFocusEffect(
-      useCallback(() => {
-        fetchOrders();
-      }, []),
-    );
+  useFocusEffect(
+    useCallback(() => {
+      fetchOrders();
+    }, []),
+  );
 
   const fetchOrders = async () => {
     try {
       setIsLoading(true);
       const currentUser = auth().currentUser;
+
       if (currentUser) {
         const orderSnapshot = await firestore()
           .collection('orders')

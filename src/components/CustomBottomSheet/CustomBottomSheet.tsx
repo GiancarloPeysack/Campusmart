@@ -1,0 +1,41 @@
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import { View, Text, Dimensions } from 'react-native';
+import RBSheet from 'react-native-raw-bottom-sheet';
+
+const CustomBottomSheet = forwardRef(({ children }, ref) => {
+  const bottomSheetRef = useRef();
+
+  useImperativeHandle(ref, () => ({
+    open: () => bottomSheetRef.current?.open(),
+    close: () => bottomSheetRef.current?.close(),
+  }));
+
+  return (
+    <RBSheet
+      ref={bottomSheetRef}
+      height={Dimensions.get('window').height / 2.12}
+      useNativeDriver={true}
+      customStyles={{
+        container: {
+          backgroundColor: '#ffffff',
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+        },
+        wrapper: { backgroundColor: '#00000080' },
+        draggableIcon: { backgroundColor: '#000' },
+      }}
+      customModalProps={{
+        animationType: 'slide',
+        statusBarTranslucent: true,
+      }}
+      customAvoidingViewProps={{
+        enabled: false,
+      }}
+      draggable={false}
+    >
+      {children}
+    </RBSheet>
+  );
+});
+
+export default CustomBottomSheet;

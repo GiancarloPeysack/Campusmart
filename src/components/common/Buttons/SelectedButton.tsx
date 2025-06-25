@@ -1,10 +1,11 @@
 import {Center, Pressable, Text} from '@gluestack-ui/themed';
 import React from 'react';
 import {useTheme} from '../../../theme/useTheme';
+import { Dimensions } from 'react-native';
 
 type ButtonProps = {
   text: string;
-  selected?: boolean;
+  selected?: string | null;
   fullWidth?: boolean;
   onPress?: () => void;
 };
@@ -16,9 +17,9 @@ export const SelectedButton = (props: ButtonProps): React.JSX.Element => {
       onPress={props.onPress}
       rounded={12}
       h={48}
-      w={props.fullWidth ? '$full' : 173}
-      borderWidth={props.selected ? 2 : 1}
-      borderColor={props.selected ? colors.primary : colors.gray1}>
+      w={props.fullWidth ? '$full' : Dimensions.get('window').width/2.25}
+      borderWidth={props.selected === props.text ? 2 : 1}
+      borderColor={props.selected=== props.text ? colors.primary : colors.gray1}>
       <Center flex={1}>
         <Text
           fontWeight="$light"

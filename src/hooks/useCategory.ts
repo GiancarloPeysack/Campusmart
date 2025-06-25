@@ -5,7 +5,7 @@ import {useFocusEffect} from '@react-navigation/native';
 
 export default function useCategory() {
   const [categories, setCategories] = useState<any>([]);
-  
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useFocusEffect(
