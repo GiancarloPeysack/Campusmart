@@ -1,8 +1,8 @@
-import {Box, Button, ButtonText, HStack, VStack} from '@gluestack-ui/themed';
-import React, {useEffect, useState} from 'react';
-import {Alert, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
+import { Box, Button, ButtonText, HStack, VStack } from '@gluestack-ui/themed';
+import React, { useEffect, useState } from 'react';
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 
-import {useTheme} from '../../../../theme/useTheme';
+import { useTheme } from '../../../../theme/useTheme';
 import {
   DateTime,
   InputFiled,
@@ -11,18 +11,19 @@ import {
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {useLoading} from '../../../../hooks/useLoading';
+import { useLoading } from '../../../../hooks/useLoading';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import useRestaurent from '../../../../hooks/useRestaurent';
 import dayjs from 'dayjs';
+import Toast from 'react-native-toast-message';
 
 
 export default function EditRestaurentProfile(props: any): React.JSX.Element {
-  const {colors, styles} = useTheme();
+  const { colors, styles } = useTheme();
 
-  const {restaurent} = useRestaurent();
+  const { restaurent } = useRestaurent();
 
-  const {onLoad, isLoading, onLoaded} = useLoading();
+  const { onLoad, isLoading, onLoaded } = useLoading();
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -32,8 +33,8 @@ export default function EditRestaurentProfile(props: any): React.JSX.Element {
   });
 
   const [openTime, setOpenTime] = useState<string | null>(null);
-const [closeTime, setCloseTime] = useState<string | null>(null);
-const [selectedTimeType, setSelectedTimeType] = useState<'open' | 'close' | null>(null);
+  const [closeTime, setCloseTime] = useState<string | null>(null);
+  const [selectedTimeType, setSelectedTimeType] = useState<'open' | 'close' | null>(null);
 
   useEffect(() => {
     if (restaurent) {
@@ -62,11 +63,18 @@ const [selectedTimeType, setSelectedTimeType] = useState<'open' | 'close' | null
             openTime: openTime,
             closeTime: closeTime,
           });
-        Alert.alert('Success', 'Changes saved successfully.');
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Changes saved successfully.',
+        });
       }
     } catch (error) {
-      console.error('Error creating category:', error);
-      Alert.alert('Error', 'Failed to save changes.');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to save changes.',
+      });
     } finally {
       onLoaded();
     }
@@ -82,13 +90,13 @@ const [selectedTimeType, setSelectedTimeType] = useState<'open' | 'close' | null
 
   const handleConfirm = (date: Date) => {
     const formattedTime = dayjs(date).format('hh:mm A');
-  
+
     if (selectedTimeType === 'open') {
       setOpenTime(formattedTime);
     } else if (selectedTimeType === 'close') {
       setCloseTime(formattedTime);
     }
-  
+
     hideDatePicker();
   };
 
@@ -97,14 +105,14 @@ const [selectedTimeType, setSelectedTimeType] = useState<'open' | 'close' | null
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
       <Box flex={1} bg={colors.background}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <VStack gap={24} p={16}>
             <Box bg={colors.white} p={16} rounded={12}>
               <InputFiled
                 value={restDetails?.nameOfRestaurent}
                 defaultValue={restDetails?.nameOfRestaurent}
                 onChangeText={text =>
-                  setRestDetails({...restDetails, nameOfRestaurent: text})
+                  setRestDetails({ ...restDetails, nameOfRestaurent: text })
                 }
                 label="Name of Restaurent"
                 type="text"
@@ -112,17 +120,17 @@ const [selectedTimeType, setSelectedTimeType] = useState<'open' | 'close' | null
               />
             </Box>
             <Box bg={colors.white} p={16} rounded={12}>
-            <DateTime label="Open" value={openTime || ''} onPress={() => showDatePicker('open')} />
+              <DateTime label="Open" value={openTime || ''} onPress={() => showDatePicker('open')} />
             </Box>
             <Box bg={colors.white} p={16} rounded={12}>
-            <DateTime label="Close" value={closeTime || ''} onPress={() => showDatePicker('close')} />
+              <DateTime label="Close" value={closeTime || ''} onPress={() => showDatePicker('close')} />
             </Box>
             <Box bg={colors.white} p={16} rounded={12}>
               <InputFiled
                 value={restDetails?.bio}
                 defaultValue={restDetails?.bio}
                 onChangeText={text =>
-                  setRestDetails({...restDetails, bio: text})
+                  setRestDetails({ ...restDetails, bio: text })
                 }
                 type="text"
                 isRequired
@@ -131,7 +139,7 @@ const [selectedTimeType, setSelectedTimeType] = useState<'open' | 'close' | null
                 placeholder="Enter item description"
               />
             </Box>
-            
+
           </VStack>
         </ScrollView>
         <Box
@@ -148,7 +156,7 @@ const [selectedTimeType, setSelectedTimeType] = useState<'open' | 'close' | null
               onPress={() => props.navigation.goBack()}
             />
             <PrimaryButton
-            onPress={onSubmit}
+              onPress={onSubmit}
               text="Save"
               width="50%"
               variant="primary"

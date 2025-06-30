@@ -1,0 +1,276 @@
+diff --git a/node_modules/react-native-credit-card-input/.DS_Store b/node_modules/react-native-credit-card-input/.DS_Store
+new file mode 100644
+index 0000000..10a9a96
+Binary files /dev/null and b/node_modules/react-native-credit-card-input/.DS_Store differ
+diff --git a/node_modules/react-native-credit-card-input/src/.DS_Store b/node_modules/react-native-credit-card-input/src/.DS_Store
+new file mode 100644
+index 0000000..e73455d
+Binary files /dev/null and b/node_modules/react-native-credit-card-input/src/.DS_Store differ
+diff --git a/node_modules/react-native-credit-card-input/src/CreditCardInput.tsx b/node_modules/react-native-credit-card-input/src/CreditCardInput.tsx
+index cbbc6b4..92d3f61 100644
+--- a/node_modules/react-native-credit-card-input/src/CreditCardInput.tsx
++++ b/node_modules/react-native-credit-card-input/src/CreditCardInput.tsx
+@@ -1,4 +1,4 @@
+-import { useEffect, useRef } from 'react';
++import React, { useEffect, useRef } from 'react';
+ import {
+   StyleSheet,
+   Text,
+@@ -20,11 +20,13 @@ interface Props {
+   inputStyle?: TextStyle;
+   placeholderColor?: string;
+   labels?: {
++    name: string;
+     number: string;
+     expiry: string;
+     cvc: string;
+   };
+   placeholders?: {
++    name: string;
+     number: string;
+     expiry: string;
+     cvc: string;
+@@ -36,38 +38,38 @@ interface Props {
+ 
+ const s = StyleSheet.create({
+   container: {
+-    paddingVertical: 15,
+-    paddingHorizontal: 15,
++    // paddingVertical: 15,
++    // paddingHorizontal: 15,
++    backgroundColor: 'red'
+   },
+-  icon: {
+-    width: 48,
+-    height: 40,
+-    resizeMode: 'contain',
++  fieldContainer: {
++    marginBottom: 16,
+   },
+-  numberInput: {},
+-  extraContainer: {
+-    flexDirection: 'row',
+-    marginTop: 15,
+-  },
+-  expiryInputContainer: {
+-    flex: 1,
+-    marginRight: 5,
+-  },
+-  cvcInputContainer: {
+-    flex: 1,
+-    marginLeft: 5,
++  label: {
++    fontSize: 14,
++    fontWeight: '600',
++    marginBottom: 6,
++    color: '#374151',
+   },
+   input: {
+-    height: 40,
++    height: 48,
+     fontSize: 16,
+-    borderBottomColor: 'darkgray',
+-    borderBottomWidth: 1,
+-    // @ts-expect-error outlineWidth is used to hide the text-input outline on react-native-web
++    paddingHorizontal: 12,
++    borderColor: '#D1D5DB',
++    borderWidth: 1,
++    borderRadius: 8,
++    backgroundColor: '#F9FAFB',
++    color: '#111827',
++    // @ts-expect-error outlineWidth is for RN web
+     outlineWidth: 0,
+   },
+-  inputLabel: {
+-    fontSize: 14,
+-    fontWeight: 600,
++  row: {
++    flexDirection: 'row',
++    justifyContent: 'space-between',
++    gap: 10,
++  },
++  halfInput: {
++    flex: 1,
+   },
+ });
+ 
+@@ -77,19 +79,21 @@ const CreditCardInput = (props: Props) => {
+     style,
+     labelStyle,
+     inputStyle,
+-    placeholderColor = 'darkgray',
++    placeholderColor = '#9CA3AF',
+     labels = {
+-      number: 'CARD NUMBER',
+-      expiry: 'EXPIRY',
+-      cvc: 'CVC/CVV',
++      name: 'Cardholder Name',
++      number: 'Card Number',
++      expiry: 'Expiry Date',
++      cvc: 'CVV',
+     },
+     placeholders = {
+-      number: '1234 5678 1234 5678',
++      name: 'Name on card',
++      number: '1234 5678 9012 3456',
+       expiry: 'MM/YY',
+-      cvc: 'CVC',
++      cvc: '123',
+     },
+-    onChange = () => {},
+-    onFocusField = () => {},
++    onChange = () => { },
++    onFocusField = () => { },
+     testID,
+   } = props;
+ 
+@@ -102,12 +106,24 @@ const CreditCardInput = (props: Props) => {
+   }, [autoFocus]);
+ 
+   return (
+-    <View
+-      style={[s.container, style]}
+-      testID={testID}
+-    >
+-      <View style={[s.numberInput]}>
+-        <Text style={[s.inputLabel, labelStyle]}>{labels.number}</Text>
++    <View style={[s.container, style]} testID={testID}>
++      <View style={s.fieldContainer}>
++        <Text style={[s.label, labelStyle]}>{labels.name}</Text>
++        <TextInput
++          keyboardType="default"
++          style={[s.input, inputStyle]}
++          placeholderTextColor={placeholderColor}
++          placeholder={placeholders.name}
++          value={values.name}
++          onChangeText={(v) => onChangeValue('name', v)}
++          onFocus={() => onFocusField('name')}
++          autoCorrect={false}
++          underlineColorAndroid="transparent"
++          testID="CC_NAME"
++        />
++      </View>
++      <View style={s.fieldContainer}>
++        <Text style={[s.label, labelStyle]}>{labels.number}</Text>
+         <TextInput
+           ref={numberInput}
+           keyboardType="numeric"
+@@ -118,14 +134,29 @@ const CreditCardInput = (props: Props) => {
+           onChangeText={(v) => onChangeValue('number', v)}
+           onFocus={() => onFocusField('number')}
+           autoCorrect={false}
+-          underlineColorAndroid={'transparent'}
++          underlineColorAndroid="transparent"
+           testID="CC_NUMBER"
+         />
+       </View>
+ 
+-      <View style={[s.extraContainer]}>
+-        <View style={s.expiryInputContainer}>
+-          <Text style={[s.inputLabel, labelStyle]}>{labels.expiry}</Text>
++      <View style={s.fieldContainer}>
++        <Text style={[s.label, labelStyle]}>{labels.name}</Text>
++        <TextInput
++          style={[s.input, inputStyle]}
++          placeholderTextColor={placeholderColor}
++          placeholder={placeholders.name}
++          value={values.name}
++          onChangeText={(v) => onChangeValue('name', v)}
++          onFocus={() => onFocusField('name')}
++          autoCorrect={false}
++          underlineColorAndroid="transparent"
++          testID="CC_NAME"
++        />
++      </View>
++
++      <View style={[s.row]}>
++        <View style={[s.fieldContainer, s.halfInput]}>
++          <Text style={[s.label, labelStyle]}>{labels.expiry}</Text>
+           <TextInput
+             keyboardType="numeric"
+             style={[s.input, inputStyle]}
+@@ -135,13 +166,13 @@ const CreditCardInput = (props: Props) => {
+             onChangeText={(v) => onChangeValue('expiry', v)}
+             onFocus={() => onFocusField('expiry')}
+             autoCorrect={false}
+-            underlineColorAndroid={'transparent'}
++            underlineColorAndroid="transparent"
+             testID="CC_EXPIRY"
+           />
+         </View>
+ 
+-        <View style={s.cvcInputContainer}>
+-          <Text style={[s.inputLabel, labelStyle]}>{labels.cvc}</Text>
++        <View style={[s.fieldContainer, s.halfInput]}>
++          <Text style={[s.label, labelStyle]}>{labels.cvc}</Text>
+           <TextInput
+             keyboardType="numeric"
+             style={[s.input, inputStyle]}
+@@ -151,7 +182,7 @@ const CreditCardInput = (props: Props) => {
+             onChangeText={(v) => onChangeValue('cvc', v)}
+             onFocus={() => onFocusField('cvc')}
+             autoCorrect={false}
+-            underlineColorAndroid={'transparent'}
++            underlineColorAndroid="transparent"
+             testID="CC_CVC"
+           />
+         </View>
+diff --git a/node_modules/react-native-credit-card-input/src/useCreditCardForm.tsx b/node_modules/react-native-credit-card-input/src/useCreditCardForm.tsx
+index bb6090d..3b3843c 100644
+--- a/node_modules/react-native-credit-card-input/src/useCreditCardForm.tsx
++++ b/node_modules/react-native-credit-card-input/src/useCreditCardForm.tsx
+@@ -12,6 +12,7 @@ export type CreditCardIssuer =
+ export type CreditCardFormField = 'number' | 'expiry' | 'cvc';
+ 
+ export type CreditCardFormValues = {
++  name: string;
+   number: string;
+   expiry: string;
+   cvc: string;
+@@ -21,6 +22,7 @@ export type CreditCardFormValues = {
+ export type ValidationState = 'incomplete' | 'invalid' | 'valid';
+ 
+ export type CreditCardFormState = {
++  name: ValidationState;
+   number: ValidationState;
+   expiry: ValidationState;
+   cvc: ValidationState;
+@@ -93,12 +95,14 @@ export const useCreditCardForm = (
+   onChange: (formData: CreditCardFormData) => void
+ ) => {
+   const [formState, setFormState] = useState<CreditCardFormState>({
++    name: 'incomplete',
+     number: 'incomplete',
+     expiry: 'incomplete',
+     cvc: 'incomplete',
+   });
+ 
+   const [values, setValues] = useState<CreditCardFormValues>({
++    name: '',
+     number: '',
+     expiry: '',
+     cvc: '',
+@@ -122,6 +126,7 @@ export const useCreditCardForm = (
+         Math.max(...(numberValidation.card?.lengths || [16]));
+ 
+       const newFormattedValues = {
++        name: newValues.name,
+         number: formatCardNumber(
+           newValues.number,
+           cardNumberMaxLength,
+@@ -133,6 +138,7 @@ export const useCreditCardForm = (
+       };
+ 
+       const newFormState = {
++        name: newFormattedValues.name,
+         number: toStatus(cardValidator.number(newFormattedValues.number)),
+         expiry: toStatus(
+           cardValidator.expirationDate(newFormattedValues.expiry)
+@@ -145,6 +151,7 @@ export const useCreditCardForm = (
+ 
+       onChange({
+         valid:
++          newFormState.name === 'valid' &&
+           newFormState.number === 'valid' &&
+           newFormState.expiry === 'valid' &&
+           newFormState.cvc === 'valid',

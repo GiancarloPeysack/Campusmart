@@ -1,5 +1,4 @@
 import {
-  ArrowLeftIcon,
   Box,
   Center,
   ClockIcon,
@@ -21,12 +20,11 @@ import {
   Platform,
   ScrollView,
   View,
-  Alert,
 } from 'react-native';
 import { navigate } from '../../navigators/Root';
 import { CustomButton } from '../../components';
 import auth from '@react-native-firebase/auth';
-
+import Toast from 'react-native-toast-message';
 
 export default function VerifyScreen(): React.JSX.Element {
   const { colors, styles } = useTheme();
@@ -63,13 +61,21 @@ export default function VerifyScreen(): React.JSX.Element {
     setTimeout(() => {
       setIsResending(false);
       startTimer();
-      Alert.alert('Success', 'Verification code resent.');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Verification code resent',
+      });
     }, 1000);
   };
 
   const handleVerify = async () => {
     if (code.length !== 4) {
-      Alert.alert('Invalid', 'Please enter a 4-digit code.');
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid',
+        text2: 'Please enter a 4-digit code.'
+      });
       return;
     }
     if (code === '1234') {
@@ -78,12 +84,15 @@ export default function VerifyScreen(): React.JSX.Element {
         hasOnboarded: false
       });
       setTimeout(() => {
-        // Alert.alert('Success');
         navigate('successUser');
 
       }, 500);
     } else {
-      Alert.alert('Error', 'Invalid verification code');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Invalid verification code'
+      });
     }
   };
 

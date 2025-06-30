@@ -15,18 +15,18 @@ import {
 } from '@gluestack-ui/themed';
 import firestore from '@react-native-firebase/firestore';
 
-import {useTheme} from '../../../../../theme/useTheme';
-import {Icons} from '../../../../../assets/icons';
-import {PrimaryButton} from '../../../../../components';
+import { useTheme } from '../../../../../theme/useTheme';
+import { Icons } from '../../../../../assets/icons';
+import { PrimaryButton } from '../../../../../components';
 import useDriver from '../../delivery/hooks/useDriver';
-import {useState} from 'react';
-import { Alert } from 'react-native';
+import { useState } from 'react';
 import { goBack } from '../../../../../navigators/Root';
+import Toast from 'react-native-toast-message';
 
-export default function AssignDriverScreen({route}: any) {
-  const {order} = route.params;
-  const {colors} = useTheme();
-  const {availableDrivers, isLoading: isLoadingDrivers} = useDriver();
+export default function AssignDriverScreen({ route }: any) {
+  const { order } = route.params;
+  const { colors } = useTheme();
+  const { availableDrivers, isLoading: isLoadingDrivers } = useDriver();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const assignDriver = async (id: string) => {
@@ -50,7 +50,11 @@ export default function AssignDriverScreen({route}: any) {
         isAvailable: false,
       });
 
-      Alert.alert("Success", "Driver has been assigned successfully!");
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Driver has been assigned successfully!',
+      });
       goBack();
 
     } catch (error) {
@@ -59,8 +63,6 @@ export default function AssignDriverScreen({route}: any) {
       setIsLoading(false);
     }
   };
-
-  console.log('Available Drivers:', availableDrivers);
 
   return (
     <Box flex={1} bg={colors.newBg} p={16}>
@@ -86,7 +88,7 @@ export default function AssignDriverScreen({route}: any) {
         elevation={5}
         shadowOpacity={0.8}
         shadowRadius={2}
-        shadowOffset={{width: 0, height: 1}}>
+        shadowOffset={{ width: 0, height: 1 }}>
         <HStack gap={10} alignItems="center">
           <Icons.Invoice />
           <VStack gap={5}>
@@ -127,7 +129,7 @@ export default function AssignDriverScreen({route}: any) {
               elevation={5}
               shadowOpacity={0.8}
               shadowRadius={2}
-              shadowOffset={{width: 0, height: 1}}>
+              shadowOffset={{ width: 0, height: 1 }}>
               <HStack space="md">
                 <Avatar>
                   <AvatarFallbackText>{driver.user.firstName}</AvatarFallbackText>
@@ -149,7 +151,7 @@ export default function AssignDriverScreen({route}: any) {
                   </HStack>
                 </VStack>
               </HStack>
-              <PrimaryButton isLoading={isLoading} disabled={isLoading} onPress={()=> assignDriver(driver.id)} text="Select" variant="primary" height={36} />
+              <PrimaryButton isLoading={isLoading} disabled={isLoading} onPress={() => assignDriver(driver.id)} text="Select" variant="primary" height={36} />
             </HStack>
           ))}
       </VStack>

@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef } from 'react';
-import { View, Text, Dimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
 const CustomBottomSheet = forwardRef(({ children }, ref) => {
@@ -14,7 +14,7 @@ const CustomBottomSheet = forwardRef(({ children }, ref) => {
     <RBSheet
       ref={bottomSheetRef}
       height={Dimensions.get('window').height / 2.12}
-      useNativeDriver={true}
+      useNativeDriver={false}
       customStyles={{
         container: {
           backgroundColor: '#ffffff',

@@ -1,5 +1,6 @@
 import {
   Box,
+  Card,
   Center,
   Divider,
   HStack,
@@ -7,9 +8,8 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
-import uuid from 'react-native-uuid';
 import { useTheme } from '../../../theme/useTheme';
 import { Icons } from '../../../assets/icons';
 import { PrimaryButton } from '../../common/Buttons/PrimaryButton';
@@ -21,14 +21,19 @@ import auth from '@react-native-firebase/auth';
 import { useLoading } from '../../../hooks/useLoading';
 
 import { CardField, confirmPayment } from '@stripe/stripe-react-native';
+import Toast from 'react-native-toast-message';
 
 export const Checkout = (): React.JSX.Element => {
   const { colors } = useTheme();
   const { user, loading } = useAuth();
-  const { cart, total, deliveryFee, subtotal, clearCart } = useCart();
+  const { cart, total, deliveryFee, serviceFee, subtotal, clearCart } = useCart();
   const { isLoading, onLoad, onLoaded } = useLoading();
 
+  const [savedCards, setSavedCards] = useState<any[]>([]);
+
   const [cardDetails, setCardDetails] = useState<any>(null);
+
+  console.log('cardDetails', cardDetails)
 
   const fetchPaymentIntentClientSecret = async () => {
     try {
@@ -74,12 +79,37 @@ export const Checkout = (): React.JSX.Element => {
   };
 
 
+  useEffect(() => {
+    if (auth().currentUser) {
+      const unsubscribe = firestore()
+        .collection('users')
+        .doc(auth().currentUser.uid)
+        .collection('cards')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot(snapshot => {
+          const cards = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setSavedCards(cards);
+        });
+
+      return () => unsubscribe();
+    }
+  }, [auth().currentUser]);
+
+
   const placeOrder = async () => {
     const currentUser = auth().currentUser;
 
     try {
       if (!currentUser) {
-        Alert.alert('Failed', 'User not authenticated');
+        Toast.show({
+          type: 'error',
+          text1: 'Failed',
+          text2: 'User not authenticated',
+        });
+
         return;
       }
 
@@ -106,7 +136,11 @@ export const Checkout = (): React.JSX.Element => {
       }
 
       if (!cardDetails?.complete) {
-        Alert.alert('Invalid Card', 'Please enter complete card details.');
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Card',
+          text2: 'Please enter complete card details.',
+        });
         return;
       }
 
@@ -115,7 +149,12 @@ export const Checkout = (): React.JSX.Element => {
       const clientSecret = await fetchPaymentIntentClientSecret();
 
       if (!clientSecret) {
-        Alert.alert('Failed', 'Issue processing your request!');
+
+        Toast.show({
+          type: 'error',
+          text1: 'Failed',
+          text2: 'Issue processing your request!',
+        });
         return;
       }
 
@@ -126,13 +165,22 @@ export const Checkout = (): React.JSX.Element => {
       });
 
       if (error) {
-        console.error('Payment failed:', error);
-        Alert.alert('Payment Failed', error.message);
+
+        Toast.show({
+          type: 'error',
+          text1: 'Payment Failed',
+          text2: '' + error.message,
+        });
+
         return;
       }
 
       if (paymentIntent?.status !== 'Succeeded' && paymentIntent?.status !== 'succeeded') {
-        Alert.alert('Payment Failed', 'Unable to complete the payment.');
+        Toast.show({
+          type: 'error',
+          text1: 'Payment Failed',
+          text2: 'Unable to complete the payment.'
+        });
         return;
       }
 
@@ -159,13 +207,21 @@ export const Checkout = (): React.JSX.Element => {
 
       await firestore().collection('orders').add(orderData);
 
-      Alert.alert('Success', 'Order placed successfully!');
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Order placed successfully!',
+      });
       clearCart();
 
       navigate('Payment', { title: 'Payment', orderData: orderData });
     } catch (error) {
-      console.error('Order Placement Error:', error);
-      Alert.alert('Failed', 'Something went wrong. Please try again.');
+      Toast.show({
+        type: 'error',
+        text1: 'Failed',
+        text2: 'Something went wrong. Please try again.'
+      });
     } finally {
       onLoaded();
     }
@@ -220,6 +276,23 @@ export const Checkout = (): React.JSX.Element => {
     );
   };
 
+  const getDefaultOrLatestCard = () => {
+    if (!savedCards || savedCards.length === 0) return null;
+
+    const defaultCard = savedCards.find(card => card.isDefault === true);
+    if (defaultCard) return defaultCard;
+
+    const sortedByDate = [...savedCards].sort((a, b) => {
+      const aTime = a.createdAt?.toDate?.()?.getTime?.() ?? 0;
+      const bTime = b.createdAt?.toDate?.()?.getTime?.() ?? 0;
+      return bTime - aTime;
+    });
+
+    return sortedByDate[0];
+  };
+
+  const selectedCard = getDefaultOrLatestCard();
+
   return (
     <Box flex={1} bg={colors.white}>
       <VStack gap={10} flex={1}>
@@ -241,13 +314,47 @@ export const Checkout = (): React.JSX.Element => {
         />
         <Divider bg={colors.gray1} />
         <VStack p={16}>
-          <Text fontSize={16} fontWeight="$semibold" color="$black">
-            Payment Method
-          </Text>
+          <HStack justifyContent='space-between'>
+            <Text fontSize={16} fontWeight="$semibold" color="$black">
+              Payment Method
+            </Text>
+
+            <Pressable $active-opacity={0.8} onPress={() => navigate('paymentMethod', { option: 'payment', title: 'Payment Method' })}>
+              <Text fontSize={14} fontWeight="$medium" color={colors.primary}>
+                Change
+              </Text>
+            </Pressable></HStack>
+
+          {selectedCard && (
+            <VStack
+              space="md"
+              bg="#F9FAFB"
+              p={16}
+              borderRadius={10}
+              borderColor="#E5E7EB"
+              borderWidth={1}
+              mb={25}
+              mt={10}
+            >
+              <Box>
+                <Box mt={4}>
+                  <Text fontSize={16} color="#374151">
+                    **** **** **** {selectedCard.cardNumber?.slice(-4)}
+                  </Text>
+                </Box>
+                <Box mt={4}>
+                  <Text fontSize={14} color="#6B7280">
+                    Expires: {selectedCard.expiry}
+                  </Text>
+                </Box>
+              </Box>
+            </VStack>
+          )}
           <CardField
             postalCodeEnabled={false}
             placeholders={{
-              number: '4242 4242 4242 4242',
+              number: selectedCard ? selectedCard.cardNumber : '4242 4242 4242 4242',
+              expiration: selectedCard ? selectedCard.expiry : 'MM/YY',
             }}
             cardStyle={{
               //   backgroundColor: colors.white,
@@ -259,7 +366,7 @@ export const Checkout = (): React.JSX.Element => {
             style={{
               width: '100%',
               height: 50,
-              marginVertical: 30,
+              // marginVertical: 30,
             }}
             onCardChange={setCardDetails}
             onFocus={focusedField => {
@@ -287,6 +394,14 @@ export const Checkout = (): React.JSX.Element => {
               </Text>
               <Text fontSize={14} fontWeight="$light" color={colors.green}>
                 ${deliveryFee}
+              </Text>
+            </HStack>
+            <HStack justifyContent="space-between">
+              <Text fontSize={14} fontWeight="$light" color={colors.title}>
+                Service Fee
+              </Text>
+              <Text fontSize={14} fontWeight="$light" color={colors.green}>
+                ${serviceFee}
               </Text>
             </HStack>
             <HStack justifyContent="space-between">

@@ -25,6 +25,9 @@ import storage from '@react-native-firebase/storage';
 import auth from '@react-native-firebase/auth';
 import { useLoading } from '../../../hooks/useLoading';
 
+import Toast from 'react-native-toast-message';
+
+
 export const EditOnboard = () => {
   const { colors } = useTheme();
 
@@ -74,8 +77,12 @@ export const EditOnboard = () => {
           }
         }
       } catch (error) {
-        console.error('Error fetching user details:', error);
-        Alert.alert('Error', 'Failed to fetch user details.');
+
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to fetch user details.'
+        });
       } finally {
         onLoaded();
       }
@@ -98,10 +105,20 @@ export const EditOnboard = () => {
       });
 
       setUserDetails({ ...userDetails, profilePicture: downloadURL }); // Update local state
-      Alert.alert('Success', 'Profile picture updated!');
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Profile picture updated!',
+      });
     } catch (error) {
-      console.error('Error updating image:', error);
-      Alert.alert('Error', 'Failed to update profile picture.');
+
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update profile picture.'
+      });
+
     } finally {
       onLoaded();
     }
@@ -127,13 +144,20 @@ export const EditOnboard = () => {
 
       await userRef.update(updateData);
 
-      Alert.alert('Success', 'User info updated');
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'User info updated!',
+      });
       setIsEditingContact(false);
       setIsEditingAddress(false);
       navigate('Food');
     } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Failed to update user info');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to update user info.'
+      });
     }
   };
 

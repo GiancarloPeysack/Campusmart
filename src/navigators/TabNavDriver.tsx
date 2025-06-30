@@ -1,15 +1,16 @@
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createStackNavigator} from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 
-import {Icons} from '../assets/icons';
-import {useTheme} from '../theme/useTheme';
+import { Icons } from '../assets/icons';
+import { useTheme } from '../theme/useTheme';
 import HomeScreen from '../screens/driver/dashboard/home/HomeScreen';
 import ProfileScreen from '../screens/driver/dashboard/profile/ProfileScreen';
 import MessagesScreen from '../screens/driver/dashboard/messages/MessagesScreen';
+import useAuth from '../hooks/useAuth';
 
 const Tab = createBottomTabNavigator();
-const {Screen, Navigator} = createStackNavigator();
+const { Screen, Navigator } = createStackNavigator();
 
 const screenOptions = {
   headerShown: false,
@@ -43,7 +44,7 @@ const ProfileStack = (): React.JSX.Element => {
 
 
 const TabNavDriver = (): React.JSX.Element => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -59,7 +60,7 @@ const TabNavDriver = (): React.JSX.Element => {
       }}>
       <Tab.Screen
         name="Home"
-        options={({route}) => {
+        options={({ route }) => {
           return {
             tabBarIcon: (props: any) => (
               <Icons.Home
@@ -73,7 +74,7 @@ const TabNavDriver = (): React.JSX.Element => {
       />
       <Tab.Screen
         name="Messages"
-        options={({route}) => {
+        options={({ route }) => {
           return {
             tabBarIcon: (props: any) => (
               <Icons.Message

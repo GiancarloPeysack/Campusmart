@@ -19,7 +19,7 @@ import { useTheme } from '../../../../theme/useTheme';
 
 import auth from '@react-native-firebase/auth';
 import useAuth from '../../../../hooks/useAuth';
-import { Icons } from '../../../../assets/icons';
+import Toast from 'react-native-toast-message';
 import { ImagePick, PrimaryButton } from '../../../../components';
 
 import firestore from '@react-native-firebase/firestore';
@@ -101,11 +101,19 @@ export default function HomeScreen(): React.JSX.Element {
             coverImage: downloadURL,
           });
 
-        Alert.alert('Success', 'Cover photo updated!');
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Cover photo updated!',
+        });
         fetchRestaurent();
       } catch (error) {
-        console.error('Error updating image:', error);
-        Alert.alert('Error', 'Failed to update cover photo.');
+
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to update cover photo.',
+        });
       } finally {
         onLoaded();
       }

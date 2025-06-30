@@ -50,6 +50,9 @@ import CommunityScreen from '../screens/dashboard/community/CommunityScreen';
 import useAuth from '../hooks/useAuth';
 import { EditOnboard } from '../screens/dashboard/EditOnboard/EditOnboard';
 import CreatePost from '../screens/dashboard/community/Create/CreatePost';
+import { PaymentMethod } from '../screens/dashboard/profile/PaymentMethod';
+import { AddPaymentMethod } from '../screens/dashboard/profile/AddPaymentMethod';
+import { SettingsScreens } from '../screens/dashboard/profile/Settings';
 
 const Tab = createBottomTabNavigator();
 const { Screen, Navigator } = createStackNavigator();
@@ -133,9 +136,56 @@ const CommonHeader = (props: any) => {
   );
 };
 
+const CommonProfileHeader = (props: any) => {
+  const { colors } = useTheme();
+  const { title } = props.route.params;
+  return (
+    <HStack
+      alignItems="center"
+      px={16}
+      bg={colors.white}
+      h={45}
+      borderBottomWidth={1}
+      borderBottomColor={colors.gray1}>
+      <HStack alignItems="center" gap={20}>
+        <Pressable
+          $active-opacity={0.8}
+          zIndex={999}
+          p={5}
+          onPress={() => props.navigation.goBack()}>
+          <Icon as={ArrowLeftIcon} color="$black" />
+        </Pressable>
+      </HStack>
+      <Text
+        position="absolute"
+        textAlign="center"
+        left={0}
+        right={0}
+        textTransform="capitalize"
+        color="$black"
+        fontWeight="$semibold"
+        fontSize={18}>
+        {title}
+      </Text>
+      <HStack alignItems="center" gap={20}
+        position="absolute" right={10}>
+        <Pressable
+          $active-opacity={0.8}
+          zIndex={999}
+          p={5}
+          onPress={() =>
+            props.navigation.navigate('settings', { title: 'Settings' })}>
+          <Icon as={SettingsIcon} color="$black" />
+        </Pressable>
+      </HStack>
+    </HStack>
+  );
+};
+
 const AdvanceHeader = (props: any) => {
   const { colors } = useTheme();
   const name = props.route.name;
+  const { user } = useAuth();
 
   return (
     <HStack
@@ -182,7 +232,7 @@ const AdvanceHeader = (props: any) => {
             height={32}
             resizeMode="cover"
             source={{
-              uri: 'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
+              uri: user?.profilePicture || 'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
             }}
           />
         </Pressable>
@@ -301,7 +351,7 @@ const FoodStack = (): React.JSX.Element => {
       <Screen
         options={{
           headerShown: true,
-          header: CommonHeader,
+          header: CommonProfileHeader,
         }}
         name="profile"
         component={ProfileScreen}
@@ -313,6 +363,31 @@ const FoodStack = (): React.JSX.Element => {
         }}
         name="editProfile"
         component={EditProfileScreen}
+      />
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="settings"
+        component={SettingsScreens}
+      />
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+          headerTitle: 'red'
+        }}
+        name="addPaymentMethod"
+        component={AddPaymentMethod}
+      />
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="paymentMethod"
+        component={PaymentMethod}
       />
       <Screen
         options={{
@@ -400,6 +475,24 @@ const CartStack = (): React.JSX.Element => {
         }}
         component={CartScreen}
       />
+
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+          headerTitle: 'red'
+        }}
+        name="addPaymentMethod"
+        component={AddPaymentMethod}
+      />
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="paymentMethod"
+        component={PaymentMethod}
+      />
       <Screen
         name="Checkout"
         options={{
@@ -477,6 +570,25 @@ const CommunityStack = (): React.JSX.Element => {
         }}
         name="profile"
         component={ProfileScreen}
+      />
+
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="paymentMethod"
+        component={PaymentMethod}
+      />
+
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+          headerTitle: 'red'
+        }}
+        name="addPaymentMethod"
+        component={AddPaymentMethod}
       />
       <Screen
         name="Notifications"

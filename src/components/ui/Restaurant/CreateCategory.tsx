@@ -1,36 +1,23 @@
 import {
-  AddIcon,
-  ArrowRightIcon,
   Box,
-  Button,
-  ButtonText,
-  Center,
-  CheckIcon,
-  ClockIcon,
-  HelpCircleIcon,
   HStack,
-  Icon,
-  MailIcon,
-  Pressable,
-  Text,
   VStack,
 } from '@gluestack-ui/themed';
-import React, {useState} from 'react';
-import {Alert, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, Platform } from 'react-native';
 
-import {useTheme} from '../../../theme/useTheme';
-import {navigate} from '../../../navigators/Root';
-import {InputFiled, PrimaryButton} from '../../../components';
-import {Icons} from '../../../assets/icons';
-
+import { useTheme } from '../../../theme/useTheme';
+import { InputFiled, PrimaryButton } from '../../../components';
 import auth from '@react-native-firebase/auth';
-import firestore, {serverTimestamp} from '@react-native-firebase/firestore';
-import {useLoading} from '../../../hooks/useLoading';
+import firestore from '@react-native-firebase/firestore';
+import { useLoading } from '../../../hooks/useLoading';
+import Toast from 'react-native-toast-message';
+
 
 export default function CreateCategory(): React.JSX.Element {
-  const {colors, styles} = useTheme();
+  const { colors, styles } = useTheme();
 
-  const {isLoading, onLoad, onLoaded} = useLoading();
+  const { isLoading, onLoad, onLoaded } = useLoading();
   const [category, setCategory] = useState<string>("");
 
   const createCategory = async () => {
@@ -39,22 +26,31 @@ export default function CreateCategory(): React.JSX.Element {
       onLoad();
       const currentUser = auth().currentUser;
       if (currentUser) {
-        const categoryData = {categoryName: category}; // Create category object
+        const categoryData = { categoryName: category }; // Create category object
 
         const categoryDocRef = firestore()
           .collection('categories')
           .doc(currentUser.uid);
 
-         await categoryDocRef.set({
+        await categoryDocRef.set({
           categories: firestore.FieldValue.arrayUnion(categoryData),
         }, { merge: true });
         setCategory("");
-        Alert.alert('Success', 'Category created successfully!');
-        
+
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Category created successfully!',
+        });
+
       }
     } catch (error) {
-      console.error('Error creating category:', error);
-      Alert.alert('Error', 'Failed to create category.');
+
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to create category.'
+      });
     } finally {
       onLoaded();
     }
@@ -67,7 +63,7 @@ export default function CreateCategory(): React.JSX.Element {
       <Box flex={1} bg={colors.background}>
         <VStack p={16} flex={1}>
           <InputFiled
-          isRequired
+            isRequired
             defaultValue={category}
             type="text"
             label="Category Name"
@@ -89,8 +85,8 @@ export default function CreateCategory(): React.JSX.Element {
               variant="outlined"
             />
             <PrimaryButton
-            onPress={createCategory}
-            isLoading={isLoading}
+              onPress={createCategory}
+              isLoading={isLoading}
               disabled={!category}
               text="Create Category"
               width="50%"

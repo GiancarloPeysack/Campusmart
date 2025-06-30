@@ -6,13 +6,11 @@ import {
   TouchableOpacity,
   Linking,
   ActivityIndicator,
-  Alert
 } from 'react-native';
-import { useStripe } from '@stripe/stripe-react-native';
 import axios, { AxiosError } from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { RouteProp } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 
 type StripeStatus = 'not_connected' | 'pending' | 'verified';
@@ -64,11 +62,21 @@ const StripeConnectScreen = ({ navigation }: any) => {
       if (status === 'verified') {
         navigation.replace('Dashboard');
       } else {
-        Alert.alert('Onboarding Incomplete', 'Please complete the Stripe onboarding process');
+        Toast.show({
+          type: 'error',
+          text1: 'Onboarding Incomplete',
+          text2: 'Please complete the Stripe onboarding process',
+        });
       }
     } catch (error) {
       console.error('Status check error:', error);
-      Alert.alert('Error', 'Failed to verify Stripe status');
+
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to verify Stripe status',
+      });
+
     } finally {
       setLoading(false);
     }
@@ -91,10 +99,12 @@ const StripeConnectScreen = ({ navigation }: any) => {
       await Linking.openURL(response.data.onboardingUrl);
     } catch (error) {
       const axiosError = error as AxiosError<{ error?: string }>;
-      Alert.alert(
-        'Connection Failed',
-        axiosError.response?.data?.error || axiosError.message
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Connection Failed',
+        text2: '' + (axiosError.response?.data?.error || axiosError.message),
+      });
+
     } finally {
       setLoading(false);
     }

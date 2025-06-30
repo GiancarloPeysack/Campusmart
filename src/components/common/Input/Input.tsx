@@ -45,7 +45,7 @@ export const InputFiled = (props: InputProps) => {
       isRequired={props.isRequired}>
       {props.label && (
         <FormControlLabel mb="$2">
-          <FormControlLabelText fontSize={14} fontWeight="$medium">
+          <FormControlLabelText fontSize={'$sm'} fontWeight="$medium">
             {props.label}
           </FormControlLabelText>
         </FormControlLabel>

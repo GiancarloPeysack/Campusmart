@@ -23,7 +23,7 @@ import { useTheme } from '../../../theme/useTheme';
 import { Icons } from '../../../assets/icons';
 import { InputFiled, PrimaryButton } from '../../../components';
 
-import { Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { navigate } from '../../../navigators/Root';
 
 import { useForm, Controller } from 'react-hook-form';
@@ -123,7 +123,12 @@ export default function RegisterScreen(): React.JSX.Element {
         });
 
       reset();
-      Alert.alert('Success', 'Restaurent registered successfully');
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: 'Restaurent registered successfully',
+      });
     } catch (error) {
       const errorMessage = handleFirebaseError(error);
       Toast.show({

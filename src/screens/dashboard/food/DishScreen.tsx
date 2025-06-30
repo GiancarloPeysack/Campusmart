@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Alert, ScrollView, Image, View, Pressable, ActivityIndicator } from 'react-native';
+import { ScrollView, Image, View, Pressable, ActivityIndicator } from 'react-native';
 import {
-  AddIcon,
   ArrowLeftIcon,
   Box,
   Button,
@@ -20,6 +19,7 @@ import useRestaurents from '../../../hooks/public/useRestaurents';
 import { useCart } from '../../../context/cart';
 import CustomBottomSheet from '../../../components/CustomBottomSheet/CustomBottomSheet';
 import CartModal from '../../../components/ui/Cart/CartModal';
+import Toast from 'react-native-toast-message';
 
 interface MenuItem {
   availability: boolean;
@@ -91,7 +91,14 @@ export default function DishScreen(props: any): React.JSX.Element {
     setLoading(true);
 
     if (!restaurant?.stripeAccountId) {
-      Alert.alert('Erorr', 'Resturant Bank Information is not set up');
+
+      Toast.show({
+        type: 'error',
+        text1: "Erorr",
+        text2: 'Resturant Bank Information is not set up',
+      });
+      setLoading(false);
+
       return;
     }
     if (menuItem) {
@@ -109,13 +116,20 @@ export default function DishScreen(props: any): React.JSX.Element {
         bottomSheetRef.current.open();
       }, 3000);
 
-      // Alert.alert('Success', 'Item added to cart')
     }
   };
 
+
   const handleBuyNow = () => {
     if (!restaurant?.stripeAccountId) {
-      Alert.alert('Erorr', 'Resturant Bank Information is not set up');
+
+      Toast.show({
+        type: 'error',
+        text1: "Erorr",
+        text2: 'Resturant Bank Information is not set up',
+      });
+      setLoading(false);
+
       return;
     }
 

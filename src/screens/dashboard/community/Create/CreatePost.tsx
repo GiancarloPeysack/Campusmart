@@ -1,109 +1,305 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Box,
     HStack,
     VStack,
     Text,
     Pressable,
-    Input,
-    TextArea,
     Badge,
     ScrollView,
     Icon,
     ArrowLeftIcon,
 } from '@gluestack-ui/themed';
 import { Image } from 'react-native';
-import useAuth from '../../../../hooks/useAuth';
+import { launchImageLibrary } from 'react-native-image-picker';
+import storage from '@react-native-firebase/storage';
+import firestore from '@react-native-firebase/firestore';
+import uuid from 'react-native-uuid';
 import { InputFiled } from '../../../../components';
-// import { Ionicons } from '@expo/vector-icons';
+import { Icons } from '../../../../assets/icons';
+import { useTheme } from '../../../../theme/useTheme';
+import useAuth from '../../../../hooks/useAuth';
+import auth from '@react-native-firebase/auth';
+import {
+    Modal,
+    ModalBackdrop,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    ModalCloseButton,
+} from '@gluestack-ui/themed';
 
-export default function CreatePost() {
-    const { user, loading } = useAuth();
+import Toast from 'react-native-toast-message';
 
-    console.log('user', user)
+export default function CreatePost(props) {
+    const { colors } = useTheme();
+    const { user } = useAuth();
+    const tagOptions = ['Sales', 'Marketing', 'Tech', 'Finance', 'Design'];
+
+    const [description, setDescription] = useState('');
+    const [images, setImages] = useState<string[]>([]);
+    const [isPosting, setIsPosting] = useState(false);
+    const [selectedTag, setSelectedTag] = useState('Sales');
+    const [tagModalVisible, setTagModalVisible] = useState(false);
+
+    const pickImages = async () => {
+        const result = await launchImageLibrary({
+            mediaType: 'photo',
+            selectionLimit: 5,
+            quality: 0.7,
+        });
+
+        if (result.didCancel) return;
+        if (result.errorCode) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: '' + result.errorMessage || 'Image selection failed'
+            });
+
+            return;
+        }
+
+        const assets = result.assets || [];
+        for (const asset of assets) {
+            if (asset.uri) await uploadImage(asset.uri);
+        }
+    };
+
+    const uploadImage = async (uri: string) => {
+        try {
+            const filename = `${uuid.v4()}.jpg`;
+            const reference = storage().ref(`community_posts/${filename}`);
+            await reference.putFile(uri);
+            const downloadURL = await reference.getDownloadURL();
+            setImages(prev => [...prev, downloadURL]);
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to upload image'
+            });
+        }
+    };
+
+    const handleSubmitPost = async () => {
+        if (!description.trim()) {
+            Toast.show({
+                type: 'error',
+                text1: 'Validation',
+                text2: 'Please enter a description.'
+            });
+            return;
+        }
+
+        setIsPosting(true);
+
+        try {
+            const body = {
+                userId: auth().currentUser.uid,
+                fullName: `${user?.firstName} ${user?.lastName}`,
+                userAvatar: user?.profilePicture || '',
+                description,
+                images,
+                visibility: 'public',
+                createdAt: firestore.FieldValue.serverTimestamp(),
+            }
+
+            await firestore()
+                .collection('community_posts')
+                .add(body);
+
+            Toast.show({
+                type: 'success',
+                text1: 'Success',
+                text2: 'Post uploaded successfully!'
+            });
+            setDescription('');
+            setImages([]);
+        } catch (error) {
+            Toast.show({
+                type: 'error',
+                text1: 'Error',
+                text2: 'Failed to upload post.'
+            });
+        } finally {
+            setIsPosting(false);
+        }
+    };
+
     return (
         <Box flex={1} bgColor="white">
-            <HStack justifyContent="space-between" alignItems="center" px={4} py={20} borderBottomWidth={1} borderColor="#E5E7EB">
-                <Pressable>
-                    <Icon as={ArrowLeftIcon} name="arrow-back" size="xl" ml={4} color="black" />
+            <HStack
+                justifyContent="space-between"
+                alignItems="center"
+                px={4}
+                py={20}
+                borderBottomWidth={1}
+                borderColor="#E5E7EB">
+                <Pressable onPress={() => props.navigation.goBack()}>
+                    <Icon
+                        as={ArrowLeftIcon}
+                        name="arrow-back"
+                        size="xl"
+                        ml={4}
+                        color="black"
+                    />
                 </Pressable>
-                <Text fontSize="$lg" fontWeight="bold">Create Post</Text>
-                <Pressable bg="#D0E1FD" px={20} py={4} borderRadius={20}>
-                    <Text color="#2563EB" fontWeight="bold">Post</Text>
+                <Text fontSize="$lg" fontWeight="bold">
+                    Create Post
+                </Text>
+                <Pressable
+                    onPress={handleSubmitPost}
+                    disabled={isPosting}
+                    bg="#D0E1FD"
+                    px={22}
+                    py={8}
+                    borderRadius={20}>
+                    <Text color="#2563EB" fontWeight="bold">
+                        {isPosting ? 'Posting...' : 'Post'}
+                    </Text>
                 </Pressable>
             </HStack>
 
             <ScrollView px={4} py={2}>
-                <HStack alignItems="center" mt={2} gap={3} m={20}>
+                <HStack alignItems="center" mt={10} gap={3} m={20}>
                     <Image
-                        source={{ uri: 'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000' }}
-                        style={{ width: 50, height: 50, borderRadius: 25 }}
+                        source={{
+                            uri:
+                                user?.profilePicture ||
+                                'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000',
+                        }}
+                        style={{ width: 60, height: 60, borderRadius: 40, margin: 5 }}
                     />
-                    <VStack>
-                        <Text fontWeight="bold" fontSize="$md">{user?.firstName} {user?.lastName}</Text>
-                        <Badge px={3} py={1} borderRadius={20} bgColor="#E0ECFF">
-                            <Text color="#2563EB" fontSize="$sm">Sales</Text>
-                        </Badge>
+                    <VStack mt={4}>
+                        <Text px={5} fontWeight="bold" fontSize="$xl">
+                            {user?.firstName} {user?.lastName}
+                        </Text>
+                        <Pressable onPress={() => setTagModalVisible(true)}>
+                            <Badge px={20} py={5} borderRadius={20} bgColor="#E0ECFF">
+                                <Text color="#2563EB" fontSize="$lg">
+                                    {selectedTag}
+                                </Text>
+                            </Badge>
+                        </Pressable>
                     </VStack>
                 </HStack>
 
-                {/* Input Area */}
                 <Box mt={4} borderColor="#fff" m={10}>
                     <InputFiled
-                        value={'restDetails?.bio'}
-                        defaultValue={'What are you looking for/selling?'}
-                        //    onChangeText={text =>
-                        //     //  setRestDetails({...restDetails, bio: text})
-                        //    }
+                        value={description}
+                        onChangeText={text => setDescription(text)}
                         type="text"
                         isRequired
                         muliline
-                        // label="Bio"
                         placeholder="Enter item description"
                     />
                 </Box>
 
-                <HStack justifyContent="space-between" mt={20} mb={20} m={10}>
-                    <Text fontSize="$xs" color="#6B7280">Be respectful and helpful to others</Text>
-                    <Text fontSize="$xs" color="#6B7280">0/500</Text>
+                <HStack justifyContent="space-between" mb={20} m={10}>
+                    <Text fontSize="$xs" color="#6B7280">
+                        Be respectful and helpful to others
+                    </Text>
+                    <Text fontSize="$xs" color="#6B7280">
+                        {description.length}/500
+                    </Text>
                 </HStack>
 
-                {/* Image Upload Boxes */}
-                {[1, 2].map((_, idx) => (
-                    <Pressable
-                        key={idx}
-                        mt={4}
-                        borderWidth={1}
-                        borderColor="#D1D5DB"
-                        borderRadius={10}
-                        borderStyle="dashed"
-                        alignItems="center"
-                        justifyContent="center"
-                        py={6}
-                    >
-                        {/* <Icon as={Ionicons} name="camera-outline" size="xl" color="#9CA3AF" /> */}
-                        <Text mt={2} fontSize="$sm" color="#4B5563">Add photos to your post</Text>
-                        <Text fontSize="$xs" color="#9CA3AF">Tap to upload images (max 5MB)</Text>
-                    </Pressable>
-                ))}
-
-                {/* Public Label */}
-                <HStack alignItems="center" mt={5}>
-                    {/* <Icon as={Ionicons} name="globe-outline" size="sm" color="#6B7280" /> */}
-                    <Text ml={2} fontSize="$sm" color="#6B7280">Public</Text>
-                </HStack>
-
-                {/* Posting Tips */}
-                <Box mt={4} bgColor="#E8F1FF" borderRadius={10} p={3}>
-                    <HStack alignItems="center">
-                        {/* <Icon as={Ionicons} name="information-circle-outline" size="sm" color="#2563EB" /> */}
-                        <Text ml={2} fontWeight="bold" fontSize="$sm" color="#2563EB">Posting Tips</Text>
+                {/* Uploaded Image Preview */}
+                {images.length > 0 && (
+                    <HStack flexWrap="wrap" m={4}>
+                        {images.map((uri, idx) => (
+                            <Image
+                                key={idx}
+                                source={{ uri }}
+                                style={{ width: 80, height: 80, borderRadius: 8, margin: 4 }}
+                            />
+                        ))}
                     </HStack>
-                    <Text mt={1} fontSize="$xs" color="#2563EB">
-                        Add clear photos and detailed descriptions to get better responses from the community.
+                )}
+
+                {/* Upload Image Box */}
+                <Pressable
+                    mt={4}
+                    height={150}
+                    borderWidth={1}
+                    borderColor="#D1D5DB"
+                    borderRadius={10}
+                    borderStyle="dashed"
+                    alignItems="center"
+                    justifyContent="center"
+                    py={6}
+                    m={10}
+                    onPress={pickImages}>
+                    <Icon
+                        as={() => <Icons.Camara w={32} h={32} fill={colors?.grey200} />}
+                    />
+                    <Text mt={2} fontSize="$sm" color="#4B5563">
+                        Add photos to your post
+                    </Text>
+                    <Text fontSize="$xs" color="#9CA3AF">
+                        Tap to upload images (max 5)
+                    </Text>
+                </Pressable>
+
+                <HStack alignItems="center" m={10} mt={5}>
+                    <Icon
+                        as={Icons.MapTag}
+                        name="globe-outline"
+                        size="sm"
+                        color="#6B7280"
+                    />
+                    <Text ml={2} fontSize="$sm" color="#6B7280">
+                        Public
+                    </Text>
+                </HStack>
+
+                <Box m={10} mt={4} bgColor="#E8F1FF" borderRadius={10} p={16}>
+                    <HStack alignItems="center">
+                        <Icon
+                            as={Icons.MapTag}
+                            name="information-circle-outline"
+                            size="sm"
+                            color="#2563EB"
+                        />
+                        <Text ml={2} fontWeight="bold" fontSize="$sm" color="#2563EB">
+                            Posting Tips
+                        </Text>
+                    </HStack>
+                    <Text mt={1} fontSize="$sm" color="#2563EB">
+                        Add clear photos and detailed descriptions to get better responses
+                        from the community.
                     </Text>
                 </Box>
             </ScrollView>
+            <Modal isOpen={tagModalVisible} onClose={() => setTagModalVisible(false)}>
+                <ModalBackdrop />
+                <ModalContent>
+                    <ModalHeader>
+                        <Text fontWeight="bold" fontSize="$lg">
+                            Select Category
+                        </Text>
+                        <ModalCloseButton />
+                    </ModalHeader>
+                    <ModalBody>
+                        {tagOptions.map(tag => (
+                            <Pressable
+                                key={tag}
+                                onPress={() => {
+                                    setSelectedTag(tag);
+                                    setTagModalVisible(false);
+                                }}
+                                py={3}>
+                                <Text fontSize="$md" color="#2563EB">
+                                    {tag}
+                                </Text>
+                            </Pressable>
+                        ))}
+                    </ModalBody>
+                    <ModalFooter />
+                </ModalContent>
+            </Modal>
         </Box>
     );
 }

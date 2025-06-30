@@ -1,13 +1,13 @@
-import {Box, Center, Spinner, Text, VStack} from '@gluestack-ui/themed';
-import {Alert, ScrollView} from 'react-native';
-import {DriverOrderCard} from '../../../../../components';
-import {useTheme} from '../../../../../theme/useTheme';
+import { Box, Center, Spinner, Text, VStack } from '@gluestack-ui/themed';
+import { ScrollView } from 'react-native';
+import { DriverOrderCard } from '../../../../../components';
+import { useTheme } from '../../../../../theme/useTheme';
 import useDeliveries from '../hooks/useDeliveries';
 
 export const DeliveredTab = () => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {delivered, isLoading, updateDeliveryStatus} =
+  const { delivered, isLoading, updateDeliveryStatus } =
     useDeliveries();
 
   return (
@@ -26,7 +26,7 @@ export const DeliveredTab = () => {
         </Center>
       )}
       <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}>
         <VStack p={16} space='md'>
           {delivered?.length > 0 ? (
@@ -39,7 +39,7 @@ export const DeliveredTab = () => {
                   address={item.order?.deliveryAddress}
                   phoneNumber={item.user?.phoneNumber}
                   whastapp={item.user?.whatsapp}
-                 
+
                   status={item.status}
                 />
               );

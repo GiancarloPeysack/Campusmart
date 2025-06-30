@@ -1,26 +1,75 @@
-import React, { useState } from 'react';
-import { ScrollView, TextInput, Image, Pressable } from 'react-native';
+// CommunityScreen.js
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  ScrollView,
+  TextInput,
+  Image,
+  Pressable,
+  Dimensions,
+} from 'react-native';
 import {
   Box,
   VStack,
   HStack,
   Text,
-  Avatar,
   Button,
   ButtonText,
   View,
+  Input,
+  Icon,
+  FavouriteIcon,
 } from '@gluestack-ui/themed';
 import { navigate } from '../../../navigators/Root';
+import useAuth from '../../../hooks/useAuth';
+import { formatTime } from '../../../utils/helper/functions';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import CustomBottomSheet from '../../../components/CustomBottomSheet/CustomBottomSheet';
+import CommentItem from '../../../components/comments/CommentItem';
+import CommentInput from '../../../components/comments/CommentInput';
 
 export default function CommunityScreen() {
+  const currentUserId = auth().currentUser.uid;
+  const { user } = useAuth();
   const [selectedTab, setSelectedTab] = useState('Sales');
+  const [posts, setPosts] = useState([]);
 
   const tabs = ['Sales', 'Chat', 'Housing'];
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('community_posts')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(async snapshot => {
+        const postData = await Promise.all(
+          snapshot.docs.map(async doc => {
+            const data = doc.data();
+            const userDoc = await firestore()
+              .collection('users')
+              .doc(data.userId)
+              .get();
+            const userData = userDoc.exists ? userDoc.data() : {};
+
+            return {
+              id: doc.id,
+              ...data,
+              fullName: `${userData.firstName || ''} ${userData.lastName || ''
+                }`,
+              userAvatar: userData.profilePicture || '',
+            };
+          }),
+        );
+
+        setPosts(postData);
+      });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
     <Box flex={1} bgColor="white">
       <VStack px={16} py={20}>
-        <HStack space={10} mt={0}>
+        <HStack space={10}>
           {tabs.map(tab => (
             <Button
               key={tab}
@@ -36,19 +85,14 @@ export default function CommunityScreen() {
         </HStack>
 
         <HStack alignItems="center" gap={4} mt={20}>
-          <Box
-            bg="#fff"
-            borderRadius={10}
-            p={2}
-            alignItems="center"
-            justifyContent="center">
+          <Box bg="#fff" borderRadius={10} p={2}>
             <Image
               width={40}
               height={40}
               borderRadius={20}
               resizeMode="cover"
               source={{
-                uri: 'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
+                uri: user?.profilePicture || 'https://via.placeholder.com/40',
               }}
             />
           </Box>
@@ -59,140 +103,206 @@ export default function CommunityScreen() {
             px={4}
             py={4}
             alignItems="center"
-            flex={1}><Pressable onPress={() => navigate('CreatePost')}>
+            flex={1}>
+            <Pressable onPress={() => navigate('CreatePost')}>
               <TextInput
                 placeholder="What are you looking for/selling?"
                 style={{ marginLeft: 10, flex: 1 }}
                 editable={false}
-
-              /></Pressable>
+              />
+            </Pressable>
           </HStack>
         </HStack>
-        {/* Feed */}
+
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ marginTop: 20 }}>
-          <PostItem
-            user="Sarah Johnson"
-            time="2 hours ago"
-            tag="Market"
-            content="Looking for a used MacBook Pro in good condition. Budget around €800. Preferably 2021 or newer model. Anyone selling?"
-            comments={12}
-            likes={24}
-            replies={[
-              {
-                user: 'Alex Brown',
-                time: '1 hour ago',
-                reply:
-                  'I have a 2022 MacBook Pro in excellent condition. DM me for details and photos.',
-              },
-            ]}
-          />
-          <PostItem
-            user="Mike Chen"
-            time="5 hours ago"
-            tag="Community"
-            content="Does anyone have a spare room to rent near campus? Max budget €500/month, available from March 2025. Clean and quiet student here!"
-            image="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85"
-            comments={8}
-            likes={15}
-          />
-          <PostItem
-            user="Emma Wilson"
-            time="8 hours ago"
-            tag="Food"
-            content="Anyone interested in joining for lunch at the new Italian place downtown? They have amazing pasta deals! 🍝"
-            multiImages={[
-              'https://images.unsplash.com/photo-1',
-              'https://images.unsplash.com/photo-2',
-              'https://images.unsplash.com/photo-3',
-            ]}
-            comments={5}
-            likes={10}
-            replies={[
-              {
-                user: 'Tom Parker',
-                time: '6 hours ago',
-                reply: `Count me in! I’ve heard great things about their carbonara. What time were you thinking?`,
-              },
-            ]}
-          />
+          {posts.map(post => (
+            <PostItem
+              key={post.id}
+              post={post}
+              currentUser={user}
+              currentUserId={currentUserId}
+            />
+          ))}
         </ScrollView>
       </VStack>
-    </Box >
+    </Box>
   );
 }
 
-const PostItem = ({
-  user,
-  time,
-  tag,
-  content,
-  image,
-  multiImages,
-  comments,
-  likes,
-  replies = [],
-}) => {
+const PostItem = ({ post, currentUserId, currentUser }: any) => {
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(post.likes || 0);
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState([]);
+  const bottomSheetRef = useRef();
+
+  useEffect(() => {
+    setLiked(post.likesBy?.includes(currentUserId) || false);
+  }, [post.likesBy]);
+
+  useEffect(() => {
+    const unsubscribe = firestore()
+      .collection('community_posts')
+      .doc(post.id)
+      .collection('comments')
+      .orderBy('createdAt', 'desc')
+      .onSnapshot(snapshot => {
+        setComments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      });
+
+    return () => unsubscribe();
+  }, []);
+
+  const toggleLike = async () => {
+    const postRef = firestore().collection('community_posts').doc(post.id);
+    const newLiked = !liked;
+    const newCount = newLiked ? likesCount + 1 : likesCount - 1;
+
+    setLiked(newLiked);
+    setLikesCount(newCount);
+
+    await postRef.update({
+      likes: newCount,
+      likesBy: newLiked
+        ? firestore.FieldValue.arrayUnion(currentUserId)
+        : firestore.FieldValue.arrayRemove(currentUserId),
+    });
+  };
+  const postComment = async () => {
+    if (!commentText.trim()) return;
+
+    const userDoc = await firestore().collection('users').doc(currentUserId).get();
+    const userData = userDoc.exists ? userDoc.data() : {};
+
+    await firestore()
+      .collection('community_posts')
+      .doc(post.id)
+      .collection('comments')
+      .add({
+        userId: currentUserId,
+        userName: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+        userAvatar: userData.profilePicture || '',
+        text: commentText.trim(),
+        createdAt: firestore.FieldValue.serverTimestamp(),
+      });
+
+    setCommentText('');
+  };
+
+
   return (
     <Box mb={20}>
       <HStack alignItems="center" mb={8}>
-        <Avatar
-          size="sm"
-          source={{ uri: 'https://randomuser.me/api/portraits/women/44.jpg' }}
+        <Image
+          width={40}
+          height={40}
+          borderRadius={20}
+          resizeMode="cover"
+          source={{ uri: post.userAvatar || 'https://via.placeholder.com/40' }}
         />
         <VStack ml={10}>
-          <Text fontWeight="bold">{user}</Text>
-
-          <HStack alignItems="center" justifyContent='center'>
+          <Text fontWeight="bold">{post.fullName}</Text>
+          <HStack alignItems="center">
             <Text ml={5} fontSize={12} color="#6B7280">
-              {time}
+              {formatTime(post.createdAt)}
             </Text>
-            {tag && <View sx={{ width: 2, height: 2, backgroundColor: '#000', borderRadius: 10, marginHorizontal: 5 }} />}
-            <Text fontSize={12} color="primary">
-              {tag}
-            </Text>
+            {post.visibility && (
+              <>
+                <View
+                  sx={{
+                    width: 2,
+                    height: 2,
+                    backgroundColor: '#000',
+                    borderRadius: 10,
+                    marginHorizontal: 5,
+                  }}
+                />
+                <Text fontSize={12} color="primary">
+                  {post.visibility}
+                </Text>
+              </>
+            )}
           </HStack>
         </VStack>
       </HStack>
 
-      <Text mb={10}>{content}</Text>
+      <Text mb={10}>{post.description}</Text>
 
-      {image && (
+      {post.images?.length === 1 && (
         <Image
-          source={{ uri: image }}
+          source={{ uri: post.images[0] }}
           style={{ height: 160, borderRadius: 10, marginBottom: 10 }}
           resizeMode="cover"
         />
       )}
-      {multiImages && (
+
+      {post.images?.length > 1 && (
         <HStack space={6} mb={10}>
-          {multiImages.map((img, idx) => (
+          {post.images.map((img, idx) => (
             <Image
               key={idx}
               source={{ uri: img }}
-              style={{ width: 80, height: 80, borderRadius: 8 }}
+              style={{
+                width: Dimensions.get('window').width / 2.5,
+                height: Dimensions.get('window').width / 2.5,
+                borderRadius: 8,
+                marginRight: 10,
+              }}
             />
           ))}
         </HStack>
       )}
 
-      <HStack space={20} mb={10}>
-        <Text fontSize={14}>💬 {comments}</Text>
-        <Text fontSize={14}>❤️ {likes}</Text>
+      <HStack gap={20} mb={10}>
+        <Pressable onPress={toggleLike}>
+          <HStack alignItems="center">
+            {liked ? (
+              <FavouriteIcon fill="red" color="red" />
+            ) : (
+              <FavouriteIcon />
+            )}
+            <Text fontSize={16} ml={6}>
+              {likesCount}
+            </Text>
+          </HStack>
+        </Pressable>
+        <Pressable onPress={() => bottomSheetRef.current.open()}>
+          <Text fontSize={16}>💬 {comments.length}</Text>
+        </Pressable>
       </HStack>
 
-      {replies.map((reply, idx) => (
-        <Box key={idx} bg="#F9FAFB" p={10} borderRadius={8} mb={5}>
-          <Text fontWeight="bold" mb={5}>
-            {reply.user}{' '}
-            <Text color="#6B7280" fontSize={12}>
-              {reply.time}
-            </Text>
-          </Text>
-          <Text>{reply.reply}</Text>
-        </Box>
-      ))}
+      <CustomBottomSheet ref={bottomSheetRef}>
+        <ScrollView>
+          {comments?.map(comment => (
+            <CommentItem
+              commentId={comment.id}
+              postId={post.id}
+              avatar={
+                comment?.userAvatar ||
+                'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000'
+              }
+              name={comment?.userName || 'Alex'}
+              comment={comment?.text || 'This is a comment'}
+              time={comment.createdAt}
+              // likes={comment?.likedBy?.length || 0}
+              currentUser={{
+                uid: currentUserId,
+                name: currentUser.firstName + ' ' + currentUser.lastName,
+                avatar: currentUser.profilePicture,
+              }}
+            />
+          ))}
+        </ScrollView>
+
+        <CommentInput
+          avatar={currentUser.profilePicture}
+          value={commentText}
+          onChangeText={setCommentText}
+          onPost={postComment}
+        />
+      </CustomBottomSheet>
     </Box>
   );
 };

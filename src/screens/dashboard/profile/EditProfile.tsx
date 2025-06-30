@@ -4,45 +4,72 @@ import {
   Icon,
   MailIcon,
   PhoneIcon,
+  Text,
+  Button,
+  ButtonText,
   VStack,
+  Switch,
 } from '@gluestack-ui/themed';
-import React, {PropsWithChildren, useEffect, useState} from 'react';
-import {useTheme} from '../../../theme/useTheme';
-import {Icons} from '../../../assets/icons';
-import {InputFiled, PrimaryButton} from '../../../components';
-import {Alert, ScrollView} from 'react-native';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
+import { useTheme } from '../../../theme/useTheme';
+import { InputFiled, PrimaryButton } from '../../../components';
+import { ScrollView } from 'react-native';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
-import {useLoading} from '../../../hooks/useLoading';
+import { useLoading } from '../../../hooks/useLoading';
+import { Home } from '../../../assets/icons/Home';
+import { MapPin } from '../../../assets/icons/MapPin';
+import { Shop } from '../../../assets/icons/Shop';
+import Toast from 'react-native-toast-message';
 
 interface Props {
   onPress?: () => void;
 }
 
-const Card: React.FC<PropsWithChildren<Props>> = ({children}) => {
-  const {colors} = useTheme();
+const Card: React.FC<PropsWithChildren<Props>> = ({ children }) => {
+  const { colors } = useTheme();
   return (
-    <Box bg={colors.white} p={16} gap={16}>
+    <Box bg={colors.gray1} p={16} gap={16}>
       {children}
     </Box>
   );
 };
 
 export const EditProfileScreen = (props: any): React.JSX.Element => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {option} = props.route.params;
+  const { option } = props.route.params;
+
+  const [selectedTab, setSelectedTab] = useState('Home');
+  const [isDefault, setIsDefault] = useState(false);
+  const [isEmailNotificationAllowed, setIsEmailNotificationAllowed] = useState(false);
+  const [isSmsNotificationAllowed, setIsSmsNotificationAllowed] = useState(false);
 
   const currentUser = auth().currentUser;
   const [userDetails, setUserDetails] = useState<any>(null);
-  const {isLoading, onLoad, onLoaded} = useLoading();
+  const { isLoading, onLoad, onLoaded } = useLoading();
   const {
     isLoading: updating,
     onLoad: onUpdate,
     onLoaded: onUpdated,
   } = useLoading();
+
+  const tabs = [
+    {
+      text: 'Home',
+      icon: <Icon as={Home} color={colors.primary} w={14} h={14} />,
+    },
+    {
+      text: 'Dorm',
+      icon: <Icon as={Shop} color={colors.primary} w={16} h={16} />,
+    },
+    {
+      text: 'Other',
+      icon: <Icon as={MapPin} color={colors.primary} w={16} h={16} />,
+    },
+  ];
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -68,20 +95,33 @@ export const EditProfileScreen = (props: any): React.JSX.Element => {
     fetchUserDetails();
   }, []);
 
+  useEffect(() => {
+    setIsEmailNotificationAllowed(userDetails?.isEmailNotificationAllowed ?? false);
+    setIsSmsNotificationAllowed(userDetails?.isSmsNotificationAllowed ?? false);
+    setIsDefault(userDetails?.address?.isDefault ?? false)
+    setSelectedTab(userDetails?.address?.addressType ?? 'Home')
+  }, [userDetails])
+
+
   const handleSubmit = async () => {
     try {
       onUpdate();
       if (currentUser) {
         if (option === 'contact') {
-          await firestore()
-            .collection('users')
-            .doc(currentUser.uid)
-            .update({
-              email: userDetails.email,
-              phoneNumber: userDetails.phoneNumber,
-              whatsapp: userDetails.whatsapp,
-            });
-          Alert.alert('Success', 'Profile updated successfully');
+          await firestore().collection('users').doc(currentUser.uid).update({
+            email: userDetails.email,
+            phoneNumber: userDetails.phoneNumber,
+            whatsapp: userDetails.whatsapp,
+            isEmailNotificationAllowed: isEmailNotificationAllowed,
+            isSmsNotificationAllowed: isSmsNotificationAllowed
+          });
+
+
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: 'Profile updated successfully',
+          });
         } else if (option === 'address') {
           await firestore()
             .collection('users')
@@ -93,9 +133,17 @@ export const EditProfileScreen = (props: any): React.JSX.Element => {
                 postalCode: userDetails.address?.postalCode || '',
                 additionalNotes: userDetails.address?.additionalNotes || '',
                 apartment: userDetails.address?.apartment || '',
+                addressType: selectedTab,
+                isDefault: isDefault,
               },
             });
-          Alert.alert('Success', 'Address saved successfully');
+
+
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: 'Address saved successfully',
+          });
         }
       }
     } catch (error) {
@@ -116,8 +164,8 @@ export const EditProfileScreen = (props: any): React.JSX.Element => {
   };
 
   return (
-    <Box flex={1} bg={colors.background}>
-      <ScrollView contentContainerStyle={{flexGrow: 1}}>
+    <Box flex={1} bg={colors.gray1}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <VStack gap={16} flex={1}>
           {option === 'contact' ? (
             <Card>
@@ -129,7 +177,7 @@ export const EditProfileScreen = (props: any): React.JSX.Element => {
                 value={userDetails?.email}
                 defaultValue={userDetails?.email}
                 onChangeText={text =>
-                  setUserDetails({...userDetails, email: text})
+                  setUserDetails({ ...userDetails, email: text })
                 }
               />
               <InputFiled
@@ -140,20 +188,44 @@ export const EditProfileScreen = (props: any): React.JSX.Element => {
                 value={userDetails?.phoneNumber}
                 defaultValue={userDetails?.phoneNumber}
                 onChangeText={text =>
-                  setUserDetails({...userDetails, phoneNumber: text})
+                  setUserDetails({ ...userDetails, phoneNumber: text })
                 }
               />
-              <InputFiled
-                label="Whatsapp Number"
-                type="text"
-                placeholder="Whatsapp"
-                rightIcon={<Icons.Whatsapp />}
-                value={userDetails?.whatsapp}
-                defaultValue={userDetails?.whatsapp}
-                onChangeText={text =>
-                  setUserDetails({...userDetails, whatsapp: text})
-                }
-              />
+
+              <HStack justifyContent="space-between" alignItems="center" mt={10}>
+                <Text color="$black" fontSize={18} fontWeight="$bold">
+                  Notification Preferences
+                </Text>
+              </HStack>
+
+              <HStack justifyContent="space-between" mb={10}>
+                <HStack justifyContent="flex-start" alignItems="center">
+                  <Icon as={MailIcon} color="#1D4ED8" mr={4} />
+                  <Text color="$black" fontSize={16}>
+                    Email Notifications
+                  </Text>
+                </HStack>
+                <Switch
+                  size="md"
+                  value={isEmailNotificationAllowed}
+                  isDisabled={false}
+                  onToggle={() => setIsEmailNotificationAllowed(!isEmailNotificationAllowed)}
+                />
+              </HStack>
+              <HStack justifyContent="space-between" mb={20}>
+                <HStack justifyContent="flex-start" alignItems="center">
+                  <Icon as={PhoneIcon} color="#1D4ED8" mr={4} />
+                  <Text color="$black" fontSize={16}>
+                    SMS Notifications
+                  </Text>
+                </HStack>
+                <Switch
+                  size="md"
+                  value={isSmsNotificationAllowed}
+                  isDisabled={false}
+                  onToggle={() => setIsSmsNotificationAllowed(!isSmsNotificationAllowed)}
+                />
+              </HStack>
               <HStack justifyContent="space-around" alignItems="center">
                 <PrimaryButton
                   onPress={() => props.navigation.goBack()}
@@ -172,6 +244,35 @@ export const EditProfileScreen = (props: any): React.JSX.Element => {
             </Card>
           ) : (
             <Card>
+              <HStack justifyContent="flex-start" alignItems="center" mt={4}>
+                <Text color="$black" fontSize={'$sm'} fontWeight={'$medium'}>
+                  Address Type
+                </Text>
+              </HStack>
+              <HStack space={10}>
+                {tabs.map(tab => (
+                  <Button
+                    key={tab.text}
+                    variant={selectedTab === tab.text ? 'solid' : 'outline'}
+                    onPress={() => setSelectedTab(tab.text)}
+                    rounded={5}
+                    sx={{
+                      borderWidth: 0,
+                      backgroundColor:
+                        selectedTab === tab.text ? colors.primary : '#fff',
+                    }}
+                    px={20}
+                    mx={10}>
+                    {tab.icon}
+                    <ButtonText
+                      color={selectedTab === tab.text ? '#fff' : colors.title}
+                      style={{ marginLeft: 2 }}>
+                      {/* {icon} */}
+                      {tab.text}
+                    </ButtonText>
+                  </Button>
+                ))}
+              </HStack>
               <InputFiled
                 label="Street Address"
                 type="text"
@@ -217,6 +318,24 @@ export const EditProfileScreen = (props: any): React.JSX.Element => {
                   updateAddressField('additionalNotes', text)
                 }
               />
+              <HStack justifyContent="space-between" mb={20}>
+                <VStack>
+                  <Text color={colors.blackDark}>Set as Default Address</Text>
+                  <Text color={colors.gray5} width={250}>
+                    Use this address as your primary delivery location
+                  </Text>
+                </VStack>
+                <Switch
+                  size="md"
+                  value={isDefault}
+                  isDisabled={false}
+                  // trackColor={{ false: colors.neutral[300], true: colors.neutral[600] }}
+                  // thumbColor={colors.neutral[50]}
+                  // activeThumbColor={colors.neutral[50]}
+                  // ios_backgroundColor={colors.neutral[300]}
+                  onToggle={() => setIsDefault(!isDefault)}
+                />
+              </HStack>
 
               <PrimaryButton
                 variant="primary"

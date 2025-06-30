@@ -18,6 +18,7 @@ interface CartContextType {
   subtotal: number;
   total: number;
   deliveryFee: number;
+  serviceFee: number;
   clearCart: () => void;
 }
 
@@ -26,6 +27,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const deliveryFee = 5.0; // Set a default delivery fee
+  const serviceFee = 0.68;
 
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
@@ -85,7 +87,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 
   // Calculate total (subtotal + delivery fee)
-  const total = useMemo(() => (cart.length > 0 ? subtotal + deliveryFee : 0), [subtotal, cart]);
+  const total = useMemo(() => (cart.length > 0 ? subtotal + deliveryFee + serviceFee : 0), [subtotal, cart]);
 
 
   const clearCart = () => {
@@ -93,7 +95,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, subtotal, total, deliveryFee, clearCart }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, subtotal, total, deliveryFee, serviceFee, clearCart }}>
       {children}
     </CartContext.Provider>
   );

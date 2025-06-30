@@ -2,6 +2,10 @@ import {
   AddIcon,
   Box,
   Center,
+  Checkbox,
+  CheckboxIndicator,
+  CheckboxLabel,
+  CheckIcon,
   HStack,
   Icon,
   Pressable,
@@ -10,7 +14,7 @@ import {
   VStack,
 } from '@gluestack-ui/themed';
 import React from 'react';
-import {useTheme} from '../../../theme/useTheme';
+import { useTheme } from '../../../theme/useTheme';
 import { Image } from 'react-native';
 
 type CartCardProps = {
@@ -25,20 +29,36 @@ type CartCardProps = {
 };
 
 export const CartCard = (props: CartCardProps): React.JSX.Element => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   return (
     <Pressable>
       <Box px={8} py={10} flex={1} rounded={12} bg={colors.light_blue}>
         <HStack gap={10} alignItems="center">
-        
+
+          <Checkbox
+            value=""
+            size="md"
+            isInvalid={false}
+            isDisabled={false}
+            isChecked={true}>
+            <CheckboxIndicator
+              borderColor="$black"
+              borderWidth={0.5}
+              rounded={1}
+              bgColor="$white"
+              $checked-bgColor={colors.primary}>
+              <CheckIcon as={CheckIcon} color="$white" />
+            </CheckboxIndicator>
+          </Checkbox>
+
           <Image
-            source={{uri: props.img}}
+            source={{ uri: props.img }}
             resizeMode="cover"
             height={64}
             width={64}
             alt="cart-image"
-            style={{borderRadius: 8}}
+            style={{ borderRadius: 8 }}
           />
           <VStack gap={7} w={150}>
             <Text flex={1} fontSize={16} fontWeight="$medium" color="$black">

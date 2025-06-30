@@ -29,6 +29,7 @@ export const useTheme = () => {
     lightGrey: '#FAFAFA',
     textBlue: '#4F46E5',
     grey100: '#E5E5E5',
+    grey200: '#A1A1A1',
     greenSuccess: '#059669',
     greenLight: '#ECFDF5',
     blackDark: '#111827',
