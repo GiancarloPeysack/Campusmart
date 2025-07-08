@@ -10,18 +10,18 @@ import {
 } from '@gluestack-ui/themed';
 import auth from '@react-native-firebase/auth';
 
-import {useTheme} from '../../../../theme/useTheme';
-import {Alert, ScrollView} from 'react-native';
-import {Icons} from '../../../../assets/icons';
-import {PrimaryButton, ProfileCard} from '../../../../components';
+import { useTheme } from '../../../../theme/useTheme';
+import { Alert, ScrollView } from 'react-native';
+import { Icons } from '../../../../assets/icons';
+import { PrimaryButton, ProfileCard } from '../../../../components';
 import useDriver from '../../hooks/useDriver';
 import useAuth from '../../../../hooks/useAuth';
 
 export default function ProfileScreen() {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {driver, isLoading} = useDriver();
-  const {user} = useAuth();
+  const { driver, isLoading } = useDriver();
+  const { user } = useAuth();
 
   const handleLogout = () => {
     try {
@@ -31,7 +31,7 @@ export default function ProfileScreen() {
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
-        {text: 'OK', onPress: async () => await auth().signOut()},
+        { text: 'OK', onPress: async () => await auth().signOut() },
       ]);
     } catch (error) {
       console.error('Error signing out:', error);
@@ -40,9 +40,9 @@ export default function ProfileScreen() {
 
   return (
     <Box flex={1} bg={colors.newBg}>
-        <HStack bg={colors.white} p={16}>
-            <Text fontSize={18} color='$black' fontWeight='$medium'>Profile</Text>
-        </HStack>
+      <HStack bg={colors.white} p={16}>
+        <Text fontSize={18} color='$black' fontWeight='$medium'>Profile</Text>
+      </HStack>
       {isLoading && (
         <Center
           zIndex={999}
@@ -58,7 +58,7 @@ export default function ProfileScreen() {
       )}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{flexGrow: 1}}>
+        contentContainerStyle={{ flexGrow: 1 }}>
         <Box flex={1} p={16}>
           <HStack space="md">
             <Avatar bgColor="#DBEAFE">

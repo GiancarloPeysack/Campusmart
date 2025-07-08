@@ -10,7 +10,7 @@ import {
     Icon,
     ArrowLeftIcon,
 } from '@gluestack-ui/themed';
-import { Image } from 'react-native';
+import { Image, PermissionsAndroid } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import storage from '@react-native-firebase/storage';
 import firestore from '@react-native-firebase/firestore';
@@ -35,13 +35,35 @@ import Toast from 'react-native-toast-message';
 export default function CreatePost(props) {
     const { colors } = useTheme();
     const { user } = useAuth();
-    const tagOptions = ['Sales', 'Marketing', 'Tech', 'Finance', 'Design'];
+    const tagOptions = ['Sales', 'Chat', 'Housing'];
 
     const [description, setDescription] = useState('');
     const [images, setImages] = useState<string[]>([]);
     const [isPosting, setIsPosting] = useState(false);
     const [selectedTag, setSelectedTag] = useState('Sales');
     const [tagModalVisible, setTagModalVisible] = useState(false);
+
+    const requestCameraPermission = async () => {
+        try {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.CAMERA,
+                {
+                    title: "App Camera Permission",
+                    message: "App needs access to your camera ",
+                    buttonNeutral: "Ask Me Later",
+                    buttonNegative: "Cancel",
+                    buttonPositive: "OK"
+                }
+            );
+            if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+                console.log("Camera permission given");
+            } else {
+                console.log("Camera permission denied");
+            }
+        } catch (err) {
+            console.warn(err);
+        }
+    };
 
     const pickImages = async () => {
         const result = await launchImageLibrary({
@@ -52,6 +74,7 @@ export default function CreatePost(props) {
 
         if (result.didCancel) return;
         if (result.errorCode) {
+            requestCameraPermission();
             Toast.show({
                 type: 'error',
                 text1: 'Error',
@@ -102,6 +125,7 @@ export default function CreatePost(props) {
                 userAvatar: user?.profilePicture || '',
                 description,
                 images,
+                postTags: selectedTag,
                 visibility: 'public',
                 createdAt: firestore.FieldValue.serverTimestamp(),
             }
@@ -134,10 +158,10 @@ export default function CreatePost(props) {
                 justifyContent="space-between"
                 alignItems="center"
                 px={4}
-                py={20}
+                py={18}
                 borderBottomWidth={1}
                 borderColor="#E5E7EB">
-                <Pressable onPress={() => props.navigation.goBack()}>
+                <Pressable onPress={() => props.navigation.navigate('Community')}>
                     <Icon
                         as={ArrowLeftIcon}
                         name="arrow-back"
@@ -176,7 +200,7 @@ export default function CreatePost(props) {
                         <Text px={5} fontWeight="bold" fontSize="$xl">
                             {user?.firstName} {user?.lastName}
                         </Text>
-                        <Pressable onPress={() => setTagModalVisible(true)}>
+                        <Pressable onPress={() => setTagModalVisible(true)} >
                             <Badge px={20} py={5} borderRadius={20} bgColor="#E0ECFF">
                                 <Text color="#2563EB" fontSize="$lg">
                                     {selectedTag}
@@ -290,7 +314,7 @@ export default function CreatePost(props) {
                                     setSelectedTag(tag);
                                     setTagModalVisible(false);
                                 }}
-                                py={3}>
+                                py={4}>
                                 <Text fontSize="$md" color="#2563EB">
                                     {tag}
                                 </Text>

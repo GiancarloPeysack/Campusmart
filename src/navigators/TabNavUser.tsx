@@ -53,6 +53,7 @@ import CreatePost from '../screens/dashboard/community/Create/CreatePost';
 import { PaymentMethod } from '../screens/dashboard/profile/PaymentMethod';
 import { AddPaymentMethod } from '../screens/dashboard/profile/AddPaymentMethod';
 import { SettingsScreens } from '../screens/dashboard/profile/Settings';
+import LikeComment from '../screens/dashboard/community/LikeComment/LikeComment';
 
 const Tab = createBottomTabNavigator();
 const { Screen, Navigator } = createStackNavigator();
@@ -167,14 +168,14 @@ const CommonProfileHeader = (props: any) => {
         fontSize={18}>
         {title}
       </Text>
-      <HStack alignItems="center" gap={20}
-        position="absolute" right={10}>
+      <HStack alignItems="center" gap={20} position="absolute" right={10}>
         <Pressable
           $active-opacity={0.8}
           zIndex={999}
           p={5}
           onPress={() =>
-            props.navigation.navigate('settings', { title: 'Settings' })}>
+            props.navigation.navigate('settings', { title: 'Settings' })
+          }>
           <Icon as={SettingsIcon} color="$black" />
         </Pressable>
       </HStack>
@@ -197,7 +198,11 @@ const AdvanceHeader = (props: any) => {
       borderBottomWidth={1}
       borderBottomColor={colors.gray1}>
       <Text fontWeight="$bold" fontSize={20} color={colors.primary}>
-        {name === 'Cart' ? 'Shopping Cart' : name === 'Community' ? 'Community' : 'Campus'}
+        {name === 'Cart'
+          ? 'Shopping Cart'
+          : name === 'Community'
+            ? 'Community'
+            : 'Campus'}
       </Text>
       <HStack gap={16} alignItems="center">
         {name !== 'Cart' && name !== 'Community' && (
@@ -211,12 +216,38 @@ const AdvanceHeader = (props: any) => {
           </Pressable>
         )}
 
-        <Pressable
-          onPress={() =>
-            props.navigation.navigate('Notifications', { title: 'Notifications' })
-          }>
-          <Icons.Bell />
+        {name === 'Community' && (<Pressable onPress={() => props.navigation.navigate('LikeComment')} style={{ marginTop: -10 }}>
+          <VStack>
+            <Badge
+              h={20}
+              w={20}
+              bg="$red600"
+              borderRadius="$full"
+              mt={0}
+              mr={-10}
+              zIndex={1}
+              variant="solid"
+              alignSelf="flex-end">
+              <BadgeText color="$white" fontSize={8}>
+                2
+              </BadgeText>
+            </Badge>
+
+            <Icons.Heart size={24} style={{ marginTop: -12 }} />
+          </VStack>
         </Pressable>
+        )}
+
+        {name !== 'Community' && (
+          <Pressable
+            onPress={() =>
+              props.navigation.navigate('Notifications', {
+                title: 'Notifications',
+              })
+            }>
+            <Icons.Bell />
+          </Pressable>
+        )}
         <Pressable
           onPress={() =>
             props.navigation.navigate('profile', { title: 'Profile' })
@@ -231,8 +262,11 @@ const AdvanceHeader = (props: any) => {
             width={32}
             height={32}
             resizeMode="cover"
+            style={{ backgroundColor: '#e7e7e7' }}
             source={{
-              uri: user?.profilePicture || 'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
+              uri:
+                user?.profilePicture ||
+                'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dXNlcnxlbnwwfHwwfHx8MA%3D%3D',
             }}
           />
         </Pressable>
@@ -376,7 +410,7 @@ const FoodStack = (): React.JSX.Element => {
         options={{
           headerShown: true,
           header: CommonHeader,
-          headerTitle: 'red'
+          headerTitle: 'red',
         }}
         name="addPaymentMethod"
         component={AddPaymentMethod}
@@ -405,6 +439,14 @@ const FoodStack = (): React.JSX.Element => {
         }}
         component={NotificationScreen}
       />
+      <Screen
+        name="OrderDetails"
+        component={OrderDetails}
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+      />
     </Navigator>
   );
 };
@@ -422,12 +464,20 @@ const OrderStack = (): React.JSX.Element => {
     <Navigator initialRouteName="Orders" screenOptions={screenOptions}>
       <Screen
         name="Orders"
+        component={NotificationScreen}
+        options={{
+          headerShown: false,
+          header: AdvanceHeader,
+        }}
+      />
+      {/* <Screen
+        name="Orders"
         component={OrdersScreen}
         options={{
           headerShown: true,
           header: AdvanceHeader,
         }}
-      />
+      /> */}
       <Screen
         name="OrderDetails"
         component={OrderDetails}
@@ -439,7 +489,7 @@ const OrderStack = (): React.JSX.Element => {
       <Screen
         options={{
           headerShown: true,
-          header: CommonHeader,
+          header: CommonProfileHeader,
         }}
         name="profile"
         component={ProfileScreen}
@@ -476,11 +526,21 @@ const CartStack = (): React.JSX.Element => {
         component={CartScreen}
       />
 
+
+      <Screen
+        name="OrderDetails"
+        component={OrderDetails}
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+      />
+
       <Screen
         options={{
           headerShown: true,
           header: CommonHeader,
-          headerTitle: 'red'
+          headerTitle: 'red',
         }}
         name="addPaymentMethod"
         component={AddPaymentMethod}
@@ -528,7 +588,7 @@ const CartStack = (): React.JSX.Element => {
       <Screen
         options={{
           headerShown: true,
-          header: CommonHeader,
+          header: CommonProfileHeader,
         }}
         name="profile"
         component={ProfileScreen}
@@ -541,6 +601,16 @@ const CartStack = (): React.JSX.Element => {
         }}
         component={NotificationScreen}
       />
+
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="settings"
+        component={SettingsScreens}
+      />
+
     </Navigator>
   );
 };
@@ -555,7 +625,15 @@ const CommunityStack = (): React.JSX.Element => {
           header: AdvanceHeader,
         }}
         component={CommunityScreen}
-      /><Screen
+      />
+      <Screen
+        name='LikeComment'
+        options={{
+          headerShown: false,
+          header: AdvanceHeader
+        }}
+        component={LikeComment} />
+      <Screen
         name="CreatePost"
         options={{
           headerShown: false,
@@ -566,7 +644,7 @@ const CommunityStack = (): React.JSX.Element => {
       <Screen
         options={{
           headerShown: true,
-          header: CommonHeader,
+          header: CommonProfileHeader,
         }}
         name="profile"
         component={ProfileScreen}
@@ -585,7 +663,7 @@ const CommunityStack = (): React.JSX.Element => {
         options={{
           headerShown: true,
           header: CommonHeader,
-          headerTitle: 'red'
+          headerTitle: 'red',
         }}
         name="addPaymentMethod"
         component={AddPaymentMethod}
@@ -597,6 +675,33 @@ const CommunityStack = (): React.JSX.Element => {
           header: CommonHeader,
         }}
         component={NotificationScreen}
+      />
+
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="settings"
+        component={SettingsScreens}
+      />
+
+      <Screen
+        name="OrderDetails"
+        component={OrderDetails}
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+      />
+
+      <Screen
+        options={{
+          headerShown: true,
+          header: CommonHeader,
+        }}
+        name="editProfile"
+        component={EditProfileScreen}
       />
     </Navigator>
   );
@@ -615,7 +720,7 @@ const TabNavUser = (): React.JSX.Element => {
         onClose={() => setModalVisible(false)}
       />
       <Tab.Navigator
-        initialRouteName={"Food"}
+        initialRouteName={'Community'}
         screenOptions={{
           ...screenOptions,
           tabBarShowLabel: true,
@@ -626,6 +731,35 @@ const TabNavUser = (): React.JSX.Element => {
             backgroundColor: colors.white,
           },
         }}>
+        <Tab.Screen
+          name="Community"
+          options={({ route }) => {
+            const routeName = getFocusedRouteNameFromRoute(route) ?? 'Food';
+            const hiddenRoutes = ['Checkout', 'Payment'];
+            return {
+              tabBarIcon: (props: any) => (
+                <VStack>
+                  <Icons.Community
+                    color={props.focused ? colors.primary : colors.gray3}
+                  />
+                </VStack>
+              ),
+              headerShown: false,
+              tabBarStyle: {
+                display: hiddenRoutes.includes(routeName) ? 'none' : 'flex',
+                backgroundColor: colors.white,
+              },
+            };
+          }}
+          component={CommunityStack}
+        // component={() => null} // no screen, we handle manually
+        // listeners={{
+        //   tabPress: e => {
+        //     e.preventDefault(); // prevent default navigation
+        //     setModalVisible(true); // open modal instead
+        //   },
+        // }}
+        />
         <Tab.Screen
           name="Food"
           options={({ route }) => {
@@ -647,6 +781,76 @@ const TabNavUser = (): React.JSX.Element => {
           }}
           component={FoodStack}
         />
+
+        <Tab.Screen
+          name="Post"
+          options={({ route }) => {
+            const routeName = getFocusedRouteNameFromRoute(route) ?? 'Food';
+            const hiddenRoutes = ['Checkout', 'Payment'];
+            return {
+              tabBarIcon: (props: any) => (
+                <VStack
+                  style={{
+                    backgroundColor: colors.primary,
+                    padding: 15,
+                    top: -15,
+                    borderRadius: 60,
+                  }}>
+                  <Icons.Plus
+                    color={props.focused ? colors.primary : colors.gray3}
+                  />
+                </VStack>
+              ),
+              headerShown: false,
+              tabBarStyle: {
+                display: hiddenRoutes.includes(routeName) ? 'none' : 'flex',
+                backgroundColor: colors.white,
+              },
+            };
+          }}
+          // component={() => console.log('in progress')}
+
+          component={CreatePost} // no screen, we handle manually
+        // listeners={{
+        //   tabPress: e => {
+        //     e.preventDefault(); // prevent default navigation
+        //     setModalVisible(true); // open modal instead
+        //   },
+        // }}
+        />
+
+        <Tab.Screen
+          name="Orders"
+          options={({ route }) => {
+            const routeName = getFocusedRouteNameFromRoute(route) ?? 'Food';
+            const hiddenRoutes = ['Checkout', 'Payment'];
+            return {
+              tabBarIcon: (props: any) => (
+                <VStack>
+                  <Icons.Bell
+                    color={props.focused ? colors.primary : colors.gray3}
+                    width={16}
+                    height={18}
+                  />
+                </VStack>
+              ),
+              headerShown: false,
+              tabBarStyle: {
+                display: hiddenRoutes.includes(routeName) ? 'none' : 'flex',
+                backgroundColor: colors.white,
+              },
+            };
+          }}
+          // component={MarketStack}
+          component={OrderStack} // no screen, we handle manually
+        // listeners={{
+        //   tabPress: e => {
+        //     e.preventDefault(); // prevent default navigation
+        //     setModalVisible(true); // open modal instead
+        //   },
+        // }}
+        />
+
         <Tab.Screen
           name="Cart"
           options={({ route }) => {
@@ -687,102 +891,7 @@ const TabNavUser = (): React.JSX.Element => {
           component={CartStack}
         />
 
-        <Tab.Screen
-          name="Post"
-          options={({ route }) => {
-            const routeName = getFocusedRouteNameFromRoute(route) ?? 'Food';
-            const hiddenRoutes = ['Checkout', 'Payment'];
-            return {
-              tabBarIcon: (props: any) => (
-                <VStack
-                  style={{
-                    backgroundColor: colors.primary,
-                    padding: 15,
-                    top: -15,
-                    borderRadius: 60,
-                  }}>
-                  <Icons.Plus
-                    color={props.focused ? colors.primary : colors.gray3}
-                  />
-                </VStack>
-              ),
-              headerShown: false,
-              tabBarStyle: {
-                display: hiddenRoutes.includes(routeName) ? 'none' : 'flex',
-                backgroundColor: colors.white,
-              },
-            };
-          }}
-          // component={() => console.log('in progress')}
 
-          component={() => null} // no screen, we handle manually
-          listeners={{
-            tabPress: e => {
-              e.preventDefault(); // prevent default navigation
-              setModalVisible(true); // open modal instead
-            },
-          }}
-        />
-
-        <Tab.Screen
-          name="Market"
-          options={({ route }) => {
-            const routeName = getFocusedRouteNameFromRoute(route) ?? 'Food';
-            const hiddenRoutes = ['Checkout', 'Payment'];
-            return {
-              tabBarIcon: (props: any) => (
-                <VStack>
-                  <Icons.Market
-                    color={props.focused ? colors.primary : colors.gray3}
-                  />
-                </VStack>
-              ),
-              headerShown: false,
-              tabBarStyle: {
-                display: hiddenRoutes.includes(routeName) ? 'none' : 'flex',
-                backgroundColor: colors.white,
-              },
-            };
-          }}
-          // component={MarketStack}
-          component={() => null} // no screen, we handle manually
-          listeners={{
-            tabPress: e => {
-              e.preventDefault(); // prevent default navigation
-              setModalVisible(true); // open modal instead
-            },
-          }}
-        />
-
-        <Tab.Screen
-          name="Community"
-          options={({ route }) => {
-            const routeName = getFocusedRouteNameFromRoute(route) ?? 'Food';
-            const hiddenRoutes = ['Checkout', 'Payment'];
-            return {
-              tabBarIcon: (props: any) => (
-                <VStack>
-                  <Icons.Community
-                    color={props.focused ? colors.primary : colors.gray3}
-                  />
-                </VStack>
-              ),
-              headerShown: false,
-              tabBarStyle: {
-                display: hiddenRoutes.includes(routeName) ? 'none' : 'flex',
-                backgroundColor: colors.white,
-              },
-            };
-          }}
-          component={CommunityStack}
-        // component={() => null} // no screen, we handle manually
-        // listeners={{
-        //   tabPress: e => {
-        //     e.preventDefault(); // prevent default navigation
-        //     setModalVisible(true); // open modal instead
-        //   },
-        // }}
-        />
 
         {/* <Tab.Screen
         name="Inbox"

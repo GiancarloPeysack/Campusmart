@@ -32,6 +32,7 @@ type InputProps = {
   isInvalid?: boolean;
   isDisabled?: boolean;
   keyboardType?: KeyboardType;
+  labelFontWeight?: number
 };
 
 export const InputFiled = (props: InputProps) => {
@@ -45,7 +46,7 @@ export const InputFiled = (props: InputProps) => {
       isRequired={props.isRequired}>
       {props.label && (
         <FormControlLabel mb="$2">
-          <FormControlLabelText fontSize={'$sm'} fontWeight="$medium">
+          <FormControlLabelText fontSize={'$sm'} fontWeight={props.labelFontWeight ?? "$medium"}>
             {props.label}
           </FormControlLabelText>
         </FormControlLabel>

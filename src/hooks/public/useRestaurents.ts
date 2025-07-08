@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import {useCallback, useState} from 'react';
 import firestore from '@react-native-firebase/firestore';
-import { useFocusEffect } from '@react-navigation/native';
+import {useFocusEffect} from '@react-navigation/native';
 
 export default function useRestaurents() {
   const [restaurents, setRestaurents] = useState<any[]>([]);
@@ -23,7 +23,7 @@ export default function useRestaurents() {
         ...doc.data(),
       }));
 
-      setRestaurents(restData);
+      setRestaurents(restData.filter(i => i.stripeAccountId));
     } catch (error) {
       console.error('Error fetching restaurants:', error);
       setRestaurents([]);
@@ -68,12 +68,12 @@ export default function useRestaurents() {
           .get();
 
         if (categoryDoc.exists) {
-          return categoryDoc.data()?.categories || []
+          return categoryDoc.data()?.categories || [];
         } else {
-          return []
+          return [];
         }
       } else {
-        return []
+        return [];
       }
     } catch (error) {
       throw error;
@@ -82,5 +82,11 @@ export default function useRestaurents() {
     }
   };
 
-  return { restaurents, isLoading, fetchRestaurents, fetchRestaurantById, fetchCategories };
+  return {
+    restaurents,
+    isLoading,
+    fetchRestaurents,
+    fetchRestaurantById,
+    fetchCategories,
+  };
 }

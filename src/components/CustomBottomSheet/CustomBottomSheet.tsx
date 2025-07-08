@@ -2,7 +2,7 @@ import React, { forwardRef, useImperativeHandle, useRef } from 'react';
 import { Dimensions } from 'react-native';
 import RBSheet from 'react-native-raw-bottom-sheet';
 
-const CustomBottomSheet = forwardRef(({ children }, ref) => {
+const CustomBottomSheet = forwardRef(({ children, height }, ref) => {
   const bottomSheetRef = useRef();
 
   useImperativeHandle(ref, () => ({
@@ -13,7 +13,7 @@ const CustomBottomSheet = forwardRef(({ children }, ref) => {
   return (
     <RBSheet
       ref={bottomSheetRef}
-      height={Dimensions.get('window').height / 2.12}
+      height={height ?? Dimensions.get('window').height / 2.12}
       useNativeDriver={false}
       customStyles={{
         container: {

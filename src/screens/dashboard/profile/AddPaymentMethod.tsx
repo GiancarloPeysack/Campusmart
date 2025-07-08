@@ -19,7 +19,7 @@ import { PrimaryButton } from '../../../components';
 import Toast from 'react-native-toast-message';
 
 
-export const AddPaymentMethod = ({ route }: any): React.JSX.Element => {
+export const AddPaymentMethod = ({ route, navigation }: any): React.JSX.Element => {
     const { option } = route.params;
     const currentUser = auth().currentUser;
 
@@ -100,6 +100,7 @@ export const AddPaymentMethod = ({ route }: any): React.JSX.Element => {
                     text1: 'Success',
                     text2: 'Card saved successfully',
                 });
+                navigation.goBack()
             }
         } catch (error) {
             console.error('Error saving card:', error);
@@ -116,7 +117,7 @@ export const AddPaymentMethod = ({ route }: any): React.JSX.Element => {
 
     return (
         <Box flex={1} bg="#fff" px={20} py={20}>
-            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
                 {/* Card Preview */}
                 {cardDetails?.values && (
                     <VStack alignSelf="center" mb={20}>

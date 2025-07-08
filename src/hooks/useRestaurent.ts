@@ -54,7 +54,7 @@ export default function useRestaurent() {
 
       setRestaurents(restItems);
     } catch (error) {
-          console.log("error", error);
+      console.log('error', error);
       throw error;
     } finally {
       setIsLoading(false);

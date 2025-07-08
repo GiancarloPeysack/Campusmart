@@ -13,7 +13,7 @@ import {
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { useTheme } from '../../../theme/useTheme';
 import { InputFiled, PrimaryButton } from '../../../components';
-import { ScrollView } from 'react-native';
+import { Platform, ScrollView } from 'react-native';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -261,7 +261,7 @@ export const EditProfileScreen = (props: any): React.JSX.Element => {
                       backgroundColor:
                         selectedTab === tab.text ? colors.primary : '#fff',
                     }}
-                    px={20}
+                    px={Platform.OS === 'ios' ? 12 : 20}
                     mx={10}>
                     {tab.icon}
                     <ButtonText

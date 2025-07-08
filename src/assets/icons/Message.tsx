@@ -2,7 +2,7 @@ import * as React from "react";
 import Svg, { G, Path, Defs, ClipPath } from "react-native-svg";
 
 export const Message = (props: any) => {
-  const {color = "#4B5563" } = props;
+  const { color = "#4B5563" } = props;
   return (
     <Svg width={20} height={20} fill="none" {...props}>
       <G clipPath="url(#prefix__clip0_39_6292)">

@@ -65,32 +65,43 @@ export default function LoginScreen(): React.JSX.Element {
 
   const onSubmit = async (data: FormData) => {
     onLoad();
+
     try {
       const { email, password } = data;
 
       const userCredential = await auth().signInWithEmailAndPassword(email, password);
       const uid = userCredential.user.uid;
 
-      reset();
+      const userDocRef = firestore().collection('users').doc(uid);
+      const userDoc = await userDocRef.get();
 
-      setTimeout(async () => {
-        const userDocRef = firestore().collection('users').doc(uid);
-        const userDoc = await userDocRef.get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
 
-        if (userDoc.exists) {
-          const userData = userDoc.data();
+        if (userData?.accountStatus === 'deleted') {
+          await auth().signOut();
+          Toast.show({
+            type: 'error',
+            text1: 'Account Deleted',
+            text2: 'This account has been deleted.',
+          });
+          return;
+        }
 
-          if (!userData?.hasOnboarded) {
-            await userDocRef.update({ hasOnboarded: true });
-          }
+        if (!userData?.hasOnboarded) {
+          await userDocRef.update({ hasOnboarded: true });
         }
 
         Toast.show({
           type: 'success',
-          text1: 'User logged.',
+          text1: 'Success',
           text2: 'User successfully logged in.',
         });
-      }, 500);
+
+        // Optional: reset form
+        reset();
+      }
+
     } catch (error) {
       const errorMessage = handleFirebaseError(error);
       Toast.show({
@@ -102,6 +113,7 @@ export default function LoginScreen(): React.JSX.Element {
       onLoaded();
     }
   };
+
 
 
   return (
@@ -142,19 +154,19 @@ export default function LoginScreen(): React.JSX.Element {
                 Hey! Welcome back
               </Text>
             </Center>
-            <VStack gap={16}>
+            {/* <VStack gap={16}>
               {/* <AuthButton
                 text="Continue with Google"
                 icon={<Icons.Google />}
                 onClick={() => { }}
-              /> */}
+              /> 
               <AuthButton
                 text="Continue with Outlook"
                 icon={<Icons.Outlook />}
                 onClick={() => { }}
               />
-            </VStack>
-            <HStack
+            </VStack> */}
+            {/* <HStack
               space="sm"
               mt="$3"
               alignItems="center"
@@ -168,7 +180,7 @@ export default function LoginScreen(): React.JSX.Element {
                 or
               </Text>
               <Divider bg={colors.gray1} />
-            </HStack>
+            </HStack> */}
             <VStack gap={10}>
               <Controller
                 control={control}

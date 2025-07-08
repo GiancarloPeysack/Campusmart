@@ -139,16 +139,16 @@ const StripeConnectScreen = ({ navigation }: any) => {
 
   }
 
-  if (stripeStatus === 'verified') {
-    return (
-      <View style={styles.container}>
-        <View style={styles.statusContainer}>
-          <Text style={styles.successText}>✓ Stripe Connected</Text>
-          <Text style={styles.subText}>You can now receive payments</Text>
-        </View>
-      </View>
-    );
-  }
+  // if (stripeStatus === 'verified') {
+  //   return (
+  //     <View style={styles.container}>
+  //       <View style={styles.statusContainer}>
+  //         <Text style={styles.successText}>✓ Stripe Connected</Text>
+  //         <Text style={styles.subText}>You can now receive payments</Text>
+  //       </View>
+  //     </View>
+  //   );
+  // }
 
   return (
     <View style={styles.container}>

@@ -81,7 +81,7 @@ const CommentItem = ({
 
       <HStack mt={3} ml={50} alignItems="center" space="lg">
         <Text fontSize={12} color="#6B7280">{formatTime(time)}</Text>
-        <Text fontSize={12} color="#6B7280">Reply</Text>
+        {/* <Text fontSize={12} color="#6B7280">Reply</Text> */}
 
         <Pressable onPress={toggleLike}>
           <HStack alignItems="center">

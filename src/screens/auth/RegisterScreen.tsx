@@ -162,14 +162,14 @@ export default function RegisterScreen(): React.JSX.Element {
                 Over 5,000 students are already here!
               </Text>
             </Center>
-            <VStack gap={16}>
+            {/* <VStack gap={16}>
               <AuthButton
                 text="Sign up with Outlook"
                 icon={<Icons.Outlook />}
                 onClick={() => { }}
               />
-            </VStack>
-            <HStack
+            </VStack> */}
+            {/* <HStack
               space="sm"
               mt="$3"
               alignItems="center"
@@ -183,7 +183,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 or
               </Text>
               <Divider bg={colors.gray1} />
-            </HStack>
+            </HStack> */}
             <VStack gap={10}>
               <HStack gap={12}>
                 <Controller

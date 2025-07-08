@@ -1,15 +1,16 @@
 import {
   Box,
-  Card,
   Center,
   Divider,
   HStack,
+  Icon,
   Pressable,
   Text,
+  View,
   VStack,
 } from '@gluestack-ui/themed';
 import React, { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { ActivityIndicator, Alert } from 'react-native';
 import { useTheme } from '../../../theme/useTheme';
 import { Icons } from '../../../assets/icons';
 import { PrimaryButton } from '../../common/Buttons/PrimaryButton';
@@ -22,25 +23,38 @@ import { useLoading } from '../../../hooks/useLoading';
 
 import { CardField, confirmPayment } from '@stripe/stripe-react-native';
 import Toast from 'react-native-toast-message';
+import { Shield } from '../../../assets/icons/Shield';
+import useRestaurent from '../../../hooks/useRestaurent';
 
 export const Checkout = (): React.JSX.Element => {
   const { colors } = useTheme();
   const { user, loading } = useAuth();
   const { cart, total, deliveryFee, serviceFee, subtotal, clearCart } = useCart();
   const { isLoading, onLoad, onLoaded } = useLoading();
+  const [selectedRestaurant, setSelectedRestaurant] = useState<any>(null);
+
+  const {
+    restaurents,
+    fetchAllRestaurents,
+  } = useRestaurent();
+
+
+
+  useEffect(() => {
+    fetchAllRestaurents();
+  }, []);
 
   const [savedCards, setSavedCards] = useState<any[]>([]);
 
   const [cardDetails, setCardDetails] = useState<any>(null);
 
-  console.log('cardDetails', cardDetails)
+  const [isProcessing, setIsProcessing] = useState<boolean>();
 
   const fetchPaymentIntentClientSecret = async () => {
     try {
       if (!cart || cart.length === 0 || !cart[0].restaurantId) {
         throw new Error('Invalid cart or restaurant ID');
       }
-
 
       const restaurantId = cart[0].restaurantId;
       const restaurantDoc = await firestore()
@@ -58,16 +72,19 @@ export const Checkout = (): React.JSX.Element => {
         throw new Error('Stripe account ID not found for this restaurant');
       }
 
-      const response = await fetch('https://us-central1-campusmart-4a549.cloudfunctions.net/api/create-payment-intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await fetch(
+        'https://us-central1-campusmart-4a549.cloudfunctions.net/api/create-payment-intent',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            amount: total,
+            restaurantId: stripeAccountId,
+          }),
         },
-        body: JSON.stringify({
-          amount: total,
-          restaurantId: stripeAccountId,
-        }),
-      });
+      );
 
       const { clientSecret } = await response.json();
 
@@ -77,7 +94,6 @@ export const Checkout = (): React.JSX.Element => {
       throw new Error('Unable to process payment');
     }
   };
-
 
   useEffect(() => {
     if (auth().currentUser) {
@@ -98,9 +114,18 @@ export const Checkout = (): React.JSX.Element => {
     }
   }, [auth().currentUser]);
 
+  useEffect(() => {
+    if (restaurents?.length > 0 && cart?.length > 0) {
+      const matched = restaurents.find(
+        rest => rest.id === cart[0].restaurantId
+      );
+      setSelectedRestaurant(matched || null);
+    }
+  }, [restaurents, cart]);
 
   const placeOrder = async () => {
     const currentUser = auth().currentUser;
+
 
     try {
       if (!currentUser) {
@@ -114,7 +139,9 @@ export const Checkout = (): React.JSX.Element => {
       }
 
       const requiredFields = ['street', 'city'];
-      const missingFields = requiredFields.filter(field => !user?.address?.[field]);
+      const missingFields = requiredFields.filter(
+        field => !user?.address?.[field],
+      );
 
       if (missingFields.length > 0) {
         Alert.alert(
@@ -144,20 +171,21 @@ export const Checkout = (): React.JSX.Element => {
         return;
       }
 
+      setIsProcessing(true);
       onLoad();
 
       const clientSecret = await fetchPaymentIntentClientSecret();
 
       if (!clientSecret) {
-
         Toast.show({
           type: 'error',
           text1: 'Failed',
           text2: 'Issue processing your request!',
         });
+
+        setIsProcessing(false);
         return;
       }
-
 
       // Step 2: Confirm the payment
       const { paymentIntent, error } = await confirmPayment(clientSecret, {
@@ -165,22 +193,44 @@ export const Checkout = (): React.JSX.Element => {
       });
 
       if (error) {
+        setTimeout(() => {
+          Toast.show({
+            type: 'error',
+            text1: 'Payment Failed',
+            text2: '' + error.message,
+          });
+          setIsProcessing(false);
 
-        Toast.show({
-          type: 'error',
-          text1: 'Payment Failed',
-          text2: '' + error.message,
-        });
+          navigate('Payment', {
+            title: 'Payment',
+            orderData: null,
+            resturant: null,
+            isSuccess: false,
+          });
+        }, 1000);
 
         return;
       }
 
-      if (paymentIntent?.status !== 'Succeeded' && paymentIntent?.status !== 'succeeded') {
-        Toast.show({
-          type: 'error',
-          text1: 'Payment Failed',
-          text2: 'Unable to complete the payment.'
-        });
+      if (
+        paymentIntent?.status !== 'Succeeded' &&
+        paymentIntent?.status !== 'succeeded'
+      ) {
+        setTimeout(() => {
+          Toast.show({
+            type: 'error',
+            text1: 'Payment Failed',
+            text2: 'Unable to complete the payment.',
+          });
+          setIsProcessing(false);
+
+          navigate('Payment', {
+            title: 'Payment',
+            orderData: null,
+            resturant: null,
+            isSuccess: false,
+          });
+        }, 1000);
         return;
       }
 
@@ -207,22 +257,41 @@ export const Checkout = (): React.JSX.Element => {
 
       await firestore().collection('orders').add(orderData);
 
+      setTimeout(() => {
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Order placed successfully!',
+        });
+        clearCart();
+        setIsProcessing(false);
 
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'Order placed successfully!',
-      });
-      clearCart();
-
-      navigate('Payment', { title: 'Payment', orderData: orderData });
+        navigate('Payment', {
+          title: 'Payment',
+          orderData: orderData,
+          resturant: selectedRestaurant,
+          isSuccess: 'true',
+        });
+      }, 3000);
     } catch (error) {
-      Toast.show({
-        type: 'error',
-        text1: 'Failed',
-        text2: 'Something went wrong. Please try again.'
-      });
+      setTimeout(() => {
+        Toast.show({
+          type: 'error',
+          text1: 'Failed',
+          text2: 'Something went wrong. Please try again.',
+        });
+        clearCart();
+        setIsProcessing(false);
+
+        navigate('Payment', {
+          title: 'Payment',
+          orderData: null,
+          resturant: null,
+          isSuccess: false,
+        });
+      }, 1000);
     } finally {
+      // setIsProcessing(false)
       onLoaded();
     }
   };
@@ -294,38 +363,47 @@ export const Checkout = (): React.JSX.Element => {
   const selectedCard = getDefaultOrLatestCard();
 
   return (
-    <Box flex={1} bg={colors.white}>
-      <VStack gap={10} flex={1}>
-        <Block
-          title="Delivery Address"
-          iconText="Home"
-          onPress={() =>
-            navigate('editProfile', { option: 'address', title: 'Address' })
-          }
-          desc={
-            user?.address?.street +
-            ', ' +
-            user?.address?.apartment +
-            user?.address?.city +
-            ' ' +
-            user?.address?.postalCode
-          }
-          icon={<Icons.MapTag color={colors.primary} />}
-        />
-        <Divider bg={colors.gray1} />
-        <VStack p={16}>
-          <HStack justifyContent='space-between'>
-            <Text fontSize={16} fontWeight="$semibold" color="$black">
-              Payment Method
-            </Text>
-
-            <Pressable $active-opacity={0.8} onPress={() => navigate('paymentMethod', { option: 'payment', title: 'Payment Method' })}>
-              <Text fontSize={14} fontWeight="$medium" color={colors.primary}>
-                Change
+    <>
+      <Box flex={1} bg={colors.white}>
+        <VStack gap={10} flex={1}>
+          <Block
+            title="Delivery Address"
+            iconText="Home"
+            onPress={() =>
+              navigate('editProfile', { option: 'address', title: 'Address' })
+            }
+            desc={
+              user?.address?.street +
+              ', ' +
+              user?.address?.apartment +
+              user?.address?.city +
+              ' ' +
+              user?.address?.postalCode
+            }
+            icon={<Icons.MapTag color={colors.primary} />}
+          />
+          <Divider bg={colors.gray1} />
+          <VStack p={16}>
+            <HStack justifyContent="space-between">
+              <Text fontSize={16} fontWeight="$semibold" color="$black">
+                Payment Method
               </Text>
-            </Pressable></HStack>
 
-          {selectedCard && (
+              <Pressable
+                $active-opacity={0.8}
+                onPress={() =>
+                  navigate('paymentMethod', {
+                    option: 'payment',
+                    title: 'Payment Method',
+                  })
+                }>
+                <Text fontSize={14} fontWeight="$medium" color={colors.primary}>
+                  Change
+                </Text>
+              </Pressable>
+            </HStack>
+
+            {/* {selectedCard && (
             <VStack
               space="md"
               bg="#F9FAFB"
@@ -349,87 +427,142 @@ export const Checkout = (): React.JSX.Element => {
                 </Box>
               </Box>
             </VStack>
-          )}
-          <CardField
-            postalCodeEnabled={false}
-            placeholders={{
-              number: selectedCard ? selectedCard.cardNumber : '4242 4242 4242 4242',
-              expiration: selectedCard ? selectedCard.expiry : 'MM/YY',
-            }}
-            cardStyle={{
-              //   backgroundColor: colors.white,
-              // textColor: '#000',
-              borderWidth: 1,
-              //   borderColor: colors.primary,
-              borderRadius: 8,
-            }}
-            style={{
-              width: '100%',
-              height: 50,
-              // marginVertical: 30,
-            }}
-            onCardChange={setCardDetails}
-            onFocus={focusedField => {
-              console.log('focusField', focusedField);
-            }}
-          />
-        </VStack>
-        <Divider bg={colors.gray1} />
-        <VStack p={16} gap={18}>
-          <Text fontSize={16} fontWeight="$semibold" color="$black">
-            Order Summary
-          </Text>
-          <VStack gap={14}>
-            <HStack justifyContent="space-between">
-              <Text fontSize={14} fontWeight="$light" color={colors.title}>
-                Selected Items ({cart.length})
-              </Text>
-              <Text fontSize={14} fontWeight="$light" color={colors.title}>
-                ${subtotal.toFixed(2)}
-              </Text>
-            </HStack>
-            <HStack justifyContent="space-between">
-              <Text fontSize={14} fontWeight="$light" color={colors.title}>
-                Delivery Fee
-              </Text>
-              <Text fontSize={14} fontWeight="$light" color={colors.green}>
-                ${deliveryFee}
-              </Text>
-            </HStack>
-            <HStack justifyContent="space-between">
-              <Text fontSize={14} fontWeight="$light" color={colors.title}>
-                Service Fee
-              </Text>
-              <Text fontSize={14} fontWeight="$light" color={colors.green}>
-                ${serviceFee}
-              </Text>
-            </HStack>
-            <HStack justifyContent="space-between">
-              <Text fontSize={14} fontWeight="$light" color={colors.green}>
-                Discount (0%)
-              </Text>
-              <Text fontSize={14} fontWeight="$light" color={colors.green}></Text>
-            </HStack>
-            <Divider bg={colors.gray1} />
-            <HStack justifyContent="space-between">
-              <Text fontSize={18} fontWeight="$semibold" color="$black">
-                Total
-              </Text>
-              <Text fontSize={18} fontWeight="$semibold" color={colors.primary}>
-                ${total.toFixed(2)}
-              </Text>
-            </HStack>
+          )} */}
+            <CardField
+              postalCodeEnabled={false}
+              placeholders={{
+                number: selectedCard
+                  ? selectedCard.cardNumber
+                  : '4242 4242 4242 4242',
+                expiration: selectedCard ? selectedCard.expiry : 'MM/YY',
+              }}
+              cardStyle={{
+                //   backgroundColor: colors.white,
+                // textColor: '#000',
+                borderWidth: 1,
+                //   borderColor: colors.primary,
+                borderRadius: 8,
+              }}
+              style={{
+                width: '100%',
+                height: 50,
+                marginVertical: 30,
+              }}
+              onCardChange={setCardDetails}
+              onFocus={focusedField => {
+                console.log('focusField', focusedField);
+              }}
+            />
+          </VStack>
+          <Divider bg={colors.gray1} />
+          <VStack p={16} gap={18}>
+            <Text fontSize={16} fontWeight="$semibold" color="$black">
+              Order Summary
+            </Text>
+            <VStack gap={14}>
+              <HStack justifyContent="space-between">
+                <Text fontSize={14} fontWeight="$light" color={colors.title}>
+                  Selected Items ({cart.length})
+                </Text>
+                <Text fontSize={14} fontWeight="$light" color={colors.title}>
+                  ${subtotal.toFixed(2)}
+                </Text>
+              </HStack>
+              <HStack justifyContent="space-between">
+                <Text fontSize={14} fontWeight="$light" color={colors.title}>
+                  Delivery Fee
+                </Text>
+                <Text fontSize={14} fontWeight="$light" color={colors.green}>
+                  ${deliveryFee}
+                </Text>
+              </HStack>
+              <HStack justifyContent="space-between">
+                <Text fontSize={14} fontWeight="$light" color={colors.title}>
+                  Service Fee
+                </Text>
+                <Text fontSize={14} fontWeight="$light" color={colors.green}>
+                  ${serviceFee}
+                </Text>
+              </HStack>
+              <HStack justifyContent="space-between">
+                <Text fontSize={14} fontWeight="$light" color={colors.green}>
+                  Discount (0%)
+                </Text>
+                <Text
+                  fontSize={14}
+                  fontWeight="$light"
+                  color={colors.green}></Text>
+              </HStack>
+              <Divider bg={colors.gray1} />
+              <HStack justifyContent="space-between">
+                <Text fontSize={18} fontWeight="$semibold" color="$black">
+                  Total
+                </Text>
+                <Text
+                  fontSize={18}
+                  fontWeight="$semibold"
+                  color={colors.primary}>
+                  ${total.toFixed(2)}
+                </Text>
+              </HStack>
+            </VStack>
           </VStack>
         </VStack>
-      </VStack>
-      <Box p={16}>
-        <PrimaryButton
-          isLoading={isLoading}
-          icon={<Icons.Lock />}
-          text={`Pay ${total.toFixed(2)}`}
-          onPress={placeOrder}
-        />
+        <Box p={16}>
+          <PrimaryButton
+            isLoading={isLoading}
+            icon={<Icons.Lock />}
+            text={`Pay ${total.toFixed(2)}`}
+            onPress={placeOrder}
+          />
+        </Box>
       </Box>
-    </Box>
+      {isProcessing && (
+        <View
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundColor: '#fff',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 999,
+          }}>
+          <ActivityIndicator
+            size="large"
+            style={{ width: 120, height: 120 }}
+            color={colors.primary}
+          />
+          <Text
+            style={{ color: colors.title_1, fontSize: 20, fontWeight: '400' }}>
+            Processing your payment...
+          </Text>
+
+          <Text
+            style={{
+              color: colors.gray5,
+              fontSize: 16,
+              lineHeight: 50,
+              fontWeight: '400',
+            }}>
+            Please wait
+          </Text>
+          <HStack mt={20}>
+            <Icon
+              as={Shield}
+              color={colors.primary}
+              sx={{ marginTop: 2, marginRight: 2 }}
+            />
+            <Text
+              style={{
+                color: colors.blue1,
+                fontSize: 14,
+              }}>
+              Secure payment processing
+            </Text>
+          </HStack>
+        </View>
+      )}
+    </>
   );
 };

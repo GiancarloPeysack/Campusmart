@@ -106,7 +106,7 @@ export default function CommunityScreen() {
             flex={1}>
             <Pressable onPress={() => navigate('CreatePost')}>
               <TextInput
-                placeholder="What are you looking for/selling?"
+                placeholder={selectedTab?.toLowerCase() === 'sales' ? "What are you looking for/selling?" : selectedTab?.toLowerCase() === 'housing' ? "Looking for a room or offering one?" : "Start a conversation"}
                 style={{ marginLeft: 10, flex: 1 }}
                 editable={false}
               />
@@ -117,14 +117,21 @@ export default function CommunityScreen() {
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ marginTop: 20 }}>
-          {posts.map(post => (
-            <PostItem
-              key={post.id}
-              post={post}
-              currentUser={user}
-              currentUserId={currentUserId}
-            />
-          ))}
+          {posts.filter(i => i.postTags?.toLowerCase() === selectedTab?.toLowerCase())?.length === 0 && (
+            <VStack justifyContent="center" alignItems="center" h={400}>
+              <Text fontSize={16} fontWeight={'400'} color={'#a7a7a7'}>no posts</Text>
+            </VStack>
+          )}
+          {posts
+            .filter(i => i.postTags?.toLowerCase() === selectedTab?.toLowerCase())
+            .map(post => (
+              <PostItem
+                key={post.id}
+                post={post}
+                currentUser={user}
+                currentUserId={currentUserId}
+              />
+            ))}
         </ScrollView>
       </VStack>
     </Box>
@@ -173,7 +180,10 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
   const postComment = async () => {
     if (!commentText.trim()) return;
 
-    const userDoc = await firestore().collection('users').doc(currentUserId).get();
+    const userDoc = await firestore()
+      .collection('users')
+      .doc(currentUserId)
+      .get();
     const userData = userDoc.exists ? userDoc.data() : {};
 
     await firestore()
@@ -182,7 +192,8 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
       .collection('comments')
       .add({
         userId: currentUserId,
-        userName: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
+        userName: `${userData.firstName || ''} ${userData.lastName || ''
+          }`.trim(),
         userAvatar: userData.profilePicture || '',
         text: commentText.trim(),
         createdAt: firestore.FieldValue.serverTimestamp(),
@@ -190,7 +201,6 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
 
     setCommentText('');
   };
-
 
   return (
     <Box mb={20}>
@@ -208,7 +218,7 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
             <Text ml={5} fontSize={12} color="#6B7280">
               {formatTime(post.createdAt)}
             </Text>
-            {post.visibility && (
+            {post.postTags && (
               <>
                 <View
                   sx={{
@@ -219,8 +229,8 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
                     marginHorizontal: 5,
                   }}
                 />
-                <Text fontSize={12} color="primary">
-                  {post.visibility}
+                <Text fontSize={12} color="#2563EB">
+                  {post.postTags}
                 </Text>
               </>
             )}

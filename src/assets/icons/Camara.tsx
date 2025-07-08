@@ -4,7 +4,6 @@ import Svg, { Path } from "react-native-svg";
 export const Camara = (props: any) => {
   const { fill = "#60A5FA" } = props;
 
-  console.log('props?.w', props?.w)
   return (
     <Svg width={props?.w ? props?.w : 48} height={props?.h ? props?.h : 42} fill="none" viewBox="0 0 48 42" {...props}>
       <Path

@@ -135,7 +135,7 @@ export default function VerifyScreen(): React.JSX.Element {
               We've sent a verification code to
             </Text>
             <Text mt={3} fontSize={13} color={colors.secondary}>
-              yourname@constructor.university
+              {currentUser?.email}
             </Text>
           </Center>
 

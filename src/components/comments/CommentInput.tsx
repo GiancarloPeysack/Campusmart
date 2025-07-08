@@ -17,12 +17,13 @@ const CommentInput = ({ avatar, value, onChangeText, onPost }) => {
         height={40}
         borderRadius={20}
         resizeMode="cover"
+        style={{ backgroundColor: '#e7e7e7' }}
         source={{ uri: avatar || 'https://via.placeholder.com/40' }}
       />
 
       <TextInput
         placeholder="Write a comment.."
-        style={{ marginLeft: 10, flex: 1, backgroundColor: '#F3F4F6', borderRadius: 20, paddingHorizontal: 5 }}
+        style={{ marginLeft: 10, height: 44, flex: 1, backgroundColor: '#F3F4F6', borderRadius: 20, paddingHorizontal: 5 }}
         value={value}
         onChangeText={onChangeText}
       />

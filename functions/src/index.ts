@@ -4,6 +4,8 @@ const admin = require('firebase-admin');
 const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const bodyParser = require('body-parser');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 admin.initializeApp({
   credential: admin.credential.cert(
@@ -62,6 +64,32 @@ app.post('/payment-sheet', async (req, res) => {
     });
   } catch (err) {
     res.status(500).json({error: err.message});
+  }
+});
+
+app.post('/send-otp', async (req, res) => {
+  const {email} = req.body;
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+  if (!email || !otp) {
+    return res.status(400).json({error: 'Email and OTP are required'});
+  }
+
+  const msg = {
+    to: email,
+    from: process.env.FROM_EMAIL,
+    subject: 'Your OTP Code',
+    text: `Your OTP code is: ${otp}`,
+    html: `<strong>Your OTP code is: ${otp}</strong>`,
+  };
+
+  try {
+    await sgMail.send(msg);
+    res.json({success: true, message: 'OTP sent successfully'});
+  } catch (error) {
+    console.error('SendGrid error:', error.response?.body || error.message);
+    res.status(500).json({error: 'Failed to send OTP'});
   }
 });
 

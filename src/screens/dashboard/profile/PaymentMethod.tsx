@@ -25,7 +25,7 @@ import { Pressable } from 'react-native';
 import { navigate } from '../../../navigators/Root';
 import { RadioGroup } from '@gluestack-ui/themed';
 
-export const PaymentMethod = (): React.JSX.Element => {
+export const PaymentMethod = (props): React.JSX.Element => {
     const { colors } = useTheme();
     const { loading } = useAuth();
     const { isLoading, onLoad, onLoaded } = useLoading();
