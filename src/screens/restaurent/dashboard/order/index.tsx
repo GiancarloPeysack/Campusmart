@@ -1,14 +1,14 @@
-import {Box, Button, ButtonText, HStack, VStack} from '@gluestack-ui/themed';
-import React, {useCallback, useMemo, useState} from 'react';
-import {ScrollView, useWindowDimensions} from 'react-native';
-import {TabView, SceneMap} from 'react-native-tab-view';
+import { ArrowLeftIcon, Box, Button, ButtonText, GripVerticalIcon, HStack, Icon, Text } from '@gluestack-ui/themed';
+import React, { useCallback, useMemo, useState } from 'react';
+import { Pressable, useWindowDimensions } from 'react-native';
+import { TabView, SceneMap } from 'react-native-tab-view';
 
-import {useTheme} from '../../../../theme/useTheme';
-import {ActiveTab} from './tabs/ActiveTab';
-import {PendingTab} from './tabs/PendingTab';
-import {CompletedTab} from './tabs/CompletedTab';
+import { useTheme } from '../../../../theme/useTheme';
+import { ActiveTab } from './tabs/ActiveTab';
+import { PendingTab } from './tabs/PendingTab';
+import { CompletedTab } from './tabs/CompletedTab';
 import useOrder from './hooks/useOrder';
-import {useFocusEffect} from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 
 const renderScene = SceneMap({
   pending: PendingTab,
@@ -16,13 +16,13 @@ const renderScene = SceneMap({
   completed: CompletedTab,
 });
 
-export default function OrderScreen(): React.JSX.Element {
-  const {colors} = useTheme();
+export default function OrderScreen(props): React.JSX.Element {
+  const { colors } = useTheme();
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
 
-  const {fetchOrder: getPendings, orders: pendingOrders} = useOrder();
-  const {fetchOrder: getActive, orders: activeOrders} = useOrder();
+  const { fetchOrder: getPendings, orders: pendingOrders } = useOrder();
+  const { fetchOrder: getActive, orders: activeOrders } = useOrder();
 
   useFocusEffect(
     useCallback(() => {
@@ -36,9 +36,9 @@ export default function OrderScreen(): React.JSX.Element {
 
   const routes = useMemo(
     () => [
-      {key: 'pending', title: `Pending (${pendingOrders?.length || 0})`},
-      {key: 'active', title: `Active (${activeOrders?.length || 0})`},
-      {key: 'completed', title: `Completed `},
+      { key: 'pending', title: `Pending (${pendingOrders?.length || 0})` },
+      { key: 'active', title: `Active (${activeOrders?.length || 0})` },
+      { key: 'completed', title: `Completed ` },
     ],
     [pendingOrders, activeOrders],
   );
@@ -78,14 +78,43 @@ export default function OrderScreen(): React.JSX.Element {
 
   return (
     <Box flex={1} bg={colors.white}>
+      <HStack
+        alignItems="center"
+        px={16}
+        bg={colors.white}
+        h={52}>
+        <HStack justifyContent='space-between' flex={1} gap={20}>
+          <Pressable
+            $active-opacity={0.8}
+            onPress={() => props.navigation.goBack()}>
+            <Icon as={ArrowLeftIcon} color="$black" />
+          </Pressable>
+          <Text
+            textAlign="center"
+            textTransform="capitalize"
+            color="$black"
+            fontWeight="$bold"
+            fontSize={18}>
+            All Orders
+          </Text>
+          <Text
+            textAlign="center"
+            textTransform="capitalize"
+            color="$black"
+            fontWeight="$bold"
+            fontSize={18}>
+
+          </Text>
+        </HStack>
+      </HStack>
       <TabView
-        navigationState={{index, routes}}
+        navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
-        initialLayout={{width: layout.width}}
+        initialLayout={{ width: layout.width }}
         swipeEnabled={false}
         renderTabBar={renderTabBar}
       />
-    </Box>
+    </Box >
   );
 }

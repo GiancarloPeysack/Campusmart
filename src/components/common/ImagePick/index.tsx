@@ -6,12 +6,13 @@ import {
   Text,
   View,
 } from '@gluestack-ui/themed';
-import React, {useEffect} from 'react';
-import {Alert, Image, StyleSheet} from 'react-native';
-import {launchImageLibrary, launchCamera} from 'react-native-image-picker';
+import React, { useEffect } from 'react';
+import { Image, StyleSheet } from 'react-native';
+import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 
-import {Icons} from '../../../assets/icons';
-import {useTheme} from '../../../theme/useTheme';
+import { Icons } from '../../../assets/icons';
+import { useTheme } from '../../../theme/useTheme';
+import Toast from 'react-native-toast-message';
 
 type imagePickerProps = {
   onPress: () => void;
@@ -34,9 +35,7 @@ export const ImagePick = ({
   isLoading,
   uploadImage,
 }: imagePickerProps): React.JSX.Element => {
-  const {colors} = useTheme();
-
-  console.log('imga', image)
+  const { colors } = useTheme();
 
   const pickImage = async () => {
     let result;
@@ -47,10 +46,13 @@ export const ImagePick = ({
         quality: 0.8,
       });
     } catch (error) {
-      Alert.alert(
-        'Image Unavailable',
-        'Sorry, this image cannot be used. Please choose another.',
-      );
+
+      Toast.show({
+        type: 'error',
+        text1: 'Image Unavailable',
+        text2: 'Sorry, this image cannot be used. Please choose another.',
+      });
+
       return;
     }
 
@@ -70,10 +72,11 @@ export const ImagePick = ({
         quality: 0.8,
       });
     } catch (error) {
-      Alert.alert(
-        'Image Unavailable',
-        'Sorry, this image cannot be used. Please choose another.',
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Image Unavailable',
+        text2: 'Sorry, this image cannot be used. Please choose another.',
+      });
       return;
     }
 
@@ -109,7 +112,7 @@ export const ImagePick = ({
             <Image
               width={150}
               height={150}
-              style={{borderRadius: 15}}
+              style={{ borderRadius: 15 }}
               resizeMode="cover"
               source={{
                 uri: image,
@@ -150,7 +153,7 @@ export const ImagePick = ({
         </Center>
       ) : (
         <Image
-         style={{borderRadius: 50}}
+          style={{ borderRadius: 50 }}
           width={64}
           height={64}
           resizeMode="cover"

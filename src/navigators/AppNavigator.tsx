@@ -1,11 +1,11 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
-import {StatusBar, useColorScheme} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { StatusBar, useColorScheme } from 'react-native';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-import {navigationRef} from './Root';
+import { navigationRef } from './Root';
 import OnboardingScreen from '../screens/onboarding/Onboarding';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
@@ -31,7 +31,7 @@ import {
   Pressable,
   Text,
 } from '@gluestack-ui/themed';
-import {useTheme} from '../theme/useTheme';
+import { useTheme } from '../theme/useTheme';
 import TabNavUser from './TabNavUser';
 import SetupRestScreen from '../screens/restaurent/setup-wizard/restaurent/SetupScreen';
 import SetupMenuScreen from '../screens/restaurent/setup-wizard/menu/SetupScreen';
@@ -42,19 +42,21 @@ import Startup from '../screens/Startup';
 import TabNavRest from './TabNavRest';
 import useDriver from '../screens/driver/hooks/useDriver';
 import TabNavDriver from './TabNavDriver';
+import RegisterSuccess from '../screens/auth/RegisterSuccess';
+import { EditOnboard } from '../screens/dashboard/EditOnboard/EditOnboard';
 
 //screens
 
-const {Screen, Navigator} = createStackNavigator();
+const { Screen, Navigator } = createStackNavigator();
 
 const screenOptions = {
   headerShown: false,
-  cardStyle: {backgroundColor: '#FFFFFF'},
+  cardStyle: { backgroundColor: '#FFFFFF' },
 };
 
 const Header = (props: any) => {
-  const {colors} = useTheme();
-  const {title} = props?.route?.params;
+  const { colors } = useTheme();
+  const { title } = props?.route?.params;
 
   return (
     <HStack
@@ -77,8 +79,8 @@ const Header = (props: any) => {
 };
 
 const SubHeader = (props: any) => {
-  const {colors} = useTheme();
-  const {title} = props.route.params;
+  const { colors } = useTheme();
+  const { title } = props.route.params;
 
   return (
     <HStack
@@ -104,7 +106,7 @@ const SubHeader = (props: any) => {
 };
 
 const header = (props: any) => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   return (
     <Box px={10} bg={colors.background}>
@@ -116,7 +118,7 @@ const header = (props: any) => {
 };
 
 const RestaurentStack = (): React.JSX.Element => {
-  const {isRegistrationCompleted} = useAuth();
+  const { isRegistrationCompleted } = useAuth();
 
   if (isRegistrationCompleted) {
     return (
@@ -129,7 +131,7 @@ const RestaurentStack = (): React.JSX.Element => {
       <Navigator initialRouteName="setupRest" screenOptions={screenOptions}>
         <Screen
           name="setupRest"
-          initialParams={{title: 'Restaurant Setup'}}
+          initialParams={{ title: 'Restaurant Setup' }}
           options={{
             headerShown: true,
             header: Header,
@@ -168,7 +170,7 @@ const RestaurentStack = (): React.JSX.Element => {
 };
 
 const DriverStack = (): React.JSX.Element => {
-  const {driver} = useDriver();
+  const { driver } = useDriver();
 
   if (driver?.isRegistrationCompleted) {
     return (
@@ -190,7 +192,7 @@ const DriverStack = (): React.JSX.Element => {
 function AppNavigator(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const {user, userRole} = useAuth();
+  const { user, userRole } = useAuth();
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -245,7 +247,7 @@ function AppNavigator(): React.JSX.Element {
           <Screen name="login" component={LoginScreen} />
           <Screen
             options={{
-              headerShown: true,
+              headerShown: false,
               header: header,
             }}
             name="register"
@@ -253,16 +255,25 @@ function AppNavigator(): React.JSX.Element {
           />
           <Screen
             options={{
-              headerShown: true,
+              headerShown: false,
               header: header,
             }}
             name="verify"
             component={VerifyScreen}
           />
+          <Screen name="successUser" component={RegisterSuccess} />
           <Screen name="restLogin" component={RestLoginScreen} />
           <Screen name="restReg" component={RestRegScreen} />
           <Screen name="driverLogin" component={DriverLoginScreen} />
           <Screen name="driverRegister" component={DriverRegScreen} />
+          <Screen
+            name="OnboardProfileEdit"
+            options={{
+              headerShown: false,
+
+            }}
+            component={EditOnboard}
+          />
         </Navigator>
       </NavigationContainer>
     );

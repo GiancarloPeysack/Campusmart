@@ -1,6 +1,6 @@
 import React from 'react';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
-import {createStackNavigator} from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createStackNavigator } from '@react-navigation/stack';
 import {
   ArrowLeftIcon,
   HStack,
@@ -9,8 +9,8 @@ import {
   Text,
 } from '@gluestack-ui/themed';
 
-import {Icons} from '../assets/icons';
-import {useTheme} from '../theme/useTheme';
+import { Icons } from '../assets/icons';
+import { useTheme } from '../theme/useTheme';
 import HomeScreen from '../screens/restaurent/dashboard/home/HomeScreen';
 import OrderScreen from '../screens/restaurent/dashboard/order';
 import MenuScreen from '../screens/restaurent/dashboard/menu/MenuScreen';
@@ -20,17 +20,18 @@ import CreateMenu from '../components/ui/Restaurant/CreateMenu';
 import DeliveryScreen from '../screens/restaurent/dashboard/delivery/DeliveryScreen';
 import AssignDriverScreen from '../screens/restaurent/dashboard/order/assignDriver/AssignDriverScreen';
 import StripeConnectScreen from '../screens/restaurent/dashboard/stripeConnect/StripeConnect';
+import ResSettings from '../screens/restaurent/dashboard/resSettings/ResSettings';
 
 const Tab = createBottomTabNavigator();
-const {Screen, Navigator} = createStackNavigator();
+const { Screen, Navigator } = createStackNavigator();
 
 const screenOptions = {
   headerShown: false,
 };
 
 const CommonHeader = (props: any) => {
-  const {colors} = useTheme();
-  const {title} = props.route.params;
+  const { colors } = useTheme();
+  const { title } = props.route.params;
 
   return (
     <HStack
@@ -76,7 +77,8 @@ const HomeStack = (): React.JSX.Element => {
         name="EditProfile"
         component={EditRestaurentProfile}
       />
-        <Screen name="StripeConnect" component={StripeConnectScreen} />
+      <Screen name="StripeConnect" component={StripeConnectScreen} />
+      <Screen name="ResSettings" component={ResSettings} />
     </Navigator>
   );
 };
@@ -85,7 +87,7 @@ const DeliveryStack = (): React.JSX.Element => {
   return (
     <Navigator initialRouteName="Delivery" screenOptions={screenOptions}>
       <Screen name="Delivery" component={DeliveryScreen} />
-     
+
     </Navigator>
   );
 };
@@ -93,8 +95,9 @@ const DeliveryStack = (): React.JSX.Element => {
 const OrderStack = (): React.JSX.Element => {
   return (
     <Navigator initialRouteName="Order" screenOptions={screenOptions}>
-      <Screen name="Order" component={OrderScreen} />
-       <Screen
+      <Screen name="Order"
+        component={OrderScreen} />
+      <Screen
         options={{
           headerShown: true,
           header: CommonHeader,
@@ -131,7 +134,7 @@ const MenuStack = (): React.JSX.Element => {
 };
 
 const TabNavRest = (): React.JSX.Element => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -147,7 +150,7 @@ const TabNavRest = (): React.JSX.Element => {
       }}>
       <Tab.Screen
         name="Home"
-        options={({route}) => {
+        options={({ route }) => {
           return {
             tabBarIcon: (props: any) => (
               <Icons.Home
@@ -161,7 +164,7 @@ const TabNavRest = (): React.JSX.Element => {
       />
       <Tab.Screen
         name="Orders"
-        options={({route}) => {
+        options={({ route }) => {
           return {
             tabBarIcon: (props: any) => (
               <Icons.Orders

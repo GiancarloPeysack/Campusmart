@@ -1,13 +1,13 @@
-import {Box, Center, Spinner, Text, VStack} from '@gluestack-ui/themed';
-import {Alert, ScrollView} from 'react-native';
-import {DriverOrderCard} from '../../../../../components';
-import {useTheme} from '../../../../../theme/useTheme';
+import { Box, Center, Spinner, Text, VStack } from '@gluestack-ui/themed';
+import { ScrollView } from 'react-native';
+import { DriverOrderCard } from '../../../../../components';
+import { useTheme } from '../../../../../theme/useTheme';
 import useDeliveries from '../hooks/useDeliveries';
 
 export const NewTab = () => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {deliveries, isLoading, updateDeliveryStatus} = useDeliveries();
+  const { deliveries, isLoading, updateDeliveryStatus } = useDeliveries();
 
   return (
     <Box flex={1}>
@@ -25,7 +25,7 @@ export const NewTab = () => {
         </Center>
       )}
       <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}>
         <VStack p={16}>
           {deliveries?.length > 0 ? (
@@ -38,10 +38,10 @@ export const NewTab = () => {
                   address={item.order?.deliveryAddress}
                   phoneNumber={item.user?.phoneNumber}
                   whastapp={item.user?.whatsapp}
-                  onPress={async() => {
-                 await updateDeliveryStatus('in_progress', item.id);
-                } 
-                }
+                  onPress={async () => {
+                    await updateDeliveryStatus('in_progress', item.id);
+                  }
+                  }
                   status={item.status}
                 />
               );

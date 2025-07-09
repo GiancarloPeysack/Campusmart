@@ -18,22 +18,22 @@ import {
   CheckIcon,
   Link,
 } from '@gluestack-ui/themed';
-import React, {ReactNode, useState} from 'react';
-import {useTheme} from '../../../theme/useTheme';
-import {Icons} from '../../../assets/icons';
-import {InputFiled, PrimaryButton} from '../../../components';
+import React, { ReactNode, useState } from 'react';
+import { useTheme } from '../../../theme/useTheme';
+import { Icons } from '../../../assets/icons';
+import { InputFiled, PrimaryButton } from '../../../components';
 
-import {Alert, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
-import {navigate} from '../../../navigators/Root';
+import { Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { navigate } from '../../../navigators/Root';
 
-import {useForm, Controller} from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import {yupResolver} from '@hookform/resolvers/yup';
-import {useLoading} from '../../../hooks/useLoading';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useLoading } from '../../../hooks/useLoading';
 import auth from '@react-native-firebase/auth';
-import firestore, {serverTimestamp} from '@react-native-firebase/firestore';
+import firestore, { serverTimestamp } from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
-import {handleFirebaseError} from '../../../utils/helper/error-handler';
+import { handleFirebaseError } from '../../../utils/helper/error-handler';
 
 interface Props {
   text: string;
@@ -66,17 +66,17 @@ const validation = yup.object({
     }),
 });
 
-export default function RegisterScreen(): React.JSX.Element {
-  const {colors, styles} = useTheme();
+export default function RegisterScreen(props): React.JSX.Element {
+  const { colors, styles } = useTheme();
   const [passState, setPassState] = useState(true);
 
-  const {isLoading, onLoad, onLoaded} = useLoading();
+  const { isLoading, onLoad, onLoaded } = useLoading();
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: {errors},
+    formState: { errors },
   } = useForm<FormData>({
     resolver: yupResolver(validation),
   });
@@ -84,7 +84,7 @@ export default function RegisterScreen(): React.JSX.Element {
   const onSubmit = async (data: FormData) => {
     onLoad();
     try {
-      const {email, password} = data;
+      const { email, password } = data;
 
       const register = await auth().createUserWithEmailAndPassword(
         email,
@@ -104,26 +104,39 @@ export default function RegisterScreen(): React.JSX.Element {
         profilePicture:
           'https://firebasestorage.googleapis.com/v0/b/campusmart-4a549.firebasestorage.app/o/blank-profile-picture-973460_1280.jpg?alt=media&token=2f42ae07-f42a-428c-9137-5fb35a304a0d',
         createdAt: serverTimestamp(),
+        isVerified: false
       });
 
       await firestore()
-        .collection('restaurents')
+        .collection('restaurants')
         .doc(user.uid)
         .set({
           nameOfRestaurent: data.nameOfRestaurent,
           bio: '',
           openTime: '08:00 AM',
           closeTime: '10:00 PM',
+          phoneNumber: data.phoneNumber,
+          address: data.address,
           coverImage: '',
           location: {
             lat: '',
             long: '',
           },
           createdAt: serverTimestamp(),
+        })
+        .then(() => {
+          reset();
+          navigate('verify');
+          Toast.show({
+            type: 'success',
+            text1: 'Success',
+            text2: 'Restaurent registered successfully',
+          });
         });
 
-      reset();
-      Alert.alert('Success', 'Restaurent registered successfully');
+      // reset();
+
+      // props.navigation.goBack()
     } catch (error) {
       const errorMessage = handleFirebaseError(error);
       Toast.show({
@@ -141,7 +154,7 @@ export default function RegisterScreen(): React.JSX.Element {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
       <Box flex={1} bg={colors.background}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <VStack gap={30} p={16}>
             <Center gap={6}>
               <Icons.Logo />
@@ -156,7 +169,7 @@ export default function RegisterScreen(): React.JSX.Element {
             <HStack justifyContent="space-between">
               <IconButton
                 text="Restaurant Admin"
-                onPress={() => {}}
+                onPress={() => { }}
                 isActive={true}
               />
               <IconButton
@@ -171,7 +184,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icons.Rest />}
@@ -192,7 +205,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icons.MapPin />}
@@ -213,7 +226,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icons.Call />}
@@ -234,7 +247,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icons.Uprof />}
@@ -255,7 +268,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icon as={MailIcon} color="#A3A3A3" />}
@@ -276,7 +289,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icons.CircleQuetion />}
@@ -305,7 +318,7 @@ export default function RegisterScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icons.CircleQuetion />}
@@ -402,7 +415,7 @@ export default function RegisterScreen(): React.JSX.Element {
 }
 
 const IconButton: React.FC<Props> = props => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   const border = props.isActive ? colors.primary : colors.gray1;
   const color = props.isActive ? colors.primary : colors.gray3;
@@ -413,7 +426,7 @@ const IconButton: React.FC<Props> = props => {
       borderWidth={1}
       borderColor={border}
       h={80}
-      w={160}
+      w={Dimensions.get('window').width / 2.25}
       rounded={12}
       justifyContent="center"
       px={10}

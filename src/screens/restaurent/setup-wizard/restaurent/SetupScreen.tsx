@@ -13,18 +13,19 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
-import {useTheme} from '../../../../theme/useTheme';
-import {Alert, KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
-import {navigate, navigateAndSimpleReset} from '../../../../navigators/Root';
-import {PrimaryButton} from '../../../../components';
-import {Icons} from '../../../../assets/icons';
+import { useTheme } from '../../../../theme/useTheme';
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { navigate, navigateAndSimpleReset } from '../../../../navigators/Root';
+import { PrimaryButton } from '../../../../components';
+import { Icons } from '../../../../assets/icons';
 import useMenu from '../../../../hooks/useMenu';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import {useLoading} from '../../../../hooks/useLoading';
+import { useLoading } from '../../../../hooks/useLoading';
+import Toast from 'react-native-toast-message';
 
 interface CardProps {
   count: string;
@@ -36,7 +37,7 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = props => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   return (
     <Box
@@ -95,11 +96,11 @@ const Card: React.FC<CardProps> = props => {
 };
 
 export default function SetupScreen(): React.JSX.Element {
-  const {colors, styles} = useTheme();
+  const { colors, styles } = useTheme();
 
-  const {menu} = useMenu();
+  const { menu } = useMenu();
 
-  const {isLoading, onLoad, onLoaded} = useLoading();
+  const { isLoading, onLoad, onLoaded } = useLoading();
 
   const currentUser = auth().currentUser;
 
@@ -111,8 +112,12 @@ export default function SetupScreen(): React.JSX.Element {
       });
       navigateAndSimpleReset('success');
     } catch (error) {
-      console.error('Error updating image:', error);
-      Alert.alert('Error', 'Failed to update profile picture.');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Error updating image:' + error,
+      });
+
     } finally {
       onLoaded();
     }
@@ -123,7 +128,7 @@ export default function SetupScreen(): React.JSX.Element {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
       <Box flex={1} bg={colors.background}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <Box p={16}>
             <Center gap={10} mb={34}>
               <Icons.CircleRest />
@@ -153,7 +158,7 @@ export default function SetupScreen(): React.JSX.Element {
                 caption="Finished"
                 isComplete={menu && menu.length > 0 ? true : false}
                 buttonText="Add your first menu item"
-                onPress={() => navigate('setupMenu', {title: 'Menu setup'})}
+                onPress={() => navigate('setupMenu', { title: 'Menu setup' })}
               />
             </VStack>
           </Box>

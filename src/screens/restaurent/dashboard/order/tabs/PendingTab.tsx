@@ -6,16 +6,16 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import {useTheme} from '../../../../../theme/useTheme';
-import {OrderCard} from '../../../../../components';
+import { useTheme } from '../../../../../theme/useTheme';
+import { OrderCard } from '../../../../../components';
 import useOrder from '../hooks/useOrder';
-import {useCallback} from 'react';
-import {RefreshControl} from 'react-native';
-import {useFocusEffect} from '@react-navigation/native';
+import { useCallback } from 'react';
+import { RefreshControl } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 
 export const PendingTab = () => {
-  const {colors} = useTheme();
-  const {fetchOrder, orders, isLoading, updateOrderStatus} = useOrder();
+  const { colors } = useTheme();
+  const { fetchOrder, orders, isLoading, updateOrderStatus } = useOrder();
 
   useFocusEffect(
     useCallback(() => {
@@ -47,7 +47,7 @@ export const PendingTab = () => {
       )}
 
       <ScrollView
-        contentContainerStyle={{flexGrow: 1}}
+        contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl

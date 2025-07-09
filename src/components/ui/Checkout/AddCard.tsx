@@ -1,14 +1,15 @@
-import {Box, Center, HStack, VStack} from '@gluestack-ui/themed';
-import {Image, ScrollView} from 'react-native';
+import { Box, Center, HStack, VStack } from '@gluestack-ui/themed';
+import { Image, ScrollView } from 'react-native';
 
-import {useTheme} from '../../../theme/useTheme';
-import {InputFiled, PrimaryButton} from '../../../components';
-import {Icons} from '../../../assets/icons';
+import { useTheme } from '../../../theme/useTheme';
+import { InputFiled, PrimaryButton } from '../../../components';
 import { CardField, useStripe } from '@stripe/stripe-react-native';
-import { Alert } from 'react-native';
 import { useState } from 'react';
 import axios from 'axios';
 import auth from '@react-native-firebase/auth';
+
+
+import Toast from 'react-native-toast-message';
 
 export const AddCard = () => {
   const { colors } = useTheme();
@@ -21,7 +22,12 @@ export const AddCard = () => {
 
   const handleAddCard = async () => {
     if (!cardDetails?.complete) {
-      Alert.alert('Error', 'Please enter complete card details');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Please enter complete card details',
+      });
+
       return;
     }
 
@@ -36,9 +42,19 @@ export const AddCard = () => {
       });
 
       if (error) {
-        Alert.alert('Error', error.message);
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: '' + error.message
+        });
+
       } else if (setupIntent) {
-        Alert.alert('Success', 'Card added successfully!');
+
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Card saved successfully',
+        });
 
         // Save payment method to user's account
         await axios.post('/payment-methods/save', {
@@ -47,7 +63,12 @@ export const AddCard = () => {
         });
       }
     } catch (error) {
-      Alert.alert('Error', 'Failed to add card');
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to add card',
+      });
+
     } finally {
       setLoading(false);
     }

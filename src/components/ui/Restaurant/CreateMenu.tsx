@@ -1,37 +1,17 @@
 import {
   AddIcon,
-  ArrowRightIcon,
   Box,
-  Button,
-  ButtonText,
-  Center,
-  CheckIcon,
-  ChevronDownIcon,
-  ClockIcon,
-  HelpCircleIcon,
   HStack,
   Icon,
   Input,
   InputField,
   InputSlot,
-  MailIcon,
   Pressable,
-  Select,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicator,
-  SelectDragIndicatorWrapper,
-  SelectIcon,
-  SelectInput,
-  SelectItem,
-  SelectPortal,
-  SelectTrigger,
   Switch,
   Text,
-  View,
   VStack,
 } from '@gluestack-ui/themed';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -40,26 +20,26 @@ import {
   TextInput,
 } from 'react-native';
 
-import {useTheme} from '../../../theme/useTheme';
-import {navigate} from '../../../navigators/Root';
+import { useTheme } from '../../../theme/useTheme';
 import {
   ImagePick,
   InputFiled,
   PrimaryButton,
   Selector,
 } from '../../../components';
-import {useForm, Controller} from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import {yupResolver} from '@hookform/resolvers/yup';
-import useApp from '../../../hooks/useCategory';
+import { yupResolver } from '@hookform/resolvers/yup';
+import useCategory from '../../../hooks/useCategory';
 
 import auth from '@react-native-firebase/auth';
-import firestore, {serverTimestamp} from '@react-native-firebase/firestore';
-import {useLoading} from '../../../hooks/useLoading';
-import Toast from 'react-native-toast-message';
+import firestore, { serverTimestamp } from '@react-native-firebase/firestore';
+import { useLoading } from '../../../hooks/useLoading';
 import storage from '@react-native-firebase/storage';
 import dayjs from 'dayjs';
-import {Icons} from '../../../assets/icons';
+import { Icons } from '../../../assets/icons';
+import Toast from 'react-native-toast-message';
+
 
 type FormData = {
   itemName: string;
@@ -83,22 +63,23 @@ const validation = yup.object({
 });
 
 export default function CreateMenu(): React.JSX.Element {
-  const {colors, styles} = useTheme();
+  const { colors, styles } = useTheme();
 
-  const {categories} = useApp();
+  const { categories } = useCategory();
+
 
   const [imageSource, setImageSource] = useState<string>('');
   const [image, setImage] = useState<string>('');
   const [availability, setAvailability] = useState(true);
   const [extraOptions, setExtraOptions] = useState<ExtraOption[]>([]);
 
-  const {onLoad, isLoading, onLoaded} = useLoading();
+  const { onLoad, isLoading, onLoaded } = useLoading();
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: {errors},
+    formState: { errors },
   } = useForm<FormData>({
     resolver: yupResolver(validation),
   });
@@ -121,7 +102,7 @@ export default function CreateMenu(): React.JSX.Element {
           style: 'cancel',
         },
       ],
-      {cancelable: true},
+      { cancelable: true },
     );
   };
 
@@ -148,14 +129,27 @@ export default function CreateMenu(): React.JSX.Element {
           createdAt: serverTimestamp(),
         };
 
+        console.log('s', menuData)
+
         await firestore().collection('menus').add(menuData);
 
         reset();
-        Alert.alert('Success', 'Item saved successfully.');
+
+
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Item saved successfully!',
+        });
       }
     } catch (error) {
-      console.error('Error creating category:', error);
-      Alert.alert('Error', 'Failed to create category.');
+
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to create category.'
+      });
+
     } finally {
       onLoaded();
     }
@@ -184,7 +178,7 @@ export default function CreateMenu(): React.JSX.Element {
   ) => {
     setExtraOptions(
       extraOptions.map(option =>
-        option.id === id ? {...option, [field]: value} : option,
+        option.id === id ? { ...option, [field]: value } : option,
       ),
     );
   };
@@ -194,8 +188,8 @@ export default function CreateMenu(): React.JSX.Element {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
-      <Box flex={1} bg={colors.background}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+      <Box flex={1} bg={colors.gray6}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <VStack gap={24} p={16}>
             <ImagePick
               onPress={triggerAlert}
@@ -204,7 +198,7 @@ export default function CreateMenu(): React.JSX.Element {
               setImage={setImage}
               image={image}
               type="dropzone"
-              uploadImage={() => {}}
+              uploadImage={() => { }}
             />
             <Box bg={colors.white} p={16} rounded={12}>
               <Controller
@@ -212,7 +206,7 @@ export default function CreateMenu(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue={value}
                     isRequired
@@ -235,7 +229,7 @@ export default function CreateMenu(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <Selector
                     data={categories.map((item: any) => ({
                       label: item.categoryName,
@@ -259,11 +253,11 @@ export default function CreateMenu(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue={value}
                     isRequired
-                    rightIcon={<Icons.Dollar/>}
+                    rightIcon={<Icons.Dollar />}
                     type="text"
                     label="Price"
                     placeholder="0.00"
@@ -302,7 +296,7 @@ export default function CreateMenu(): React.JSX.Element {
                     <VStack w={172} gap={4}>
                       <TextInput
                         autoCorrect={false}
-                        style={{fontSize: 14}}
+                        style={{ fontSize: 14 }}
                         placeholder="Option name"
                         value={option.name}
                         onChangeText={text =>
@@ -311,7 +305,7 @@ export default function CreateMenu(): React.JSX.Element {
                       />
                       <TextInput
                         autoCorrect={false}
-                        style={{fontSize: 12}}
+                        style={{ fontSize: 12 }}
                         placeholder="Option description (optional)"
                         value={option.description}
                         onChangeText={text =>
@@ -346,7 +340,7 @@ export default function CreateMenu(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     type="text"
                     defaultValue={value}

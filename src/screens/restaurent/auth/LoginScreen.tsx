@@ -17,21 +17,23 @@ import {
   CheckboxLabel,
   CheckIcon,
   Link,
+  ArrowLeftIcon,
 } from '@gluestack-ui/themed';
-import React, {ReactNode, useState} from 'react';
-import {useTheme} from '../../../theme/useTheme';
-import {Icons} from '../../../assets/icons';
-import {InputFiled, PrimaryButton} from '../../../components';
-import {KeyboardAvoidingView, Platform, ScrollView} from 'react-native';
-import {navigate} from '../../../navigators/Root';
+import React, { useState } from 'react';
+import { useTheme } from '../../../theme/useTheme';
+import { Icons } from '../../../assets/icons';
+import { InputFiled, PrimaryButton } from '../../../components';
+import { Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { navigate } from '../../../navigators/Root';
+import firestore from '@react-native-firebase/firestore';
 
-import {useLoading} from '../../../hooks/useLoading';
+import { useLoading } from '../../../hooks/useLoading';
 import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
-import {handleFirebaseError} from '../../../utils/helper/error-handler';
-import {useForm, Controller} from 'react-hook-form';
+import { handleFirebaseError } from '../../../utils/helper/error-handler';
+import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
-import {yupResolver} from '@hookform/resolvers/yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 interface Props {
   text: string;
@@ -40,7 +42,7 @@ interface Props {
 }
 
 const IconButton: React.FC<Props> = props => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   const border = props.isActive ? colors.primary : colors.gray1;
   const color = props.isActive ? colors.primary : colors.gray3;
@@ -51,7 +53,7 @@ const IconButton: React.FC<Props> = props => {
       borderWidth={1}
       borderColor={border}
       h={80}
-      w={160}
+      w={Dimensions.get('window').width / 2.25}
       rounded={12}
       justifyContent="center"
       px={10}
@@ -80,17 +82,17 @@ const validation = yup.object({
   password: yup.string().required(),
 });
 
-export default function LoginScreen(): React.JSX.Element {
-  const {colors, styles} = useTheme();
+export default function LoginScreen(props): React.JSX.Element {
+  const { colors, styles } = useTheme();
   const [passState, setPassState] = useState(true);
 
-  const {isLoading, onLoad, onLoaded} = useLoading();
+  const { isLoading, onLoad, onLoaded } = useLoading();
 
   const {
     control,
     handleSubmit,
     reset,
-    formState: {errors},
+    formState: { errors },
   } = useForm<FormData>({
     resolver: yupResolver(validation),
   });
@@ -98,18 +100,42 @@ export default function LoginScreen(): React.JSX.Element {
   const onSubmit = async (data: FormData) => {
     onLoad();
     try {
-      const {email, password} = data;
 
-      await auth()
-        .signInWithEmailAndPassword(email, password)
-        .then(() => {
-          reset();
-          Toast.show({
-            type: 'success',
-            text1: 'User logged.',
-            text2: 'User successfully logged in.',
-          });
+      const { email, password } = data;
+
+      const userCredential = await auth().signInWithEmailAndPassword(email, password);
+      const uid = userCredential.user.uid;
+
+      reset();
+
+      setTimeout(async () => {
+        const userDocRef = firestore().collection('users').doc(uid);
+        const userDoc = await userDocRef.get();
+
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+
+          if (userData?.accountStatus === 'deleted') {
+            await auth().signOut();
+            Toast.show({
+              type: 'error',
+              text1: 'Account Deleted',
+              text2: 'This account has been deleted.',
+            });
+            return;
+          }
+
+          if (!userData?.hasOnboarded) {
+            await userDocRef.update({ hasOnboarded: true });
+          }
+        }
+
+        Toast.show({
+          type: 'success',
+          text1: 'User logged.',
+          text2: 'User successfully logged in.',
         });
+      }, 500);
     } catch (error) {
       const errorMessage = handleFirebaseError(error);
       Toast.show({
@@ -127,9 +153,12 @@ export default function LoginScreen(): React.JSX.Element {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
       <Box flex={1} bg={colors.background}>
-        <ScrollView contentContainerStyle={{flexGrow: 1}}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+
           <VStack gap={30} p={16}>
-            <Center gap={6}>
+            <Pressable onPress={() => props.navigation.goBack()}>
+              <Icon as={ArrowLeftIcon} /></Pressable>
+            <Center gap={6} mt={20}>
               <Icons.Logo />
               <Text fontWeight="$bold" fontSize={24} color="$black">
                 Restaurant Partner Login
@@ -142,7 +171,7 @@ export default function LoginScreen(): React.JSX.Element {
             <HStack justifyContent="space-between">
               <IconButton
                 text="Restaurant Admin"
-                onPress={() => {}}
+                onPress={() => { }}
                 isActive={true}
               />
               <IconButton
@@ -157,7 +186,7 @@ export default function LoginScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icon as={MailIcon} color="#A3A3A3" />}
@@ -178,7 +207,7 @@ export default function LoginScreen(): React.JSX.Element {
                 rules={{
                   required: true,
                 }}
-                render={({field: {onChange, onBlur, value}}) => (
+                render={({ field: { onChange, onBlur, value } }) => (
                   <InputFiled
                     defaultValue=""
                     rightIcon={<Icons.CircleQuetion />}

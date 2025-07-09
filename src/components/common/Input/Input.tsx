@@ -12,7 +12,7 @@ import {
   InputSlot,
   MailIcon,
 } from '@gluestack-ui/themed';
-import {useTheme} from '../../../theme/useTheme';
+import { useTheme } from '../../../theme/useTheme';
 import { KeyboardType } from 'react-native';
 
 type InputProps = {
@@ -32,10 +32,11 @@ type InputProps = {
   isInvalid?: boolean;
   isDisabled?: boolean;
   keyboardType?: KeyboardType;
+  labelFontWeight?: number
 };
 
 export const InputFiled = (props: InputProps) => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   return (
     <FormControl
       flex={1}
@@ -45,7 +46,7 @@ export const InputFiled = (props: InputProps) => {
       isRequired={props.isRequired}>
       {props.label && (
         <FormControlLabel mb="$2">
-          <FormControlLabelText fontSize={14} fontWeight="$medium">
+          <FormControlLabelText fontSize={'$sm'} fontWeight={props.labelFontWeight ?? "$medium"}>
             {props.label}
           </FormControlLabelText>
         </FormControlLabel>
@@ -76,8 +77,8 @@ export const InputFiled = (props: InputProps) => {
         </InputSlot>
       </Input>
       <FormControlError>
-        <FormControlErrorIcon as={AlertCircleIcon} />
-        <FormControlErrorText>{props.error}</FormControlErrorText>
+        <FormControlErrorIcon as={AlertCircleIcon} color={colors.textBlue} />
+        <FormControlErrorText color={colors.textBlue}>{props.error}</FormControlErrorText>
       </FormControlError>
     </FormControl>
   );

@@ -2,7 +2,7 @@ import * as React from "react";
 import Svg, { G, Path, Defs, ClipPath } from "react-native-svg";
 
 export const Cart = (props: any) => {
-  const {color = '#9CA3AF' } = props;
+  const { color = '#9CA3AF' } = props;
 
   return (
     <Svg width={23} height={20} fill="none" {...props}>
