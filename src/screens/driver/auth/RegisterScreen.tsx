@@ -23,7 +23,7 @@ import { useTheme } from '../../../theme/useTheme';
 import { Icons } from '../../../assets/icons';
 import { InputFiled, PrimaryButton, Selector } from '../../../components';
 
-import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { navigate } from '../../../navigators/Root';
 
 import { useForm, Controller } from 'react-hook-form';
@@ -111,6 +111,7 @@ export default function RegisterScreen(): React.JSX.Element {
 
       const user = register.user;
 
+
       await firestore().collection('users').doc(user.uid).set({
         firstName: data.fullName,
         phoneNumber: data.phoneNumber,
@@ -121,7 +122,8 @@ export default function RegisterScreen(): React.JSX.Element {
         profilePicture:
           'https://firebasestorage.googleapis.com/v0/b/campusmart-4a549.firebasestorage.app/o/blank-profile-picture-973460_1280.jpg?alt=media&token=2f42ae07-f42a-428c-9137-5fb35a304a0d',
         createdAt: serverTimestamp(),
-      });
+        isVerified: false
+      })
 
       await firestore().collection('drivers').doc(user.uid).set({
         restaurentId: data.restaurentId,
@@ -129,13 +131,14 @@ export default function RegisterScreen(): React.JSX.Element {
         isRegistrationCompleted: false,
         createdAt: serverTimestamp(),
         isVerified: false
-      });
-
-      reset();
-      Toast.show({
-        type: 'success',
-        text1: 'Success',
-        text2: 'Driver registered successfully',
+      }).then(() => {
+        reset();
+        navigate('dverify');
+        Toast.show({
+          type: 'success',
+          text1: 'User registered.',
+          text2: 'User successfully registered.',
+        });
       });
 
 
@@ -406,7 +409,7 @@ const IconButton: React.FC<Props> = props => {
       borderWidth={1}
       borderColor={border}
       h={80}
-      w={160}
+      w={Dimensions.get('window').width / 2.25}
       rounded={12}
       justifyContent="center"
       px={10}

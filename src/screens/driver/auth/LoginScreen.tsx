@@ -23,7 +23,7 @@ import React, { ReactNode, useState } from 'react';
 import { useTheme } from '../../../theme/useTheme';
 import { Icons } from '../../../assets/icons';
 import { InputFiled, PrimaryButton } from '../../../components';
-import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { navigate } from '../../../navigators/Root';
 
 import { useLoading } from '../../../hooks/useLoading';
@@ -53,7 +53,7 @@ const IconButton: React.FC<Props> = props => {
       borderWidth={1}
       borderColor={border}
       h={80}
-      w={160}
+      w={Dimensions.get('window').width / 2.25}
       rounded={12}
       justifyContent="center"
       px={10}
@@ -107,7 +107,7 @@ export default function LoginScreen(props): React.JSX.Element {
       const uid = userCredential.user.uid;
 
 
-      // reset();
+      reset();
 
       setTimeout(async () => {
         const userDocRef = firestore().collection('users').doc(uid);
@@ -126,8 +126,8 @@ export default function LoginScreen(props): React.JSX.Element {
             return;
           }
 
-          if (!userData?.hasOnboarded) {
-            await userDocRef.update({ hasOnboarded: true });
+          if (!userData?.isVerified) {
+            navigate('dverify');
           }
 
         }

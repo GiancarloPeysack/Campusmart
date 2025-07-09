@@ -44,6 +44,7 @@ import useDriver from '../screens/driver/hooks/useDriver';
 import TabNavDriver from './TabNavDriver';
 import RegisterSuccess from '../screens/auth/RegisterSuccess';
 import { EditOnboard } from '../screens/dashboard/EditOnboard/EditOnboard';
+import DriverVerifyScreen from '../screens/driver/auth/DriverVerifyScreen';
 
 //screens
 
@@ -260,6 +261,14 @@ function AppNavigator(): React.JSX.Element {
             }}
             name="verify"
             component={VerifyScreen}
+          />
+          <Screen
+            options={{
+              headerShown: false,
+              header: header,
+            }}
+            name="dverify"
+            component={DriverVerifyScreen}
           />
           <Screen name="successUser" component={RegisterSuccess} />
           <Screen name="restLogin" component={RestLoginScreen} />

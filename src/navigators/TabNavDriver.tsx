@@ -8,6 +8,7 @@ import HomeScreen from '../screens/driver/dashboard/home/HomeScreen';
 import ProfileScreen from '../screens/driver/dashboard/profile/ProfileScreen';
 import MessagesScreen from '../screens/driver/dashboard/messages/MessagesScreen';
 import useAuth from '../hooks/useAuth';
+import ChatScreen from '../screens/driver/dashboard/messages/ChatScreen';
 
 const Tab = createBottomTabNavigator();
 const { Screen, Navigator } = createStackNavigator();
@@ -34,10 +35,11 @@ const MessagesStack = (): React.JSX.Element => {
   );
 };
 
-const ProfileStack = (): React.JSX.Element => {
+const MessageStack = (): React.JSX.Element => {
   return (
-    <Navigator initialRouteName="Profile" screenOptions={screenOptions}>
-      <Screen name="Profile" component={ProfileScreen} />
+    <Navigator initialRouteName="MessagesScreen" screenOptions={screenOptions}>
+      <Screen name="MessagesScreen" component={MessagesScreen} />
+      <Screen name="ChatScreen" component={ChatScreen} />
     </Navigator>
   );
 };
@@ -84,7 +86,7 @@ const TabNavDriver = (): React.JSX.Element => {
             headerShown: false,
           };
         }}
-        component={MessagesScreen}
+        component={MessageStack}
       />
       <Tab.Screen
         name="Profile"

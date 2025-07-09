@@ -1,4 +1,6 @@
 import {
+  Badge,
+  BadgeText,
   Box,
   Button,
   ButtonText,
@@ -8,16 +10,17 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import React, {useState} from 'react';
-import {ScrollView, useWindowDimensions} from 'react-native';
-import {TabView, SceneMap} from 'react-native-tab-view';
+import React, { useState } from 'react';
+import { useWindowDimensions } from 'react-native';
+import { TabView, SceneMap } from 'react-native-tab-view';
 
-import {useTheme} from '../../../../theme/useTheme';
-import {ConfirmedTab} from './tabs/ConfirmedTab';
-import {DeliveredTab} from './tabs/DeliveredTab';
-import {NewTab} from './tabs/NewTab';
-import {Icons} from '../../../../assets/icons';
+import { useTheme } from '../../../../theme/useTheme';
+import { ConfirmedTab } from './tabs/ConfirmedTab';
+import { DeliveredTab } from './tabs/DeliveredTab';
+import { NewTab } from './tabs/NewTab';
+import { Icons } from '../../../../assets/icons';
 import useAuth from '../../../../hooks/useAuth';
+import useDeliveries from './hooks/useDeliveries';
 
 const renderScene = SceneMap({
   new: NewTab,
@@ -26,15 +29,17 @@ const renderScene = SceneMap({
 });
 
 const routes = [
-  {key: 'new', title: 'New'},
-  {key: 'confirmed', title: 'Confirmed'},
-  {key: 'delivered', title: 'Delivered'},
+  { key: 'new', title: 'New' },
+  { key: 'confirmed', title: 'Confirmed' },
+  { key: 'delivered', title: 'Delivered' },
 ];
 
 export default function HomeScreen(): React.JSX.Element {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   const layout = useWindowDimensions();
   const [index, setIndex] = useState(0);
+
+  const { deliveries, inprogressDeliveries, delivered } = useDeliveries();
 
   const renderTabBar = (props: any) => {
     return (
@@ -83,15 +88,27 @@ export default function HomeScreen(): React.JSX.Element {
                   fontWeight={index === i ? '$medium' : '$normal'}>
                   {route.title}
                 </ButtonText>
+                {deliveries?.filter(i => i.status === 'pending')?.length > 0 && route.key === 'new' && <Badge style={{ position: 'absolute', top: -12, right: -10, borderRadius: 30, backgroundColor: borderColor, }}>
+                  <BadgeText style={{ color: '#fff' }}>{deliveries?.length}</BadgeText>
+                </Badge>}
+
+                {inprogressDeliveries?.length > 0 && route.key === 'confirmed' && <Badge style={{ position: 'absolute', top: -12, right: -10, borderRadius: 30, backgroundColor: borderColor, }}>
+                  <BadgeText style={{ color: '#fff' }}>{inprogressDeliveries?.length}</BadgeText>
+                </Badge>}
+
+                {delivered?.length > 0 && route.key === 'delivered' && <Badge style={{ position: 'absolute', top: -12, right: -10, borderRadius: 30, backgroundColor: borderColor, }}>
+                  <BadgeText style={{ color: '#fff' }}>{delivered?.length}</BadgeText>
+                </Badge>}
               </Button>
             </Box>
           );
-        })}
-      </HStack>
+        })
+        }
+      </HStack >
     );
   };
 
-  const {user} = useAuth();
+  const { user } = useAuth();
 
 
   return (
@@ -106,26 +123,26 @@ export default function HomeScreen(): React.JSX.Element {
             <Center flex={1}>
               <Icons.SmallBike />
             </Center>
-           
+
           </Box>
           <VStack>
             <Text fontSize={14} fontWeight="$semibold">
               {user?.firstName}
             </Text>
             <HStack alignItems='center' space='sm'>
-                 <Box w={6} h={6} rounded='$full' bg='$green400' />
-            <Text fontSize={14}>Online</Text>
+              <Box w={6} h={6} rounded='$full' bg='$green400' />
+              <Text fontSize={14}>Online</Text>
             </HStack>
           </VStack>
         </HStack>
         <SettingsIcon />
       </HStack>
       <TabView
-        style={{backgroundColor: colors.newBg}}
-        navigationState={{index, routes}}
+        style={{ backgroundColor: colors.newBg }}
+        navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
-        initialLayout={{width: layout.width}}
+        initialLayout={{ width: layout.width }}
         swipeEnabled={false}
         renderTabBar={renderTabBar}
       />

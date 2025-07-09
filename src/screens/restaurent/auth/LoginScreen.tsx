@@ -125,6 +125,12 @@ export default function LoginScreen(props): React.JSX.Element {
             return;
           }
 
+
+          if (!userData?.isVerified) {
+            navigate('verify');
+          }
+
+
           if (!userData?.hasOnboarded) {
             await userDocRef.update({ hasOnboarded: true });
           }

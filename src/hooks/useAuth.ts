@@ -18,13 +18,12 @@ export default function useAuth() {
         const unsubscribeFirestore = userRef.onSnapshot(doc => {
           if (doc.exists) {
             const data = doc.data();
-            console.log('data', data);
-            if (data?.role === 'driver') {
-              setUser(data);
-              setUserRole(data?.role);
-              setIsRegistrationCompleted(data?.isRegistrationCompleted);
-              return;
-            }
+            // if (data?.role === 'driver' && data?.isVerified) {
+            //   setUser(data);
+            //   setUserRole(data?.role);
+            //   setIsRegistrationCompleted(data?.isRegistrationCompleted);
+            //   return;
+            // }
             if (data?.isVerified && data?.hasOnboarded) {
               setUser(data);
               setUserRole(data?.role);
