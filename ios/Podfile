@@ -20,6 +20,8 @@ target 'UniMarkt' do
   use_frameworks! :linkage => :static
   $RNFirebaseAsStaticFramework = true
 
+  pod 'RNI18n', :path => '../node_modules/react-native-i18n'
+
   use_react_native!(
     :path => config[:reactNativePath],
     # An absolute path to your application root.

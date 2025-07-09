@@ -20,6 +20,8 @@ import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { useTheme } from '../../../theme/useTheme';
 import CustomBottomSheet from '../../../components/CustomBottomSheet/CustomBottomSheet';
+import PrivacyPolicyScreen from '../PrivacyPolicyScreen';
+import TermsOfServiceScreen from '../TermsOfServiceScreen';
 
 export const SettingsScreens = (): React.JSX.Element => {
   const { colors } = useTheme();
@@ -157,12 +159,10 @@ export const SettingsScreens = (): React.JSX.Element => {
       </ScrollView>
 
       <CustomBottomSheet ref={termsSheetRef} height={500}>
-        <ScrollView contentContainerStyle={{ padding: 20 }}>
-          <Text fontSize={16} fontWeight="bold" marginBottom={10}>Terms & Privacy Policy</Text>
-          <Text fontSize={14} color={colors.gray}>
-            This is where your app’s Terms and Privacy Policy content goes. You can update this content from the backend or manage it manually in future releases.
-          </Text>
-        </ScrollView>
+        <Text fontWeight="bold" fontSize="$lg" mb={12}>Terms & Privacy</Text>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <PrivacyPolicyScreen />
+          <TermsOfServiceScreen /></ScrollView>
       </CustomBottomSheet>
 
       <CustomBottomSheet ref={feedbackSheetRef}>

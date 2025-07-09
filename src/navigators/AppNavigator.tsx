@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { NavigationContainer, useIsFocused } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar, useColorScheme } from 'react-native';
 
@@ -45,6 +45,7 @@ import TabNavDriver from './TabNavDriver';
 import RegisterSuccess from '../screens/auth/RegisterSuccess';
 import { EditOnboard } from '../screens/dashboard/EditOnboard/EditOnboard';
 import DriverVerifyScreen from '../screens/driver/auth/DriverVerifyScreen';
+import I18n, { loadAppLanguage } from '../localization/i18n';
 
 //screens
 
@@ -121,9 +122,21 @@ const header = (props: any) => {
 const RestaurentStack = (): React.JSX.Element => {
   const { isRegistrationCompleted } = useAuth();
 
+  const isFocused = useIsFocused();
+
+
+  useEffect(() => {
+    const initLang = async () => {
+      await loadAppLanguage();
+    };
+
+    initLang();
+  }, [isFocused]);
+
   if (isRegistrationCompleted) {
     return (
       <Navigator initialRouteName="home" screenOptions={screenOptions}>
+
         <Screen name="home" component={TabNavRest} />
       </Navigator>
     );
@@ -191,9 +204,13 @@ const DriverStack = (): React.JSX.Element => {
 };
 
 function AppNavigator(): React.JSX.Element {
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const { user, userRole } = useAuth();
+
+
+
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -219,6 +236,7 @@ function AppNavigator(): React.JSX.Element {
             backgroundColor={backgroundStyle.backgroundColor}
             networkActivityIndicatorVisible={true}
           />
+
           <RestaurentStack />
         </NavigationContainer>
       );

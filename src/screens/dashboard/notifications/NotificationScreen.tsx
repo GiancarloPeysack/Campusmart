@@ -83,12 +83,15 @@ export default function NotificationScreen(props) {
   };
 
 
-
   useEffect(() => {
     const fetchOrdersWithRestaurants = async () => {
+      const currentUserId = auth().currentUser?.uid;
+      if (!currentUserId) return;
+
       try {
         const orderSnapshot = await firestore()
           .collection('orders')
+          .where('userId', '==', currentUserId)
           .orderBy('createdAt', 'desc')
           .get();
 
@@ -97,12 +100,10 @@ export default function NotificationScreen(props) {
           ...doc.data(),
         }));
 
-        // Get unique restaurant IDs
         const restaurantIds = [
           ...new Set(orderData.map(order => order.restaurentId)),
         ];
 
-        // Fetch restaurant details in parallel
         const restaurantDocs = await Promise.all(
           restaurantIds.map(id =>
             firestore().collection('restaurants').doc(id).get(),
@@ -116,7 +117,6 @@ export default function NotificationScreen(props) {
           }
         });
 
-        // Merge restaurant data into orders
         const enrichedOrders = orderData.map(order => ({
           ...order,
           restaurantInfo: restaurantMap[order.restaurentId],
@@ -132,6 +132,7 @@ export default function NotificationScreen(props) {
 
     fetchOrdersWithRestaurants();
   }, []);
+
 
   const getStatusLabel = (status: string) => {
     switch (status) {
@@ -151,6 +152,9 @@ export default function NotificationScreen(props) {
           onPress={() => setSelectedTab('all')}
           px={12}
           py={4}
+          height={40}
+          justifyContent='center'
+          alignItems='center'
           bg={selectedTab.toLowerCase() === 'all' ? '#2563EB' : '#F3F4F6'}
           borderRadius={20}>
           <Text
@@ -163,6 +167,9 @@ export default function NotificationScreen(props) {
           onPress={() => setSelectedTab('unread')}
           px={12}
           py={4}
+          height={40}
+          justifyContent='center'
+          alignItems='center'
           bg={selectedTab.toLowerCase() === 'unread' ? '#2563EB' : '#F3F4F6'}
           borderRadius={20}>
           <Text

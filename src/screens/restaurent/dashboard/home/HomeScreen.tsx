@@ -32,6 +32,7 @@ import { navigate } from '../../../../navigators/Root';
 import { ScrollView } from 'react-native-gesture-handler';
 import { Icons } from '../../../../assets/icons';
 import { Message } from '../../../../assets/icons/Message';
+import I18n from '../../../../localization/i18n';
 
 export default function HomeScreen(): React.JSX.Element {
   const { colors } = useTheme();
@@ -51,18 +52,6 @@ export default function HomeScreen(): React.JSX.Element {
 
 
   const [hasUnread, setHasUnread] = useState(false);
-
-  useEffect(() => {
-    // const unsubscribe = firestore()
-    //   .collection('messages')
-    //   .where('receiverId', '==', user?.uid)
-    //   .where('isRead', '==', false)
-    //   .onSnapshot(snapshot => {
-    //     setHasUnread(!snapshot.empty);
-    //   });
-
-    // return () => unsubscribe();
-  }, [user?.uid]);
 
   const handleLogout = () => {
     try {
@@ -177,10 +166,8 @@ export default function HomeScreen(): React.JSX.Element {
         </Box>
       </Box>
 
-      {/* Profile Info */}
       <ScrollView
         style={{ paddingTop: 20 }}
-        gap={12}
         borderBottomColor={colors.gray1}
         borderTopLeftRadius={20}
         borderTopRightRadius={20}
@@ -270,9 +257,8 @@ export default function HomeScreen(): React.JSX.Element {
             </Text>
           </Box>
 
-          {/* Messages */}
           <Pressable
-            onPress={() => navigate('Messages')}
+            onPress={() => navigate('MessagesScreen')}
             flexDirection="row"
             justifyContent="space-between"
             alignItems="center"

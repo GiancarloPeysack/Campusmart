@@ -12,8 +12,10 @@ type HCardProps = {
   price: string;
   discount_price: string;
   isFav?: boolean;
+  isFullWidth?: boolean
 };
 export const VCard = (props: HCardProps) => {
+  const { isFullWidth = false } = props
   const { colors } = useTheme();
 
   return (
@@ -21,7 +23,7 @@ export const VCard = (props: HCardProps) => {
       bg="$white"
       borderColor="#E5E7EB"
       borderWidth={1}
-      w={Dimensions.get('window').width / 2.25}
+      w={isFullWidth ? Dimensions.get('window').width - 25 : Dimensions.get('window').width / 2.25}
       borderRadius={12}
       overflow="hidden"
       onPress={props.onPress}>

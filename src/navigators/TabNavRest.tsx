@@ -21,6 +21,8 @@ import DeliveryScreen from '../screens/restaurent/dashboard/delivery/DeliveryScr
 import AssignDriverScreen from '../screens/restaurent/dashboard/order/assignDriver/AssignDriverScreen';
 import StripeConnectScreen from '../screens/restaurent/dashboard/stripeConnect/StripeConnect';
 import ResSettings from '../screens/restaurent/dashboard/resSettings/ResSettings';
+import MessagesScreen from '../screens/restaurent/messages/MessagesScreen';
+import ChatScreen from '../screens/restaurent/messages/ChatScreen';
 
 const Tab = createBottomTabNavigator();
 const { Screen, Navigator } = createStackNavigator();
@@ -79,6 +81,8 @@ const HomeStack = (): React.JSX.Element => {
       />
       <Screen name="StripeConnect" component={StripeConnectScreen} />
       <Screen name="ResSettings" component={ResSettings} />
+      <Screen name="MessagesScreen" component={MessagesScreen} />
+      <Screen name="ChatScreen" component={ChatScreen} />
     </Navigator>
   );
 };

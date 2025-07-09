@@ -122,6 +122,7 @@ export default function FoodScreen(): React.JSX.Element {
                   title={item.itemName}
                   description={item.description}
                   rate={4.3}
+                  isFullWidth={true}
                   discount_price={item.price}
                   price={item.price}
                   image={item.image}

@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
     Box,
     Text,
@@ -25,6 +25,12 @@ import CardIcon from '../../../../assets/images/CCard.png';
 import DeleteIcon from '../../../../assets/images/delete.png';
 import firestore from '@react-native-firebase/firestore';
 import { Alert, ScrollView, TouchableOpacity } from 'react-native';
+import PrivacyPolicyScreen from '../../../dashboard/PrivacyPolicyScreen';
+import TermsOfServiceScreen from '../../../dashboard/TermsOfServiceScreen';
+
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import I18n, { changeAppLanguage, getAppLang, loadAppLanguage } from '../../../../localization/i18n';
+
 
 export default function SettingsScreen(props) {
     const { colors } = useTheme();
@@ -33,7 +39,14 @@ export default function SettingsScreen(props) {
 
     const bottomSheetRef = useRef(null);
     const [sheetType, setSheetType] = useState(null);
-    const [selectedLanguage, setSelectedLanguage] = useState<'English' | 'German'>('English');
+    const [selectedLanguage, setSelectedLanguage] = useState<
+        'English' | 'German'
+    >('English');
+
+
+    useEffect(() => {
+        setSelectedLanguage(getAppLang() === 'en' ? 'English' : 'German')
+    }, [])
 
     useLayoutEffect(() => {
         const parent = navigation.getParent();
@@ -41,7 +54,7 @@ export default function SettingsScreen(props) {
         return () => parent?.setOptions({ tabBarStyle: undefined });
     }, [navigation]);
 
-    const openSheet = (type) => {
+    const openSheet = type => {
         setSheetType(type);
         bottomSheetRef.current?.open();
     };
@@ -60,7 +73,6 @@ export default function SettingsScreen(props) {
                     deletedAt: firestore.FieldValue.serverTimestamp(),
                 });
                 setTimeout(async () => {
-
                     await auth().signOut();
                 }, 500);
 
@@ -77,12 +89,14 @@ export default function SettingsScreen(props) {
 
         try {
             const user = auth().currentUser;
-            await firestore().collection('client_feedback').add({
-                uid: user?.uid || null,
-                email: user?.email || null,
-                feedback: feedback.trim(),
-                createdAt: firestore.FieldValue.serverTimestamp(),
-            });
+            await firestore()
+                .collection('client_feedback')
+                .add({
+                    uid: user?.uid || null,
+                    email: user?.email || null,
+                    feedback: feedback.trim(),
+                    createdAt: firestore.FieldValue.serverTimestamp(),
+                });
 
             setFeedback('');
             closeSheet('help');
@@ -95,30 +109,38 @@ export default function SettingsScreen(props) {
         }
     };
 
+
+
+    const toggleLanguage = async (lang) => {
+        await changeAppLanguage(lang);
+        setSelectedLanguage(lang === 'en' ? 'English' : 'German');
+        Toast.show({ text1: `${lang} selected` });
+        closeSheet();
+
+        await loadAppLanguage();
+        navigation.navigate('Home')
+    };
+
     const renderSheetContent = () => {
         switch (sheetType) {
             case 'language':
                 return (
                     <VStack p={20}>
-                        <Text fontWeight="bold" fontSize="$lg" mb={12}>Select Language</Text>
-                        {['English', 'German'].map((lang) => (
+                        <Text fontWeight="bold" fontSize="$lg" mb={12}>
+                            {I18n.t('Language')}
+                        </Text>
+                        {['English', 'German'].map(lang => (
                             <Pressable
                                 key={lang}
-                                onPress={() => {
-                                    setSelectedLanguage(lang);
-                                    Toast.show({ text1: `${lang} selected` });
-                                    closeSheet();
-                                }}
+                                onPress={() => toggleLanguage(lang === 'English' ? 'en' : 'de')}
                                 bg={selectedLanguage === lang ? '#E0ECFF' : 'transparent'}
                                 p={10}
                                 rounded={6}
-                                mb={6}
-                            >
+                                mb={6}>
                                 <Text
                                     fontSize="$md"
                                     color={selectedLanguage === lang ? '#2563EB' : '$black'}
-                                    fontWeight={selectedLanguage === lang ? 'bold' : 'normal'}
-                                >
+                                    fontWeight={selectedLanguage === lang ? 'bold' : 'normal'}>
                                     {lang}
                                 </Text>
                             </Pressable>
@@ -128,16 +150,22 @@ export default function SettingsScreen(props) {
             case 'payment':
                 return (
                     <VStack p={20}>
-                        <Text fontWeight="bold" fontSize="$lg" mb={12}>Payment Methods</Text>
+                        <Text fontWeight="bold" fontSize="$lg" mb={12}>
+                            {I18n.t('SetUpPayment')}
+                        </Text>
                         <Text>Integrate Stripe or show saved cards here.</Text>
                     </VStack>
                 );
             case 'help':
                 return (
                     <VStack p={20}>
-                        <Text fontWeight="bold" fontSize="$lg" mb={12}>Help Center</Text>
+                        <Text fontWeight="bold" fontSize="$lg" mb={12}>
+                            {I18n.t('HelpCenter')}
+                        </Text>
                         <ScrollView contentContainerStyle={{ padding: 20 }}>
-                            <Text fontSize={16} fontWeight="bold" marginBottom={10}>We’d love your feedback!</Text>
+                            <Text fontSize={16} fontWeight="bold" marginBottom={10}>
+                                We’d love your feedback!
+                            </Text>
                             <Input
                                 h={96}
                                 bg={colors.gray6}
@@ -146,10 +174,10 @@ export default function SettingsScreen(props) {
                                 borderWidth={1}
                                 $focus-borderColor={colors.primary}>
                                 <InputField
-                                    onChangeText={(val) => setFeedback(val)}
+                                    onChangeText={val => setFeedback(val)}
                                     multiline={true}
                                     autoCorrect={false}
-                                    autoCapitalize='none'
+                                    autoCapitalize="none"
                                     defaultValue={feedback}
                                     placeholderTextColor="#ADAEBC"
                                 />
@@ -163,35 +191,42 @@ export default function SettingsScreen(props) {
                                     height: 46,
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                    marginTop: 10
-                                }} onPress={handleSendFeedback}>
+                                    marginTop: 10,
+                                }}
+                                onPress={handleSendFeedback}>
                                 <Text style={{ color: '#fff' }}>Submit</Text>
                             </TouchableOpacity>
                         </ScrollView>
-
                     </VStack>
                 );
             case 'terms':
                 return (
-                    <VStack p={20}>
-                        <Text fontWeight="bold" fontSize="$lg" mb={12}>Terms & Privacy</Text>
-                        <Text>Display terms of use and privacy policy.</Text>
+                    <VStack p={20} marginBottom={100}>
+                        <Text fontWeight="bold" fontSize="$lg" mb={12}>
+                            {I18n.t('T_Privacy')}
+                        </Text>
+                        <ScrollView showsVerticalScrollIndicator={false}>
+                            <PrivacyPolicyScreen />
+                            <TermsOfServiceScreen />
+                        </ScrollView>
                     </VStack>
                 );
             case 'delete':
                 return (
                     <VStack p={20}>
-                        <Text fontWeight="bold" fontSize="$lg" color="red" mb={12}>Delete Account</Text>
-                        <Text mb={16}>
-                            Are you sure? This action cannot be undone.
+                        <Text fontWeight="bold" fontSize="$lg" color="red" mb={12}>
+                            <Text>{I18n.t('DeleteAccount')}</Text>
                         </Text>
+                        <Text mb={16}>Are you sure? This action cannot be undone.</Text>
                         <Pressable
                             onPress={handleDeleteAccount}
                             bg="red"
                             p={12}
                             rounded={8}
                             alignItems="center">
-                            <Text color="white" fontWeight="bold">Yes, Delete My Account</Text>
+                            <Text color="white" fontWeight="bold">
+                                Yes, Delete My Account
+                            </Text>
                         </Pressable>
                     </VStack>
                 );
@@ -206,36 +241,65 @@ export default function SettingsScreen(props) {
                 <HStack flex={1} gap={10}>
                     <Pressable mt={2} onPress={() => props.navigation.goBack()}>
                         <Icon as={ArrowLeftIcon} color="$black" />
-
                     </Pressable>
-                    <Text fontSize={18} fontWeight="$bold" color="$black">Settings</Text>
+                    <Text fontSize={18} fontWeight="$bold" color="$black">
+                        Settings
+                    </Text>
                 </HStack>
             </HStack>
 
             <VStack gap={24}>
                 {/* Account Section */}
                 <VStack>
-                    <Text color="gray" fontSize={14} mb={8}>Account</Text>
+                    <Text color="gray" fontSize={14} mb={8}>
+                        Account
+                    </Text>
                     <Box bg="#F9FAFB" p={12} rounded={12}>
-                        <Pressable onPress={() => openSheet('language')} paddingVertical={16} paddingHorizontal={4}>
+                        <Pressable
+                            onPress={() => openSheet('language')}
+                            paddingVertical={16}
+                            paddingHorizontal={4}>
                             <HStack justifyContent="space-between">
                                 <HStack>
-                                    <Image source={WorldIcon} resizeMode="contain" height={16} width={16} marginTop={3} />
-                                    <Text color={colors.gray} fontSize={14} marginLeft={10}>Language</Text>
+                                    <Image
+                                        source={WorldIcon}
+                                        resizeMode="contain"
+                                        height={16}
+                                        width={16}
+                                        marginTop={3}
+                                    />
+                                    <Text color={colors.gray} fontSize={14} marginLeft={10}>
+                                        {I18n.t('Language')}
+                                    </Text>
                                 </HStack>
                                 <HStack>
-                                    <Text color="#6B7280" fontSize={14}>{selectedLanguage}</Text>
-                                    <Icon as={ChevronRightIcon} /></HStack>
+                                    <Text color="#6B7280" fontSize={14}>
+                                        {selectedLanguage}
+                                    </Text>
+                                    <Icon as={ChevronRightIcon} />
+                                </HStack>
                             </HStack>
                         </Pressable>
-                        <Pressable onPress={() => navigation.navigate('StripeConnect')} paddingVertical={16} paddingHorizontal={4}>
+                        <Pressable
+                            onPress={() => navigation.navigate('StripeConnect')}
+                            paddingVertical={16}
+                            paddingHorizontal={4}>
                             <HStack justifyContent="space-between">
                                 <HStack>
-                                    <Image source={CardIcon} resizeMode="contain" height={16} width={16} marginTop={3} />
-                                    <Text color={colors.gray} fontSize={14} marginLeft={10}>Setup Payment</Text>
+                                    <Image
+                                        source={CardIcon}
+                                        resizeMode="contain"
+                                        height={16}
+                                        width={16}
+                                        marginTop={3}
+                                    />
+                                    <Text color={colors.gray} fontSize={14} marginLeft={10}>
+                                        {I18n.t('SetUpPayment')}
+                                    </Text>
                                 </HStack>
                                 <HStack>
-                                    <Icon as={ChevronRightIcon} /></HStack>
+                                    <Icon as={ChevronRightIcon} />
+                                </HStack>
                             </HStack>
                         </Pressable>
                     </Box>
@@ -243,22 +307,46 @@ export default function SettingsScreen(props) {
 
                 {/* Support Section */}
                 <VStack>
-                    <Text color="gray" fontSize={14} mb={8}>Support</Text>
+                    <Text color="gray" fontSize={14} mb={8}>
+                        Support
+                    </Text>
                     <Box bg="#F9FAFB" p={12} rounded={12}>
-                        <Pressable onPress={() => openSheet('help')} paddingVertical={16} paddingHorizontal={4}>
+                        <Pressable
+                            onPress={() => openSheet('help')}
+                            paddingVertical={16}
+                            paddingHorizontal={4}>
                             <HStack justifyContent="space-between">
                                 <HStack>
-                                    <Image source={InfoIcon} resizeMode="contain" height={16} width={16} marginTop={3} />
-                                    <Text color={colors.gray} fontSize={14} marginLeft={10}>Help Center</Text>
+                                    <Image
+                                        source={InfoIcon}
+                                        resizeMode="contain"
+                                        height={16}
+                                        width={16}
+                                        marginTop={3}
+                                    />
+                                    <Text color={colors.gray} fontSize={14} marginLeft={10}>
+                                        {I18n.t('HelpCenter')}
+                                    </Text>
                                 </HStack>
                                 <Icon as={ChevronRightIcon} />
                             </HStack>
                         </Pressable>
-                        <Pressable onPress={() => openSheet('terms')} paddingVertical={16} paddingHorizontal={4}>
+                        <Pressable
+                            onPress={() => openSheet('terms')}
+                            paddingVertical={16}
+                            paddingHorizontal={4}>
                             <HStack justifyContent="space-between">
                                 <HStack>
-                                    <Image source={DocIcon} resizeMode="contain" height={16} width={16} marginTop={3} />
-                                    <Text color={colors.gray} fontSize={14} marginLeft={10}>Terms & Privacy Policy</Text>
+                                    <Image
+                                        source={DocIcon}
+                                        resizeMode="contain"
+                                        height={16}
+                                        width={16}
+                                        marginTop={3}
+                                    />
+                                    <Text color={colors.gray} fontSize={14} marginLeft={10}>
+                                        {I18n.t('T_Privacy')}
+                                    </Text>
                                 </HStack>
                                 <Icon as={ChevronRightIcon} />
                             </HStack>
@@ -266,12 +354,22 @@ export default function SettingsScreen(props) {
                     </Box>
                 </VStack>
 
-
-                <Pressable onPress={() => openSheet('delete')} paddingVertical={10} paddingHorizontal={4}>
+                <Pressable
+                    onPress={() => openSheet('delete')}
+                    paddingVertical={10}
+                    paddingHorizontal={4}>
                     <HStack p={12} justifyContent="space-between">
                         <HStack>
-                            <Image source={DeleteIcon} resizeMode="contain" height={16} width={16} marginTop={3} />
-                            <Text color={colors.gray} fontSize={14} marginLeft={10}>Delete Account</Text>
+                            <Image
+                                source={DeleteIcon}
+                                resizeMode="contain"
+                                height={16}
+                                width={16}
+                                marginTop={3}
+                            />
+                            <Text color={colors.gray} fontSize={14} marginLeft={10}>
+                                {I18n.t('DeleteAccount')}
+                            </Text>
                         </HStack>
                         <Icon as={ChevronRightIcon} />
                     </HStack>
@@ -279,12 +377,16 @@ export default function SettingsScreen(props) {
 
                 {/* Version */}
                 <Center>
-                    <Text color="#9CA3AF" fontSize={14}>Version 1.0</Text>
+                    <Text color="#9CA3AF" fontSize={14}>
+                        Version 1.0
+                    </Text>
                 </Center>
             </VStack>
 
             {/* Bottom Sheet */}
-            <CustomBottomSheet ref={bottomSheetRef}>
+            <CustomBottomSheet
+                ref={bottomSheetRef}
+                height={sheetType === 'terms' ? 800 : 500}>
                 {renderSheetContent()}
             </CustomBottomSheet>
         </Box>

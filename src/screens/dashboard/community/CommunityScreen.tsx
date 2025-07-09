@@ -1,8 +1,7 @@
-// CommunityScreen.js
+// CommunityScreen.tsx
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ScrollView,
-  TextInput,
   Image,
   Pressable,
   Dimensions,
@@ -15,8 +14,6 @@ import {
   Button,
   ButtonText,
   View,
-  Input,
-  Icon,
   FavouriteIcon,
 } from '@gluestack-ui/themed';
 import { navigate } from '../../../navigators/Root';
@@ -50,12 +47,20 @@ export default function CommunityScreen() {
               .get();
             const userData = userDoc.exists ? userDoc.data() : {};
 
+            const commentsSnapshot = await firestore()
+              .collection('community_posts')
+              .doc(doc.id)
+              .collection('comments')
+              .get();
+
             return {
               id: doc.id,
               ...data,
-              fullName: `${userData.firstName || ''} ${userData.lastName || ''
-                }`,
+              fullName: `${userData.firstName || ''} ${userData.lastName || ''}`,
               userAvatar: userData.profilePicture || '',
+              commentsCount: commentsSnapshot.size,
+              likes: data?.likes || 0,
+              likesBy: data?.likesBy || [],
             };
           }),
         );
@@ -103,35 +108,34 @@ export default function CommunityScreen() {
             px={4}
             py={4}
             alignItems="center"
-            // justifyContent='center'
             flex={1}
           >
-            <Pressable onPress={() => navigate('CreatePost', { postType: selectedTab })} style={{ height: 44 }}>
-              <TextInput
-                placeholder={selectedTab?.toLowerCase() === 'sales' ? "What are you looking for/selling?" : selectedTab?.toLowerCase() === 'housing' ? "Looking for a room or offering one?" : "Start a conversation"}
-                style={{ marginLeft: 10, }}
-                editable={false}
-              />
+            <Pressable style={{ height: 44, justifyContent: 'center', alignItems: 'center' }} onPress={() => navigate('CreatePost', { postType: selectedTab })}>
+              <Text style={{ marginLeft: 10, fontSize: 14, color: '#a0a0a0' }}>
+                {selectedTab?.toLowerCase() === 'sales'
+                  ? "What are you looking for/selling?"
+                  : selectedTab?.toLowerCase() === 'housing'
+                    ? "Looking for a room or offering one?"
+                    : "Start a conversation"}
+              </Text>
             </Pressable>
           </HStack>
         </HStack>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={{ marginTop: 20 }}>
-          {posts.filter(i => i.postTags?.toLowerCase() === selectedTab?.toLowerCase())?.length === 0 && (
+        <ScrollView showsVerticalScrollIndicator={false} style={{ marginTop: 20 }}>
+          {posts.filter(i => i.postTags?.toLowerCase() === selectedTab.toLowerCase()).length === 0 && (
             <VStack justifyContent="center" alignItems="center" h={400}>
-              <Text fontSize={16} fontWeight={'400'} color={'#a7a7a7'}>no posts</Text>
+              <Text fontSize={16} fontWeight={'400'} color={'#a7a7a7'}>No posts</Text>
             </VStack>
           )}
           {posts
-            .filter(i => i.postTags?.toLowerCase() === selectedTab?.toLowerCase())
+            .filter(i => i.postTags?.toLowerCase() === selectedTab.toLowerCase())
             .map(post => (
               <PostItem
                 key={post.id}
                 post={post}
-                currentUser={user}
                 currentUserId={currentUserId}
+                currentUser={user}
               />
             ))}
         </ScrollView>
@@ -144,15 +148,15 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(post.likes || 0);
   const [comments, setComments] = useState([]);
-  const [commentText, setCommentText] = useState([]);
+  const [commentText, setCommentText] = useState('');
   const bottomSheetRef = useRef();
 
   useEffect(() => {
     setLiked(post.likesBy?.includes(currentUserId) || false);
   }, [post.likesBy]);
 
-  useEffect(() => {
-    const unsubscribe = firestore()
+  const fetchComments = () => {
+    firestore()
       .collection('community_posts')
       .doc(post.id)
       .collection('comments')
@@ -160,9 +164,12 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
       .onSnapshot(snapshot => {
         setComments(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
       });
+  };
 
-    return () => unsubscribe();
-  }, []);
+  const openComments = () => {
+    bottomSheetRef.current?.open();
+    fetchComments();
+  };
 
   const toggleLike = async () => {
     const postRef = firestore().collection('community_posts').doc(post.id);
@@ -179,14 +186,9 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
         : firestore.FieldValue.arrayRemove(currentUserId),
     });
   };
+
   const postComment = async () => {
     if (!commentText.trim()) return;
-
-    const userDoc = await firestore()
-      .collection('users')
-      .doc(currentUserId)
-      .get();
-    const userData = userDoc.exists ? userDoc.data() : {};
 
     await firestore()
       .collection('community_posts')
@@ -194,9 +196,8 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
       .collection('comments')
       .add({
         userId: currentUserId,
-        userName: `${userData.firstName || ''} ${userData.lastName || ''
-          }`.trim(),
-        userAvatar: userData.profilePicture || '',
+        userName: `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim(),
+        userAvatar: currentUser.profilePicture || '',
         text: commentText.trim(),
         createdAt: firestore.FieldValue.serverTimestamp(),
       });
@@ -280,28 +281,25 @@ const PostItem = ({ post, currentUserId, currentUser }: any) => {
             </Text>
           </HStack>
         </Pressable>
-        <Pressable onPress={() => bottomSheetRef.current.open()}>
-          <Text fontSize={16}>💬 {comments.length}</Text>
+        <Pressable onPress={openComments}>
+          <Text fontSize={16}>💬 {post.commentsCount || 0}</Text>
         </Pressable>
       </HStack>
 
       <CustomBottomSheet ref={bottomSheetRef}>
         <ScrollView>
-          {comments?.map(comment => (
+          {comments.map(comment => (
             <CommentItem
+              key={comment.id}
               commentId={comment.id}
               postId={post.id}
-              avatar={
-                comment?.userAvatar ||
-                'https://plus.unsplash.com/premium_photo-1683121366070-5ceb7e007a97?fm=jpg&q=60&w=3000'
-              }
-              name={comment?.userName || 'Alex'}
-              comment={comment?.text || 'This is a comment'}
+              avatar={comment.userAvatar}
+              name={comment.userName}
+              comment={comment.text}
               time={comment.createdAt}
-              // likes={comment?.likedBy?.length || 0}
               currentUser={{
                 uid: currentUserId,
-                name: currentUser.firstName + ' ' + currentUser.lastName,
+                name: `${currentUser.firstName} ${currentUser.lastName}`,
                 avatar: currentUser.profilePicture,
               }}
             />
