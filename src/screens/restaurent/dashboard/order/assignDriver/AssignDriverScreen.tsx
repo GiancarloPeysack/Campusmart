@@ -100,7 +100,7 @@ export default function AssignDriverScreen({ route }: any) {
         </HStack>
         <Divider />
         <HStack alignItems="center" gap={8}>
-          <Icons.MapPin color="#2563EB" h={16} w={16} />
+          <Icons.MapPin fill="red" h={16} w={16} />
           <Text flex={1} fontWeight={300}>
             {order.address}
           </Text>

@@ -10,10 +10,10 @@ import {
   View,
   VStack,
 } from '@gluestack-ui/themed';
-import {Icons} from '../../../assets/icons';
-import {ViewProps} from 'react-native';
-import {MapPin} from '../../../assets/icons/MapPin';
-import {formatRelativeTime} from '../../../utils/helper/time';
+import { Icons } from '../../../assets/icons';
+import { ViewProps } from 'react-native';
+import { MapPin } from '../../../assets/icons/MapPin';
+import { formatRelativeTime } from '../../../utils/helper/time';
 import { Timestamp } from '@react-native-firebase/firestore';
 
 type Items = {
@@ -31,7 +31,7 @@ type Props = ViewProps & {
   phoneNumber: string;
   whatsappNumber: string;
   total: string;
-  onPress?: any
+  onPress?: any;
 };
 
 export const OrderCard = ({
@@ -43,20 +43,35 @@ export const OrderCard = ({
   phoneNumber,
   whatsappNumber,
   total,
-  onPress
+  onPress,
 }: Props) => {
   return (
     <View bg="$white" p={17} rounded={12}>
       <HStack justifyContent="space-between">
         <HStack alignItems="center" gap={10}>
-          <Icons.DineIn />
+          <Icons.DineIn
+            bgColor={
+              status === 'pending'
+                ? '#DBEAFE'
+                : status === 'accepted'
+                  ? '#FEF9C3'
+                  : '#DBEAFE'
+            }
+            color={status === 'pending'
+              ? '#2563EB'
+              : status === 'accepted'
+                ? '#CA8A04'
+                : '#2563EB'}
+          />
           <VStack gap={8}>
             <Text color="#000" fontWeight={600}>
               #{orderNumber}
             </Text>
             <HStack alignItems="center" gap={8}>
               <ClockIcon w={14} h={14} />
-              <Text fontSize={14}>{formatRelativeTime(createdAt?.toDate())}</Text>
+              <Text fontSize={14}>
+                {formatRelativeTime(createdAt?.toDate())}
+              </Text>
             </HStack>
           </VStack>
         </HStack>
@@ -65,12 +80,12 @@ export const OrderCard = ({
             status === 'pending'
               ? '#FFEDD5'
               : status === 'accepted'
-              ? '#FEF9C3'
-              : '#DCFCE7'
+                ? '#FEF9C3'
+                : '#DCFCE7'
           }
           px={12}
           py={4}
-          alignSelf='flex-start'
+          alignSelf="flex-start"
           rounded={24}>
           <Text
             textTransform="capitalize"
@@ -80,10 +95,10 @@ export const OrderCard = ({
               status === 'pending'
                 ? '#EA580C'
                 : status === 'accepted'
-                ? '#A16207'
-                : '#16A34A'
+                  ? '#A16207'
+                  : '#16A34A'
             }>
-            {status ==='accepted' ? 'Ready to Assign' : status}
+            {status === 'accepted' ? 'Ready to Assign' : status}
           </Text>
         </Box>
       </HStack>
@@ -125,8 +140,8 @@ export const OrderCard = ({
         </VStack>
         {status === 'pending' || status === 'accepted' ? (
           <Button
-          rounded={8}
-          onPress={onPress}
+            rounded={8}
+            onPress={onPress}
             $active-opacity={0.8}
             h={36}
             px={10}
@@ -135,10 +150,8 @@ export const OrderCard = ({
               {status === 'pending' ? 'Accept Order' : 'Assign a Driver'}
             </ButtonText>
           </Button>
-        ) : (
-          // <Text color="#16A34A">Waiting for Driver Response</Text>
-          null
-        )}
+        ) : // <Text color="#16A34A">Waiting for Driver Response</Text>
+          null}
       </HStack>
     </View>
   );

@@ -14,9 +14,17 @@ export default function useAuth() {
       setLoading(true);
       if (firebaseUser) {
         const userRef = firestore().collection('users').doc(firebaseUser.uid);
+
         const unsubscribeFirestore = userRef.onSnapshot(doc => {
           if (doc.exists) {
             const data = doc.data();
+            console.log('data', data);
+            if (data?.role === 'driver') {
+              setUser(data);
+              setUserRole(data?.role);
+              setIsRegistrationCompleted(data?.isRegistrationCompleted);
+              return;
+            }
             if (data?.isVerified && data?.hasOnboarded) {
               setUser(data);
               setUserRole(data?.role);

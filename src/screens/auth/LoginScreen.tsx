@@ -100,6 +100,12 @@ export default function LoginScreen(): React.JSX.Element {
 
         // Optional: reset form
         reset();
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Login Failed!',
+          text2: 'User does not exists',
+        });
       }
 
     } catch (error) {

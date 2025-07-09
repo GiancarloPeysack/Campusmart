@@ -19,11 +19,12 @@ import {
   SelectPortal,
   SelectTrigger,
 } from '@gluestack-ui/themed';
-import {useTheme} from '../../theme/useTheme';
+import { useTheme } from '../../theme/useTheme';
+import { ScrollView } from 'react-native';
 
 type item = {
-    label: string;
-    value: string
+  label: string;
+  value: string
 }
 
 type InputProps = {
@@ -32,7 +33,7 @@ type InputProps = {
   error?: string;
   onBlur?: () => void;
   value?: string | number;
-  onValueChange?: (value: string)=> any;
+  onValueChange?: (value: string) => any;
   isRequired?: boolean;
   isInvalid?: boolean;
   isDisabled?: boolean;
@@ -40,7 +41,7 @@ type InputProps = {
 };
 
 export const Selector = (props: InputProps) => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
   return (
     <FormControl
       flex={1}
@@ -75,9 +76,10 @@ export const Selector = (props: InputProps) => {
             <SelectDragIndicatorWrapper>
               <SelectDragIndicator />
             </SelectDragIndicatorWrapper>
-            {props.data.map((item, index)=>(
+            <ScrollView style={{ width: '100%' }}>
+              {props.data.map((item, index) => (
                 <SelectItem key={index} label={item.label} value={item.value} />
-            ))}
+              ))}</ScrollView>
           </SelectContent>
         </SelectPortal>
       </Select>

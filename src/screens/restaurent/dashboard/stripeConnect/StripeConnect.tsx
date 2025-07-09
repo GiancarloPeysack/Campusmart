@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   Linking,
   ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import axios, { AxiosError } from 'axios';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
+import { ArrowLeftIcon, Icon } from '@gluestack-ui/themed';
 
 
 type StripeStatus = 'not_connected' | 'pending' | 'verified';
@@ -152,6 +154,7 @@ const StripeConnectScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
+      <Pressable style={{ position: 'absolute', top: 20, left: 20 }} onPress={() => navigation.goBack()}><Icon as={ArrowLeftIcon} /></Pressable>
       <Text style={styles.title}>Connect Your Stripe Account</Text>
       <Text style={styles.subtitle}>
         To receive payments, link your Stripe account (takes 2 minutes)

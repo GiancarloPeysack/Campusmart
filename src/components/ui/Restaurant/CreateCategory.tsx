@@ -9,7 +9,7 @@ import firestore from '@react-native-firebase/firestore';
 import { useLoading } from '../../../hooks/useLoading';
 import Toast from 'react-native-toast-message';
 
-export default function CreateCategory(): React.JSX.Element {
+export default function CreateCategory(props): React.JSX.Element {
   const { colors, styles } = useTheme();
 
   const { isLoading, onLoad, onLoaded } = useLoading();
@@ -69,7 +69,7 @@ export default function CreateCategory(): React.JSX.Element {
               labelFontWeight={300}
             />
           </HStack>
-          <VStack bg={colors.background} p={10}>
+          <VStack bg={colors.background} p={10} mt={12}>
             <Text>Popular Categories</Text>
             <HStack space={'sm'} p={2} flexWrap='wrap' justifyContent={'flex-start'} mt={10}>
               {['Burgers', 'Pizza', 'Sandwiches', 'Salads', 'Hot Dogs', 'Sides', 'Drinks', 'Desserts'].map((item, index) => {
@@ -103,6 +103,7 @@ export default function CreateCategory(): React.JSX.Element {
               width="50%"
               borderColor={colors.gray1}
               variant="outlined"
+              onPress={() => props.navigation.goBack()}
             />
             <PrimaryButton
               onPress={createCategory}

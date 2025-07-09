@@ -3,19 +3,17 @@ import {
   Button,
   ButtonText,
   Center,
-  ChevronRightIcon,
   ClockIcon,
   EditIcon,
   HStack,
   Icon,
   Pressable,
-  SettingsIcon,
   Spinner,
   Text,
   View,
   VStack,
 } from '@gluestack-ui/themed';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Alert, Image, StyleSheet } from 'react-native';
 import { useTheme } from '../../../../theme/useTheme';
 
@@ -29,9 +27,6 @@ import storage from '@react-native-firebase/storage';
 import { useLoading } from '../../../../hooks/useLoading';
 import useRestaurent from '../../../../hooks/useRestaurent';
 import { navigate } from '../../../../navigators/Root';
-import { ScrollView } from 'react-native-gesture-handler';
-import { Icons } from '../../../../assets/icons';
-import { Message } from '../../../../assets/icons/Message';
 
 export default function HomeScreen(): React.JSX.Element {
   const { colors } = useTheme();
@@ -49,26 +44,12 @@ export default function HomeScreen(): React.JSX.Element {
     fetchRestaurent,
   } = useRestaurent();
 
-
-  const [hasUnread, setHasUnread] = useState(false);
-
-  useEffect(() => {
-    // const unsubscribe = firestore()
-    //   .collection('messages')
-    //   .where('receiverId', '==', user?.uid)
-    //   .where('isRead', '==', false)
-    //   .onSnapshot(snapshot => {
-    //     setHasUnread(!snapshot.empty);
-    //   });
-
-    // return () => unsubscribe();
-  }, [user?.uid]);
-
   const handleLogout = () => {
     try {
       Alert.alert('Logout', 'Are you sure you want to logout?', [
         {
           text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
         { text: 'OK', onPress: async () => await auth().signOut() },
@@ -127,6 +108,7 @@ export default function HomeScreen(): React.JSX.Element {
         });
         fetchRestaurent();
       } catch (error) {
+
         Toast.show({
           type: 'error',
           text1: 'Error',
@@ -142,14 +124,16 @@ export default function HomeScreen(): React.JSX.Element {
   return (
     <Box flex={1} bg={colors.white}>
       <Box position="relative">
-        {/* {restaurent?.coverImage && ( */}
-        <Image
-          height={220}
-          resizeMode="cover"
-          source={{ uri: restaurent?.coverImage }}
-          alt="cover"
-        />
-        {/* )} */}
+        {restaurent && (
+          <Image
+            height={200}
+            resizeMode="cover"
+            source={{
+              uri: restaurent?.coverImage,
+            }}
+            alt="cover"
+          />
+        )}
         {(isLoading || isLoadingData) && (
           <Center
             zIndex={999}
@@ -176,28 +160,23 @@ export default function HomeScreen(): React.JSX.Element {
           />
         </Box>
       </Box>
-
-      {/* Profile Info */}
-      <ScrollView
-        style={{ paddingTop: 20 }}
-        gap={12}
-        borderBottomColor={colors.gray1}
-        borderTopLeftRadius={20}
-        borderTopRightRadius={20}
-        backgroundColor='#fff'
-        top={-20}
-        borderBottomWidth={1}
-        showsVerticalScrollIndicator={false}>
-        <Box>
-          <HStack justifyContent="space-between" paddingHorizontal={5}>
+      <Box flex={1}>
+        <Box
+          p={16}
+          gap={12}
+          borderBottomColor={colors.gray1}
+          borderBottomWidth={1}>
+          <HStack justifyContent="space-between">
             <HStack alignItems="center" gap={12}>
               <Image
                 height={48}
                 width={48}
-                borderRadius={100}
+                // style={{borderRadius: '100%'}}
                 resizeMode="cover"
-                source={{ uri: user?.profilePicture }}
-                alt="profile"
+                source={{
+                  uri: user?.profilePicture,
+                }}
+                alt="cover"
               />
               <VStack gap={6}>
                 <Text color="$black" fontWeight="$bold" fontSize={18}>
@@ -205,18 +184,18 @@ export default function HomeScreen(): React.JSX.Element {
                 </Text>
                 <HStack alignItems="center" gap={8}>
                   <Box w={8} h={8} rounded="$full" bg="#22C55E" />
-                  <Text color={colors.gray5} fontSize={14}>
-                    Open until {restaurent?.closeTime}
+                  <Text color={colors.gray5} fontSize={14} fontWeight="$light">
+                    Open until {restaurent && restaurent.closeTime}
                   </Text>
                 </HStack>
               </VStack>
             </HStack>
-            <Pressable onPress={() => navigate('EditProfile')}>
+            <Pressable
+              onPress={() => navigate('EditProfile', { title: 'Edit Profile' })}>
               <Icon as={EditIcon} color={colors.primary} w={20} h={20} />
             </Pressable>
           </HStack>
-
-          <HStack gap={8} paddingVertical={10} paddingHorizontal={10}>
+          <HStack gap={8}>
             <Box
               h={32}
               rounded={8}
@@ -226,8 +205,8 @@ export default function HomeScreen(): React.JSX.Element {
               gap={5}
               bg={colors.light_blue}>
               <Icon as={ClockIcon} color={colors.primary} w={14} h={14} />
-              <Text color={colors.primary} fontSize={14}>
-                From: {restaurent?.openTime}
+              <Text color={colors.primary} fontSize={14} fontWeight="$light">
+                From: {restaurent && restaurent.openTime}
               </Text>
             </Box>
             <Box
@@ -239,109 +218,47 @@ export default function HomeScreen(): React.JSX.Element {
               gap={5}
               bg={colors.light_blue}>
               <Icon as={ClockIcon} color={colors.primary} w={14} h={14} />
-              <Text color={colors.primary} fontSize={14}>
-                Until: {restaurent?.closeTime}
+              <Text color={colors.primary} fontSize={14} fontWeight="$light">
+                Until: {restaurent && restaurent.closeTime}
               </Text>
             </Box>
           </HStack>
         </Box>
-
         <VStack p={16} flex={1} gap={20}>
           <Box
             bg={colors.white}
             borderWidth={1}
             borderColor="#F3F4F6"
             rounded={12}
-            p={17}
-            gap={8}>
-            <HStack justifyContent="space-between" alignItems="center">
-              <Text color={colors.title} fontSize={16} fontWeight="$medium">
-                Restaurant Bio
-              </Text>
-              <Pressable
-                onPress={() => navigate('EditBio', { bio: restaurent?.bio })}>
-                <Text color={colors.primary} fontSize={14}>
-                  Edit
-                </Text>
-              </Pressable>
-            </HStack>
+            gap={8}
+            p={17}>
+            <Text color={colors.title} fontSize={16} fontWeight="$medium">
+              Restaurant Bio
+            </Text>
             <Text color={colors.title} fontSize={14} fontWeight="$light">
-              {restaurent?.bio || 'Welcome to our restaurant!'}
+              {(restaurent && restaurent.bio) || '{ Placeholder } '}
             </Text>
           </Box>
+          <PrimaryButton
+            variant="secondry"
+            text="Restaurent Wallet"
+            onPress={() => navigate('StripeConnect')}
+          />
 
-          {/* Messages */}
-          <Pressable
-            onPress={() => navigate('Messages')}
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="center"
-            py={12}
-            borderBottomWidth={1}
-            borderColor="#E5E7EB">
-            <HStack alignItems="center" space="md">
-              <Icon as={Icons.Message} />
-              <Text fontSize={16} fontWeight="medium">
-                Messages
-              </Text>
-              {hasUnread && <Box w={8} h={8} bg="$red500" rounded="$full" ml={6} />}
-            </HStack>
-
-            <Icon as={ChevronRightIcon} />
-          </Pressable>
-
-          <Pressable
-            onPress={() => navigate('ResSettings')}
-            flexDirection="row"
-            justifyContent="space-between"
-            alignItems="center"
-            py={12}
-            borderBottomWidth={1}
-            borderColor="#E5E7EB">
-            <HStack alignItems="center" space="md">
-              <Icon as={SettingsIcon} />
-              <Text fontSize={16} fontWeight="medium">
-                Settings
-              </Text>
-            </HStack>
-
-            <Icon as={ChevronRightIcon} />
-          </Pressable>
-
-          {restaurent?.stripeStatus === 'verified' && restaurent?.stripeAccountId ?
-            <PrimaryButton
-              variant="secondry"
-              text="Stripe Connected"
-              onPress={() => navigate('StripeConnect')}
-              disabled={true}
-            />
-            : restaurent?.stripeStatus === 'pending' && restaurent?.stripeAccountId ?
-              <PrimaryButton
-                variant="secondry"
-                text="Stripe Acccount Waiting Approval "
-                onPress={() => navigate('StripeConnect')}
-                disabled={true}
-              />
-              :
-              <PrimaryButton
-                variant="secondry"
-                text="Restaurent Wallet"
-                onPress={() => navigate('StripeConnect')}
-              />}
         </VStack>
         <Box p={16}>
-          <Button rounded={8} onPress={handleLogout} bg="$red500" size="md">
+          <Button rounded={8} onPress={handleLogout} bg='$red500' size="md">
             <ButtonText>Logout</ButtonText>
           </Button>
         </Box>
-      </ScrollView >
-    </Box >
+      </Box>
+    </Box>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)', // Dark overlay with 40% opacity
   },
 });

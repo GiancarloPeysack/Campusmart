@@ -128,6 +128,7 @@ export default function RegisterScreen(): React.JSX.Element {
         isAvailable: false,
         isRegistrationCompleted: false,
         createdAt: serverTimestamp(),
+        isVerified: false
       });
 
       reset();

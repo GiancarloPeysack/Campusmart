@@ -17,8 +17,9 @@ import {
   CheckboxLabel,
   CheckIcon,
   Link,
+  ArrowLeftIcon,
 } from '@gluestack-ui/themed';
-import React, { ReactNode, useState } from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '../../../theme/useTheme';
 import { Icons } from '../../../assets/icons';
 import { InputFiled, PrimaryButton } from '../../../components';
@@ -81,7 +82,7 @@ const validation = yup.object({
   password: yup.string().required(),
 });
 
-export default function LoginScreen(): React.JSX.Element {
+export default function LoginScreen(props): React.JSX.Element {
   const { colors, styles } = useTheme();
   const [passState, setPassState] = useState(true);
 
@@ -114,6 +115,16 @@ export default function LoginScreen(): React.JSX.Element {
         if (userDoc.exists) {
           const userData = userDoc.data();
 
+          if (userData?.accountStatus === 'deleted') {
+            await auth().signOut();
+            Toast.show({
+              type: 'error',
+              text1: 'Account Deleted',
+              text2: 'This account has been deleted.',
+            });
+            return;
+          }
+
           if (!userData?.hasOnboarded) {
             await userDocRef.update({ hasOnboarded: true });
           }
@@ -143,8 +154,11 @@ export default function LoginScreen(): React.JSX.Element {
       style={styles.flex}>
       <Box flex={1} bg={colors.background}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+
           <VStack gap={30} p={16}>
-            <Center gap={6} mt={40}>
+            <Pressable onPress={() => props.navigation.goBack()}>
+              <Icon as={ArrowLeftIcon} /></Pressable>
+            <Center gap={6} mt={20}>
               <Icons.Logo />
               <Text fontWeight="$bold" fontSize={24} color="$black">
                 Restaurant Partner Login

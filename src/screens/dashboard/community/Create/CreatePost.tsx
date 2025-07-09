@@ -33,6 +33,7 @@ import {
 import Toast from 'react-native-toast-message';
 
 export default function CreatePost(props) {
+    // const { postType } = props?.route?.params
     const { colors } = useTheme();
     const { user } = useAuth();
     const tagOptions = ['Sales', 'Chat', 'Housing'];
@@ -40,7 +41,7 @@ export default function CreatePost(props) {
     const [description, setDescription] = useState('');
     const [images, setImages] = useState<string[]>([]);
     const [isPosting, setIsPosting] = useState(false);
-    const [selectedTag, setSelectedTag] = useState('Sales');
+    const [selectedTag, setSelectedTag] = useState(props?.route?.params?.postType ?? 'Sales');
     const [tagModalVisible, setTagModalVisible] = useState(false);
 
     const requestCameraPermission = async () => {

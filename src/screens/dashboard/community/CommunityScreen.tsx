@@ -103,11 +103,13 @@ export default function CommunityScreen() {
             px={4}
             py={4}
             alignItems="center"
-            flex={1}>
-            <Pressable onPress={() => navigate('CreatePost')}>
+            // justifyContent='center'
+            flex={1}
+          >
+            <Pressable onPress={() => navigate('CreatePost', { postType: selectedTab })} style={{ height: 44 }}>
               <TextInput
                 placeholder={selectedTab?.toLowerCase() === 'sales' ? "What are you looking for/selling?" : selectedTab?.toLowerCase() === 'housing' ? "Looking for a room or offering one?" : "Start a conversation"}
-                style={{ marginLeft: 10, flex: 1 }}
+                style={{ marginLeft: 10, }}
                 editable={false}
               />
             </Pressable>

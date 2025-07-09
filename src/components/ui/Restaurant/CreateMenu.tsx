@@ -30,7 +30,7 @@ import {
 import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import useApp from '../../../hooks/useCategory';
+import useCategory from '../../../hooks/useCategory';
 
 import auth from '@react-native-firebase/auth';
 import firestore, { serverTimestamp } from '@react-native-firebase/firestore';
@@ -65,7 +65,8 @@ const validation = yup.object({
 export default function CreateMenu(): React.JSX.Element {
   const { colors, styles } = useTheme();
 
-  const { categories } = useApp();
+  const { categories } = useCategory();
+
 
   const [imageSource, setImageSource] = useState<string>('');
   const [image, setImage] = useState<string>('');
@@ -128,6 +129,8 @@ export default function CreateMenu(): React.JSX.Element {
           createdAt: serverTimestamp(),
         };
 
+        console.log('s', menuData)
+
         await firestore().collection('menus').add(menuData);
 
         reset();
@@ -185,7 +188,7 @@ export default function CreateMenu(): React.JSX.Element {
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.flex}>
-      <Box flex={1} bg={colors.background}>
+      <Box flex={1} bg={colors.gray6}>
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           <VStack gap={24} p={16}>
             <ImagePick
