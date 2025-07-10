@@ -35,6 +35,7 @@ import firestore, { serverTimestamp } from '@react-native-firebase/firestore';
 import Toast from 'react-native-toast-message';
 import { handleFirebaseError } from '../../../utils/helper/error-handler';
 import useRestaurent from '../../../hooks/useRestaurent';
+import I18n from '../../../localization/i18n';
 
 interface Props {
   text: string;
@@ -164,21 +165,21 @@ export default function RegisterScreen(): React.JSX.Element {
             <Center gap={6}>
               <Icons.Logo />
               <Text fontWeight="$bold" fontSize={24} color="$black">
-                Create Account
+                {I18n.t('Create_Account')}
               </Text>
               <Text fontSize={16} color={colors.gray} fontWeight="$light">
-                Join our delivery team
+                {I18n.t('Join_Team')}
               </Text>
             </Center>
 
             <HStack justifyContent="space-between">
               <IconButton
-                text="Restaurant Admin"
+                text={I18n.t('Restaurant_Admin')}
                 onPress={() => navigate('restReg')}
                 isActive={false}
               />
               <IconButton
-                text="Delivery Staff"
+                text={I18n.t('Delivery_Staff')}
                 onPress={() => { }}
                 isActive={true}
               />
@@ -194,7 +195,7 @@ export default function RegisterScreen(): React.JSX.Element {
                     data={rests}
                     placeholder="Select your restaurant"
                     isRequired
-                    label="Select Restaurant"
+                    label={I18n.t('Select_Restaurant')}
                     onBlur={onBlur}
                     onValueChange={onChange}
                     isInvalid={errors.restaurentId ? true : false}
@@ -214,7 +215,7 @@ export default function RegisterScreen(): React.JSX.Element {
                     defaultValue=""
                     rightIcon={<Icons.Call />}
                     type="text"
-                    label="Phone Number"
+                    label={I18n.t('Phone_Number')}
                     placeholder="+1 (555) 000-0000"
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -235,7 +236,7 @@ export default function RegisterScreen(): React.JSX.Element {
                     defaultValue=""
                     rightIcon={<Icons.Uprof />}
                     type="text"
-                    label="Full Name"
+                    label={I18n.t('Full_Name')}
                     placeholder="Your full name"
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -256,7 +257,7 @@ export default function RegisterScreen(): React.JSX.Element {
                     defaultValue=""
                     rightIcon={<Icon as={MailIcon} color="#A3A3A3" />}
                     type="text"
-                    label="Emaill address"
+                    label={I18n.t('Email')}
                     placeholder="jhone@email.com"
                     onBlur={onBlur}
                     onChangeText={onChange}
@@ -283,7 +284,7 @@ export default function RegisterScreen(): React.JSX.Element {
                       />
                     }
                     type={passState ? 'password' : 'text'}
-                    label="Password"
+                    label={I18n.t('Password')}
                     placeholder="••••••••"
                     onPressIcon={() => setPassState(!passState)}
                     onBlur={onBlur}
@@ -312,7 +313,7 @@ export default function RegisterScreen(): React.JSX.Element {
                       />
                     }
                     type={passState ? 'password' : 'text'}
-                    label="Confirm Password"
+                    label={I18n.t('Confirm_Password')}
                     placeholder="••••••••"
                     onPressIcon={() => setPassState(!passState)}
                     onBlur={onBlur}
@@ -344,7 +345,7 @@ export default function RegisterScreen(): React.JSX.Element {
                     ml={5}
                     color={colors.title}
                     fontWeight="$light">
-                    I agree to the
+                    {I18n.t('Agree_To')}
                   </CheckboxLabel>
                 </Checkbox>
                 <Link>
@@ -352,7 +353,7 @@ export default function RegisterScreen(): React.JSX.Element {
                     color={colors.primary}
                     fontSize={14}
                     fontWeight="$light">
-                    Terms & Conditions
+                    {I18n.t('Terms_Conditions')}
                   </Text>
                 </Link>
               </HStack>

@@ -53,19 +53,6 @@ export default function HomeScreen(): React.JSX.Element {
 
   const [hasUnread, setHasUnread] = useState(false);
 
-  const handleLogout = () => {
-    try {
-      Alert.alert('Logout', 'Are you sure you want to logout?', [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        { text: 'OK', onPress: async () => await auth().signOut() },
-      ]);
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
 
   const triggerAlert = () => {
     Alert.alert(
@@ -193,14 +180,14 @@ export default function HomeScreen(): React.JSX.Element {
                 <HStack alignItems="center" gap={8}>
                   <Box w={8} h={8} rounded="$full" bg="#22C55E" />
                   <Text color={colors.gray5} fontSize={14}>
-                    Open until {restaurent?.closeTime}
+                    {I18n.t('Open_Until')} {restaurent?.closeTime}
                   </Text>
                 </HStack>
               </VStack>
             </HStack>
-            <Pressable onPress={() => navigate('EditProfile')}>
+            {/* <Pressable onPress={() => navigate('EditProfile')}>
               <Icon as={EditIcon} color={colors.primary} w={20} h={20} />
-            </Pressable>
+            </Pressable> */}
           </HStack>
 
           <HStack gap={8} paddingVertical={10} paddingHorizontal={10}>
@@ -214,7 +201,7 @@ export default function HomeScreen(): React.JSX.Element {
               bg={colors.light_blue}>
               <Icon as={ClockIcon} color={colors.primary} w={14} h={14} />
               <Text color={colors.primary} fontSize={14}>
-                From: {restaurent?.openTime}
+                {I18n.t('From')}: {restaurent?.openTime}
               </Text>
             </Box>
             <Box
@@ -227,7 +214,7 @@ export default function HomeScreen(): React.JSX.Element {
               bg={colors.light_blue}>
               <Icon as={ClockIcon} color={colors.primary} w={14} h={14} />
               <Text color={colors.primary} fontSize={14}>
-                Until: {restaurent?.closeTime}
+                {I18n.t('Until')}: {restaurent?.closeTime}
               </Text>
             </Box>
           </HStack>
@@ -243,14 +230,14 @@ export default function HomeScreen(): React.JSX.Element {
             gap={8}>
             <HStack justifyContent="space-between" alignItems="center">
               <Text color={colors.title} fontSize={16} fontWeight="$medium">
-                Restaurant Bio
+                {I18n.t('Restaurant_Bio')}
               </Text>
-              <Pressable
+              {/* <Pressable
                 onPress={() => navigate('EditBio', { bio: restaurent?.bio })}>
                 <Text color={colors.primary} fontSize={14}>
                   Edit
                 </Text>
-              </Pressable>
+              </Pressable> */}
             </HStack>
             <Text color={colors.title} fontSize={14} fontWeight="$light">
               {restaurent?.bio || 'Welcome to our restaurant!'}
@@ -268,7 +255,7 @@ export default function HomeScreen(): React.JSX.Element {
             <HStack alignItems="center" space="md">
               <Icon as={Icons.Message} />
               <Text fontSize={16} fontWeight="medium">
-                Messages
+                {I18n.t('Messages')}
               </Text>
               {hasUnread && <Box w={8} h={8} bg="$red500" rounded="$full" ml={6} />}
             </HStack>
@@ -287,7 +274,7 @@ export default function HomeScreen(): React.JSX.Element {
             <HStack alignItems="center" space="md">
               <Icon as={SettingsIcon} />
               <Text fontSize={16} fontWeight="medium">
-                Settings
+                {I18n.t('Settings')}
               </Text>
             </HStack>
 
@@ -315,11 +302,6 @@ export default function HomeScreen(): React.JSX.Element {
                 onPress={() => navigate('StripeConnect')}
               />}
         </VStack>
-        <Box p={16}>
-          <Button rounded={8} onPress={handleLogout} bg="$red500" size="md">
-            <ButtonText>Logout</ButtonText>
-          </Button>
-        </Box>
       </ScrollView >
     </Box >
   );

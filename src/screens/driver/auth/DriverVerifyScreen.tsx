@@ -84,10 +84,10 @@ export default function DriverVerifyScreen(): React.JSX.Element {
       await firestore().collection('drivers').doc(currentUser?.uid).update({
         isVerified: true,
       });
-      // setTimeout(() => {
-      //   navigate('successUser');
+      setTimeout(() => {
+        navigate('onboarding');
 
-      // }, 500);
+      }, 500);
     } else {
       Toast.show({
         type: 'error',

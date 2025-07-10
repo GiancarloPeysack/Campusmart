@@ -4,8 +4,7 @@ const admin = require('firebase-admin');
 const express = require('express');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const bodyParser = require('body-parser');
-const sgMail = require('@sendgrid/mail');
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+const nodemailer = require('nodemailer');
 
 admin.initializeApp({
   credential: admin.credential.cert(
@@ -76,19 +75,29 @@ app.post('/send-otp', async (req, res) => {
     return res.status(400).json({error: 'Email and OTP are required'});
   }
 
-  const msg = {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: `"Campusmart" <${process.env.FROM_EMAIL}>`,
     to: email,
-    from: process.env.FROM_EMAIL,
     subject: 'Your OTP Code',
     text: `Your OTP code is: ${otp}`,
     html: `<strong>Your OTP code is: ${otp}</strong>`,
   };
 
   try {
-    await sgMail.send(msg);
+    await transporter.sendMail(mailOptions);
     res.json({success: true, message: 'OTP sent successfully'});
   } catch (error) {
-    console.error('SendGrid error:', error.response?.body || error.message);
+    console.error('Nodemailer error:', error);
     res.status(500).json({error: 'Failed to send OTP'});
   }
 });

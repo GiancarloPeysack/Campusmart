@@ -12,6 +12,8 @@ import {
     ChevronRightIcon,
     Input,
     InputField,
+    Button,
+    ButtonText,
 } from '@gluestack-ui/themed';
 import auth from '@react-native-firebase/auth';
 import Toast from 'react-native-toast-message';
@@ -81,6 +83,21 @@ export default function SettingsScreen(props) {
         } catch (error) {
             console.error('Soft delete failed:', error);
             Alert.alert('Error', 'Something went wrong.');
+        }
+    };
+
+
+    const handleLogout = () => {
+        try {
+            Alert.alert('Logout', 'Are you sure you want to logout?', [
+                {
+                    text: 'Cancel',
+                    style: 'cancel',
+                },
+                { text: 'OK', onPress: async () => await auth().signOut() },
+            ]);
+        } catch (error) {
+            console.error('Error signing out:', error);
         }
     };
 
@@ -243,7 +260,7 @@ export default function SettingsScreen(props) {
                         <Icon as={ArrowLeftIcon} color="$black" />
                     </Pressable>
                     <Text fontSize={18} fontWeight="$bold" color="$black">
-                        Settings
+                        {I18n.t('Settings')}
                     </Text>
                 </HStack>
             </HStack>
@@ -374,6 +391,13 @@ export default function SettingsScreen(props) {
                         <Icon as={ChevronRightIcon} />
                     </HStack>
                 </Pressable>
+
+
+                <Box p={16}>
+                    <Button rounded={8} onPress={handleLogout} bg="$red500" size="md">
+                        <ButtonText>{I18n.t('Sign_Out')}</ButtonText>
+                    </Button>
+                </Box>
 
                 {/* Version */}
                 <Center>

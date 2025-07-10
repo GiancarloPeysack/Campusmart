@@ -34,6 +34,7 @@ import { useForm, Controller } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import firestore from '@react-native-firebase/firestore';
+import I18n from '../../../localization/i18n';
 
 interface Props {
   text: string;
@@ -163,21 +164,18 @@ export default function LoginScreen(props): React.JSX.Element {
             <Center gap={6}>
               <Icons.Logo />
               <Text fontWeight="$bold" fontSize={24} color="$black">
-                Delivery Staff Login
-              </Text>
-              <Text fontSize={16} color={colors.gray} fontWeight="$light">
-                Access your delivery dashboard
+                {I18n.t('Login_Deliver_Staff')}
               </Text>
             </Center>
 
             <HStack justifyContent="space-between">
               <IconButton
-                text="Restaurant Admin"
+                text={I18n.t('Restaurant_Admin')}
                 onPress={() => navigate('restLogin')}
                 isActive={false}
               />
               <IconButton
-                text="Delivery Staff"
+                text={I18n.t('Delivery_Staff')}
                 onPress={() => { }}
                 isActive={true}
               />
@@ -252,7 +250,7 @@ export default function LoginScreen(props): React.JSX.Element {
                     ml={5}
                     color={colors.title}
                     fontWeight="$light">
-                    Remember me
+                    {I18n.t('Remember_Me')}
                   </CheckboxLabel>
                 </Checkbox>
                 <Link>
@@ -260,40 +258,41 @@ export default function LoginScreen(props): React.JSX.Element {
                     color={colors.primary}
                     fontSize={14}
                     fontWeight="$light">
-                    Forgot password?
+                    {I18n.t('Forgot_Password')}
                   </Text>
                 </Link>
               </HStack>
             </VStack>
             <PrimaryButton
-              text="Sign In"
+              text={I18n.t('Sign_In')}
               isLoading={isLoading}
               onPress={handleSubmit(onSubmit)}
             />
             <Center gap={10}>
               <HStack gap={5}>
                 <Text color={colors.title} fontSize={14} fontWeight="$light">
-                  New restaurant partner?
+                  {I18n.t('New_Res_Partner')}
                 </Text>
                 <Pressable onPress={() => navigate('driverRegister')}>
                   <Text
                     fontWeight="$light"
                     fontSize={14}
                     color={colors.primary}>
-                    Register here
+                    {I18n.t('Reg_Here')}
                   </Text>
                 </Pressable>
               </HStack>
               <HStack gap={5}>
                 <Text color={colors.title} fontSize={14} fontWeight="$light">
-                  Need help?
+
+                  {I18n.t('New_Help')}
                 </Text>
                 <Pressable onPress={() => navigate('register')}>
                   <Text
                     fontSize={14}
                     fontWeight="$light"
                     color={colors.primary}>
-                    Contact Support
+                    {I18n.t('Contact_Support')}
                   </Text>
                 </Pressable>
               </HStack>

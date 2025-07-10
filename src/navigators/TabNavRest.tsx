@@ -23,6 +23,7 @@ import StripeConnectScreen from '../screens/restaurent/dashboard/stripeConnect/S
 import ResSettings from '../screens/restaurent/dashboard/resSettings/ResSettings';
 import MessagesScreen from '../screens/restaurent/messages/MessagesScreen';
 import ChatScreen from '../screens/restaurent/messages/ChatScreen';
+import I18n from '../localization/i18n';
 
 const Tab = createBottomTabNavigator();
 const { Screen, Navigator } = createStackNavigator();
@@ -141,7 +142,7 @@ const TabNavRest = (): React.JSX.Element => {
   const { colors } = useTheme();
   return (
     <Tab.Navigator
-      initialRouteName="Home"
+      initialRouteName={I18n.t('Home')}
       screenOptions={{
         ...screenOptions,
         tabBarShowLabel: true,
@@ -153,7 +154,7 @@ const TabNavRest = (): React.JSX.Element => {
         },
       }}>
       <Tab.Screen
-        name="Home"
+        name={I18n.t('Home')}
         options={({ route }) => {
           return {
             tabBarIcon: (props: any) => (
@@ -167,7 +168,7 @@ const TabNavRest = (): React.JSX.Element => {
         component={HomeStack}
       />
       <Tab.Screen
-        name="Orders"
+        name={I18n.t('Orders')}
         options={({ route }) => {
           return {
             tabBarIcon: (props: any) => (
@@ -181,7 +182,7 @@ const TabNavRest = (): React.JSX.Element => {
         component={OrderStack}
       />
       <Tab.Screen
-        name="Delivery"
+        name={I18n.t('Delivery')}
         options={{
           tabBarIcon: (props: any) => (
             <Icons.Truck
@@ -192,7 +193,7 @@ const TabNavRest = (): React.JSX.Element => {
         component={DeliveryStack}
       />
       <Tab.Screen
-        name="Menu"
+        name={I18n.t('Menu')}
         options={{
           tabBarIcon: (props: any) => (
             <Icons.Food color={props.focused ? colors.primary : colors.gray3} />

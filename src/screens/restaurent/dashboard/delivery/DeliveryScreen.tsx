@@ -1,4 +1,4 @@
-import {ScrollView} from 'react-native';
+import { ScrollView } from 'react-native';
 import React from 'react';
 import {
   Box,
@@ -9,18 +9,19 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed';
-import {useTheme} from '../../../../theme/useTheme';
-import {Icons} from '../../../../assets/icons';
-import {DriverCard} from '../../../../components';
+import { useTheme } from '../../../../theme/useTheme';
+import { Icons } from '../../../../assets/icons';
+import { DriverCard } from '../../../../components';
 import useDriver from './hooks/useDriver';
+import I18n from '../../../../localization/i18n';
 
 export default function DeliveryScreen(): React.JSX.Element {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
-  const {newApplicants, isLoading, activeDrivers, updateDriverRequest} = useDriver();
+  const { newApplicants, isLoading, activeDrivers, updateDriverRequest } = useDriver();
 
 
-  const handleApplicant = async (status: boolean, id: string) =>{
+  const handleApplicant = async (status: boolean, id: string) => {
     await updateDriverRequest(status, id)
   }
 
@@ -41,7 +42,7 @@ export default function DeliveryScreen(): React.JSX.Element {
       )}
       <HStack p={10} alignItems="center" justifyContent="space-between">
         <Text color="$black" fontWeight="$bold" fontSize={20}>
-          Delivery Staff
+          {I18n.t('Delivery_Staff')}
         </Text>
         <Pressable
           rounded="$full"
@@ -56,8 +57,8 @@ export default function DeliveryScreen(): React.JSX.Element {
       </HStack>
 
       <ScrollView
-        style={{backgroundColor: colors.newBg}}
-        contentContainerStyle={{flexGrow: 1}}>
+        style={{ backgroundColor: colors.newBg }}
+        contentContainerStyle={{ flexGrow: 1 }}>
         <VStack p={16} flex={1} gap={20}>
           {activeDrivers?.length > 0 && (
             <VStack gap={20}>
@@ -106,8 +107,8 @@ export default function DeliveryScreen(): React.JSX.Element {
                       createdAt={item.createdAt}
                       status="pending"
                       newApplicant={true}
-                      onPressAccept={()=> handleApplicant(true, item.id)}
-                      onPressDecline={()=> handleApplicant(false, item.id)}
+                      onPressAccept={() => handleApplicant(true, item.id)}
+                      onPressDecline={() => handleApplicant(false, item.id)}
                     />
                   );
                 })}

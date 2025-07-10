@@ -9,6 +9,7 @@ import { PendingTab } from './tabs/PendingTab';
 import { CompletedTab } from './tabs/CompletedTab';
 import useOrder from './hooks/useOrder';
 import { useFocusEffect } from '@react-navigation/native';
+import I18n from '../../../../localization/i18n';
 
 const renderScene = SceneMap({
   pending: PendingTab,
@@ -36,9 +37,9 @@ export default function OrderScreen(props): React.JSX.Element {
 
   const routes = useMemo(
     () => [
-      { key: 'pending', title: `Pending (${pendingOrders?.length || 0})` },
-      { key: 'active', title: `Active (${activeOrders?.length || 0})` },
-      { key: 'completed', title: `Completed ` },
+      { key: 'pending', title: `${I18n.t('Pending')} (${pendingOrders?.length || 0})` },
+      { key: 'active', title: `${I18n.t('Active')} (${activeOrders?.length || 0})` },
+      { key: 'completed', title: `${I18n.t('Completed')} ` },
     ],
     [pendingOrders, activeOrders],
   );
@@ -95,7 +96,7 @@ export default function OrderScreen(props): React.JSX.Element {
             color="$black"
             fontWeight="$bold"
             fontSize={18}>
-            All Orders
+            {I18n.t('All_Orders')}
           </Text>
           <Text
             textAlign="center"

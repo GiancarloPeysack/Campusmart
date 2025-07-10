@@ -12,7 +12,7 @@ I18n.translations = {
 };
 
 // Default fallback
-I18n.locale = 'en';
+I18n.locale = 'de';
 
 // Load saved language from AsyncStorage
 export const loadAppLanguage = async () => {
